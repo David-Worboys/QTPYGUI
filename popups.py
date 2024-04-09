@@ -727,7 +727,7 @@ class PopOKCancelApply(PopOKCancel):
         """
         if self.buttons is None:
             self.buttons = (
-                Button(text="&Ok", tag="ok",callback=self.event_handler),
+                Button(text="&Ok", tag="ok", callback=self.event_handler),
                 Button(text="&Cancel", tag="cancel", callback=self.cancel_callback),
                 Button(text="&Apply", tag="apply", callback=self.apply_callback),
             )
@@ -972,7 +972,7 @@ class PopYesNo(PopMessage):
         if self.buttons is None:
             self.buttons = (
                 Button(text="&Yes", tag="yes", callback=self.event_handler),
-                Button(text="&No", tag="no",callback=self.event_handler),
+                Button(text="&No", tag="no", callback=self.event_handler),
             )
         super().__post_init__()
 
