@@ -52,7 +52,7 @@ import PySide6.QtWidgets as qtW
 import shiboken6  # type: ignore
 from attrs import define
 
-#import popups
+import popups
 import utils
 from file_utils import App_Path
 from langtran import Lang_Tran
@@ -6456,7 +6456,7 @@ class _Dialog(qtW.QDialog):
             self.exec()  # Blocks
             while g_application.app_get.processEvents():
                 time.sleep(0.05)
-
+        print(f"DBG > {self._result=}")
         return self._result
 
 
@@ -15387,7 +15387,7 @@ class Video_Player(qtM.QMediaPlayer):
         elif playback_state == qtM.QMediaPlayer.PlaybackState.StoppedState:
             return "stop"
 
-    def set_source(self, input_file: str, frame_rate: float) -> None:
+    def set_source(self, input_file: str, frame_rate: float) -> str:
         """Sets the source file and frame rate for the media player.
 
         This method sets the source of the media player to the provided input file
@@ -15397,6 +15397,9 @@ class Video_Player(qtM.QMediaPlayer):
         Args:
             input_file (str): The source file of the media player.
             frame_rate (float): The frame rate of the media player.
+
+        Returns:
+                str: An error message if the source file is not supported, otherwise an empty string.    
 
         """
 
@@ -15419,21 +15422,15 @@ class Video_Player(qtM.QMediaPlayer):
                 try:
                     self.setSource(qtC.QUrl.fromLocalFile(input_file))
 
-                    return None
+                    return ""
 
                 except Exception as e:  # Do not expect this to be called
                     print(
                         f"Error ({e=}) on load of {input_file}. Attempt {attempt} of 3 - Retrying..."
                     )
 
-            # If all retries fail, display the error message
-            popups.PopError(
-                title="Video File Error...",
-                message="Video File Is Not Supported!",
-            ).show()
-
-        return None
-
+        return "Video File Is Not Supported!"
+        
     def _duration_changed(self, duration: int) -> None:
         """Handles a video duration change
 
