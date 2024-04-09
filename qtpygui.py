@@ -52,7 +52,6 @@ import PySide6.QtWidgets as qtW
 import shiboken6  # type: ignore
 from attrs import define
 
-import popups
 import utils
 from file_utils import App_Path
 from langtran import Lang_Tran
@@ -2405,7 +2404,7 @@ class _qtpyBase_Control(_qtpyBase):
                 case Image():
                     self._widget = _Image(parent)
                 case Label():
-                    self._widget = qtW.QLabel(self.text.replace("\00", ""), parent)                    
+                    self._widget = qtW.QLabel(self.text.replace("\00", ""), parent)
                 case LCD():
                     self._widget = qtW.QLCDNumber(parent)
                     self._widget.setStyleSheet(Align_SS_Text[self.txt_align])
@@ -6456,7 +6455,7 @@ class _Dialog(qtW.QDialog):
             self.exec()  # Blocks
             while g_application.app_get.processEvents():
                 time.sleep(0.05)
-        print(f"DBG > {self._result=}")
+
         return self._result
 
 
@@ -11887,7 +11886,7 @@ class Label(_qtpyBase_Control):
             QWidget : The label widget or the container housing it.
         """
         # self.width = utils.amper_length(self.text.strip())
-        
+
         if self.height <= 0:
             self.height = LINEEDIT_SIZE.height
 
@@ -15399,7 +15398,7 @@ class Video_Player(qtM.QMediaPlayer):
             frame_rate (float): The frame rate of the media player.
 
         Returns:
-                str: An error message if the source file is not supported, otherwise an empty string.    
+                str: An error message if the source file is not supported, otherwise an empty string.
 
         """
 
@@ -15430,7 +15429,7 @@ class Video_Player(qtM.QMediaPlayer):
                     )
 
         return "Video File Is Not Supported!"
-        
+
     def _duration_changed(self, duration: int) -> None:
         """Handles a video duration change
 
