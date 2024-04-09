@@ -52,7 +52,7 @@ import PySide6.QtWidgets as qtW
 import shiboken6  # type: ignore
 from attrs import define
 
-import popups
+#import popups
 import utils
 from file_utils import App_Path
 from langtran import Lang_Tran
@@ -2405,7 +2405,7 @@ class _qtpyBase_Control(_qtpyBase):
                 case Image():
                     self._widget = _Image(parent)
                 case Label():
-                    self._widget = qtW.QLabel(self.text.replace("\00", ""), parent)
+                    self._widget = qtW.QLabel(self.text.replace("\00", ""), parent)                    
                 case LCD():
                     self._widget = qtW.QLCDNumber(parent)
                     self._widget.setStyleSheet(Align_SS_Text[self.txt_align])
@@ -11887,7 +11887,7 @@ class Label(_qtpyBase_Control):
             QWidget : The label widget or the container housing it.
         """
         # self.width = utils.amper_length(self.text.strip())
-
+        
         if self.height <= 0:
             self.height = LINEEDIT_SIZE.height
 
@@ -11897,6 +11897,8 @@ class Label(_qtpyBase_Control):
         widget = super()._create_widget(
             parent_app=parent_app, parent=parent, container_tag=container_tag
         )
+
+        self._widget.setAlignment(self.txt_align.value)
 
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")

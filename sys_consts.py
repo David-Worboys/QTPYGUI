@@ -60,6 +60,11 @@ SDELIM = (  # Used to delimit strings - particularly non-translatable sections o
     "||"
 )
 
+# Database Setting Keys
+APP_LANG_DBK: Final[str] = "app_lang"  # All qtgui apps
+APP_COUNTRY_DBK: Final[str] = "app_country"  # All qtgui apps
+
+
 class SPECIAL_PATH(utils.strEnum):
     """Contains enums for strings that represent special paths on the user's computer"""
 
