@@ -331,7 +331,7 @@ class Sys_Events(IntEnum):
     BADINPUT = 4  #: The input is not valid
     ACTIVATED = 5  #: The widget has been activated
     CHANGED = 6  #: The widget has changed
-    CLEAR_TYPING_BUFFER = 7  # A Grid widget has is about to cleat the type buffer
+    CLEAR_TYPING_BUFFER = 7  # A Grid widget is about to clear the type buffer
     CLICKED = 8  #: The widget has been clicked
     COLLAPSED = 9  #: A node has been collapsed
     CLOSED = 10  #: The widget has been closed
@@ -2210,7 +2210,7 @@ class _qtpyBase_Control(_qtpyBase):
         Returns:
             qtW.QWidget : The QT GUI widget.
         """
-        if self._widget is None:
+        if not isinstance(self, (Menu, _Menu_Entry)) and self._widget is None:
             raise RuntimeError(
                 f"{self.container_tag=} {self.tag=} {self._widget=}. Widget not created"
                 " yet!"
@@ -2239,29 +2239,81 @@ class _qtpyBase_Control(_qtpyBase):
               Nuitka 1.8.4  Seems to have addressed the issue (And nope after a long session finally locked)
 
         Args:
+
             event (Sys_Events): Event to install
             signal (str): Signal to connect the event handler to
             use_lambda (bool): True use lambda , False use functools.partial.
         """
 
+        def get_signal_metamethod(
+            widget: qtC.QObject, signal: str
+        ) -> qtC.QMetaMethod | None:
+            """
+            A function to retrieve the QMetaMethod for a given signal of a QObject widget.
+            Introduced with PySide6 6.7.0 as can no longer do signal.disconnect() without ensuring connected first
+
+            Parameters:
+                widget (qtC.QObject): The QObject widget to retrieve the signal QMetaMethod from.
+                signal (str): The name of the signal to retrieve the QMetaMethod for.
+
+            Returns:
+                qtC.QMetaMethod | None: The QMetaMethod corresponding to the signal if found, else None.
+            """
+
+            meta_object = widget.metaObject()
+
+            for method_index in range(meta_object.methodCount()):
+                meta_method = meta_object.method(method_index)
+
+                if not meta_method.isValid():
+                    continue
+
+                if (
+                    meta_method.methodType() == qtC.QMetaMethod.Signal
+                    and meta_method.name() == signal
+                ):
+                    return meta_method
+
+            return None
+
         try:
-            widget_signal: qtC.SignalInstance = getattr(self._widget, signal)
+            if hasattr(self._widget, signal):
+                widget_signal: qtC.SignalInstance = getattr(self._widget, signal)
 
-            try:
-                widget_signal.disconnect()
-            except TypeError:
-                pass
-            except RuntimeError:
-                pass
-            except ValueError:
-                pass
+                if widget_signal is None:
+                    return None
 
-            if use_lambda:
-                widget_signal.connect(lambda *args: self._event_handler(event, args))
-            else:
-                widget_signal.connect(functools.partial(self._event_handler, event))
+                try:
+                    if get_signal_metamethod(
+                        self._widget, signal
+                    ) is not None and self._widget.isSignalConnected(
+                        get_signal_metamethod(self._widget, signal)
+                    ):
+                        widget_signal.disconnect()
+
+                except TypeError as e:
+                    raise RuntimeError(
+                        f"TE - Failed to disconnect signal {signal}. {e}"
+                    )
+                except RuntimeError as e:
+                    raise RuntimeError(
+                        f"RE - Failed to disconnect signal {signal}. {e}"
+                    )
+                except ValueError as e:
+                    raise RuntimeError(
+                        f"VE - Failed to disconnect signal {signal}. {e}"
+                    )
+
+                if use_lambda:
+                    widget_signal.connect(
+                        lambda *args: self._event_handler(event, args)
+                    )
+                else:
+                    widget_signal.connect(functools.partial(self._event_handler, event))
         except AttributeError:
             pass
+
+        return None
 
     def _install_event_handlers(self, use_lambda: bool = USE_LAMBDA):
         """Attaches events to the low-level GUI object created in _Create_Widget"""
@@ -2523,9 +2575,12 @@ class _qtpyBase_Control(_qtpyBase):
                 if isinstance(buddy_widget, qtW.QFrame):
                     pass
                     # buddy_widget.setFrameShape(qtW.QFrame.Shape.Box)  # Debug
-
             edit_group = qtW.QHBoxLayout()
-            edit_group.setContentsMargins(0, 0, 0, 0)
+
+            # This is a bit odd, but combo boxes need some right margin, whereas other controls do not
+            edit_group.setContentsMargins(
+                0, 0, 25 if isinstance(self, ComboBox) else 0, 0
+            )
 
             if label_widget is not None:
                 edit_group.addWidget(label_widget)
@@ -2671,6 +2726,7 @@ class _qtpyBase_Control(_qtpyBase):
         Args:
             gui_event: The event that was triggered.
         """
+
         window_id = Get_Window_ID(self.parent_app, self.parent, self)
         container_tag = (
             self.container_tag.split("|")[1]
@@ -2706,7 +2762,9 @@ class _qtpyBase_Control(_qtpyBase):
             result = self._event_handler(Sys_Events.FOCUSIN)
 
         if result == -1:
-            gui_event[0].ignore()
+            gui_event[0].ignore() if isinstance(
+                gui_event, tuple
+            ) else gui_event.ignore()
         else:
             if hasattr(self._widget, "focusInEvent"):
                 if shiboken6.isValid(self.guiwidget_get):
@@ -2723,6 +2781,7 @@ class _qtpyBase_Control(_qtpyBase):
         Args:
             gui_event (Action): The event that was triggered.
         """
+
         if isinstance(self, FolderView):  # Bit poxy, have to watch this
             result = self._event_handler(
                 Sys_Events.FOCUSOUT, self.guiwidget_get.selectedIndexes()
@@ -2735,7 +2794,9 @@ class _qtpyBase_Control(_qtpyBase):
             result = self._event_handler(Sys_Events.FOCUSOUT)
 
         if result == -1:
-            gui_event[0].ignore()
+            gui_event[0].ignore() if isinstance(
+                gui_event, tuple
+            ) else gui_event.ignore()
         else:
             if hasattr(self.guiwidget_get, "focusOutEvent"):
                 if shiboken6.isValid(self.guiwidget_get):
@@ -6961,7 +7022,11 @@ class ComboBox(_qtpyBase_Control):
             self.height = 1  # COMBOBOX_SIZE.height
 
         if self.width == -1:
-            self.width = COMBOBOX_SIZE.width + len(self.label) + 2
+            self.width = (
+                COMBOBOX_SIZE.width + amper_length(self.trans_str(self.label)) + 2
+            )
+        elif self.width > 0 and self.label != "":
+            self.width += amper_length(self.trans_str(self.label)) + 2
 
         widget = super()._create_widget(
             parent_app=parent_app, parent=parent, container_tag=container_tag
@@ -7574,24 +7639,11 @@ class _Custom_Dateedit(qtW.QWidget):
         self.calendar.setWindowFlags(qtC.Qt.Popup)
         self.calendar.installEventFilter(self)
 
-        if use_lambda:
-            self.dropDownButton.pressed.connect(lambda: self.showPopup())
-            self.dropDownButton.released.connect(lambda: self.calendar.hide())
-            self.lineEdit.editingFinished.connect(lambda: self.editingFinished())
-            self.calendar.clicked.connect(lambda args: self.setDate(args, "clicked"))
-            self.calendar.activated.connect(
-                lambda args: self.setDate(args, "activated")
-            )
-        else:
-            self.dropDownButton.pressed.connect(functools.partial(self.showPopup))
-            self.dropDownButton.released.connect(functools.partial(self.calendar.hide))
-            self.lineEdit.editingFinished.connect(
-                functools.partial(self.editingFinished)
-            )
-            self.calendar.clicked.connect(functools.partial(self.setDate, "clicked"))
-            self.calendar.activated.connect(
-                functools.partial(self.setDate, "activated")
-            )
+        self.dropDownButton.pressed.connect(lambda: self.showPopup())
+        self.dropDownButton.released.connect(lambda: self.calendar.hide())
+        self.lineEdit.editingFinished.connect(lambda: self.editingFinished())
+        self.calendar.clicked.connect(lambda args: self.setDate(args, "clicked"))
+        self.calendar.activated.connect(lambda args: self.setDate(args, "activated"))
 
         self.lineEdit.setInputMask(self.get_mask())
 
@@ -7938,13 +7990,19 @@ class Dateedit(_qtpyBase_Control):
 
         event = cast(Action, args[0])  # type: Action
 
-        if event.event == Sys_Events.CLICKED:
-            # print(f'{event.tag=} {event.tag.startswith("derase_")}')
+        if isinstance(event, Action):
+            triggered_event = event.event
+        elif isinstance(event, Sys_Events):
+            triggered_event = event
+        else:
+            raise RuntimeError(f"{event=}. Must be Action or Sys_Events")
+
+        if triggered_event == Sys_Events.CLICKED:
             if event.tag.startswith("derase_"):
                 self.clear()
-        elif event.event == Sys_Events.FOCUSIN:
+        elif triggered_event == Sys_Events.FOCUSIN:
             pass
-        elif event.event == Sys_Events.FOCUSOUT:
+        elif triggered_event == Sys_Events.FOCUSOUT:
             date_widget: _Custom_Dateedit = self._widget
 
             if date_widget.date() < self.MINDATE:
@@ -7952,14 +8010,7 @@ class Dateedit(_qtpyBase_Control):
                 date_widget.setFocus()
 
                 return -1
-
-            # Part of hack to clear displayed date
-            # if self.guiwidget_get.date() == self.guiwidget_get.minimumDate():
-            #    # minimumdate matching "100,1,1" (Object default)  means first use!
-            # also means can not use 100,1,1 as a system date - what are the odds?
-            #    if self.guiwidget_get.minimumDate() == qtC.QDate(100, 1, 1):
-            #        self.date_set(date_format=self.date_format)
-        elif event.event == Sys_Events.POPCAL:
+        elif triggered_event == Sys_Events.POPCAL:
             self._calandar_activated(event)
 
         if callable(self.callback):
@@ -7970,10 +8021,10 @@ class Dateedit(_qtpyBase_Control):
             return handler.event(
                 window_id=window_id,
                 callback=self.callback,
-                action=event.event.name,
+                action=triggered_event.name,
                 container_tag=self.container_tag,
                 tag=self.tag,
-                event=event.event,
+                event=triggered_event,
                 value=self.value_get(date_tuple=True),
                 widget_dict=self.parent_app.widget_dict_get(
                     window_id=window_id, container_tag=self.container_tag
@@ -8419,7 +8470,7 @@ class FolderView(_qtpyBase_Control):
         # style = "QTreeView{alternate-background-color: wheat; background: powderblue;}"
         # self.guiwidget_get.setStyleSheet(style)
 
-        self._widget.setMinimumWidth(width + self.tune_hsize)
+        self._widget.setMinimumWidth(width + self.tune_hsize + (2 * pixel_size.width))
         self._widget.setMinimumHeight(self.height * pixel_size.height + self.tune_vsize)
 
         self._widget.setExpandsOnDoubleClick(False)
@@ -12171,6 +12222,8 @@ class LineEdit(_qtpyBase_Control):
         if len(self.text.strip()) > 0:
             self._widget.setPlaceholderText(self.text)
 
+        self._widget.setMaxLength(self.char_length)
+
         return widget
 
     def _event_handler(
@@ -12312,7 +12365,7 @@ class LineEdit(_qtpyBase_Control):
         return self._widget.isModified()
 
     def value_get(self, original_value: bool = False) -> str:
-        """Gets the original taxt if `original_value` is `True otherwise the modified text  is returned
+        """Gets the original text if `original_value` is `True otherwise the modified text  is returned
 
 
         Args:
@@ -14415,7 +14468,7 @@ class Treeview(_qtpyBase_Control):
     multiselect: bool = False
     headers: Union[list[str], tuple[str, ...]] = ()
     header_widths: Union[tuple[int, ...], list[int]] = ()  # Column widths in char
-    header_font: Font = field(default_factory=Font())
+    header_font: Font = field(default_factory=Font)
     header_width_default = 15
     toplevel_items: Union[list[str], tuple[str, ...]] = ()
     _parent_list: list = None
@@ -14583,16 +14636,16 @@ class Treeview(_qtpyBase_Control):
 
         event: Action = cast(Action, args[0])
 
-        if len(args) > 1:
+        if hasattr(args, "len") and len(args) > 1:
             if len(args[1]) == 0:
                 pass
-            elif len(args[1]) == 1:
+            elif len(args) == 1:
                 selected_index = args[1][0]
                 item_data = selected_index.data(qtC.Qt.UserRole)
 
                 items.append(selected_index.data(qtC.Qt.DisplayRole))
                 items.append(item_data)
-            elif len(args[1]) == 2:
+            elif len(args) == 2:
                 selected_index = args[1][0]
                 col = args[1][1]
 
@@ -14649,7 +14702,7 @@ class Treeview(_qtpyBase_Control):
         )  # Bogus static var - another way :-)
 
         if first_call or self._parent_list is None:
-            self.parent_list = []
+            self._parent_list = []
 
         if child_item is not None:
             self._parent_list.append(child_item)
@@ -14703,14 +14756,14 @@ class Treeview(_qtpyBase_Control):
 
             if parent_route == item_route:
                 parent_item = item_tuple[0]
-                for index, text in enumerate(display_items):
+                for _, text in enumerate(display_items):
                     assert (
                         isinstance(text, str) and text.strip() != ""
                     ), f"treeview display item <{text}> must a non-empty str"
 
                     child_item = qtW.QTreeWidgetItem(parent_item)
-                    item_data = self.Item_Data(user_data=user_data[index])  # TODO Fix
-                    child_item.setData(0, qtC.Qt.UserRole, item_data)
+                    # item_data = self.Item_Data(user_data=user_data[index])  # TODO Fix
+                    # child_item.setData(0, qtC.Qt.UserRole, item_data)
                     child_item.setText(
                         0,
                         self.trans_str(text),
@@ -14822,6 +14875,8 @@ class Treeview(_qtpyBase_Control):
         Returns:
             tuple[(str,any)] : Current Tree view node value tuple (node text, node user value)
         """
+        if self._value is None:
+            return ()
 
         return tuple(self._value)
 
