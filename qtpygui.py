@@ -453,12 +453,14 @@ class Col_Def:
 
 
 @dataclasses.dataclass(slots=True)
-# `Combo_Data` is a class used by combo boxes that contains an index, a display string, and a data value
 class Combo_Data:
+    """Combo_Data is a class returned by combo boxes that contains an index, a
+    display string, a data value and user data"""
+
     index: int
     display: str
     data: None | str | int | float | bytes | bool
-    user_data: None | str | int | float | bytes | bool
+    user_data: None | str | int | float | bytes | bool | dict
 
     def _post_init(self):
         # Checking the arguments passed to the constructor are of the correct type.
@@ -470,14 +472,16 @@ class Combo_Data:
             isinstance(self.data, (str, int, float, bytes, bool)) or self.data is None
         ), f"{self.data=}. Must be None | str | int | float | bytes | bool"
         assert (
-            isinstance(self.user_data, (str, int, float, bytes, bool))
+            isinstance(self.user_data, (str, int, float, bytes, bool, dict))
             or self.user_data is None
-        ), f"{self.user_data=}. Must be None | str | int | float | bytes | bool"
+        ), f"{self.user_data=}. Must be None | str | int | float | bytes | bool | dict"
 
 
 @dataclasses.dataclass(slots=True)
-# `Combo_Item` is a class used by combo boxes that holds a display string, a data value, an icon, and a user data value.
 class Combo_Item:
+    """Combo_Item is a class used to set combo box items that holds a display string, a
+    data value, an icon, and a user data value."""
+
     display: str
     data: None | str | int | float | bytes | bool
     icon: None | str | qtG.QPixmap | qtG.QIcon
@@ -6293,49 +6297,6 @@ class Button(_qtpyBase_Control):
 
         self._widget.setText(self.trans_str(button_text) if translate else button_text)
 
-
-@dataclasses.dataclass
-class FormContainer(_Container):
-    """Creates a`Form Container instance`"""
-
-    def __post_init__(self) -> None:
-        """Initialises the form container."""
-        super().__post_init__()
-
-    def add_control(
-        self,
-        control: _qtpyBase_Control,
-        zero_based: bool = False,
-    ) -> "FormContainer":
-        """Adds a control to the form container.
-
-        Args:
-            control (_qtpyBase_Control): _qtpyBase_Control added to the form container.
-            zero_based (bool): bool = False. Defaults to False
-
-        Returns:
-            FormContainer : The Form Container instance.
-        """
-        assert isinstance(
-            control, _qtpyBase_Control
-        ), f"{control=}. Must be an instance of _qtpyBase_Control"
-
-        super().add_control(
-            control=control, row=len(self._layout), col=1, zero_based=zero_based
-        )
-
-        return self
-
-
-@dataclasses.dataclass
-class GridContainer(_Container):
-    """Creates a`Grid Container instance`"""
-
-    def __post_init__(self) -> None:
-        """Initialises the form container."""
-        super().__post_init__()
-
-
 class _Dialog(qtW.QDialog):
     """Provides the pop-up dialogue used in PopContainer and its descendants.
     Note: This class exists because QT 6.2.2 broke the multiple inheritance used in dataclass PopContainer.
@@ -6734,6 +6695,47 @@ class PopContainer(_qtpyBase_Control):
     #         event.ignore()
     #     else:
     #         super().keyPressEvent(event)
+
+@dataclasses.dataclass
+class FormContainer(_Container):
+    """Creates a`Form Container instance`"""
+
+    def __post_init__(self) -> None:
+        """Initialises the form container."""
+        super().__post_init__()
+
+    def add_control(
+        self,
+        control: _qtpyBase_Control,
+        zero_based: bool = False,
+    ) -> "FormContainer":
+        """Adds a control to the form container.
+
+        Args:
+            control (_qtpyBase_Control): _qtpyBase_Control added to the form container.
+            zero_based (bool): bool = False. Defaults to False
+
+        Returns:
+            FormContainer : The Form Container instance.
+        """
+        assert isinstance(
+            control, _qtpyBase_Control
+        ), f"{control=}. Must be an instance of _qtpyBase_Control"
+
+        super().add_control(
+            control=control, row=len(self._layout), col=1, zero_based=zero_based
+        )
+
+        return self
+
+
+@dataclasses.dataclass
+class GridContainer(_Container):
+    """Creates a`Grid Container instance`"""
+
+    def __post_init__(self) -> None:
+        """Initialises the form container."""
+        super().__post_init__()
 
 
 @dataclasses.dataclass
