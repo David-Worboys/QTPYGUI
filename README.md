@@ -187,8 +187,8 @@ on a GUI control, say if a Button (as defined below) is clicked on:
 ```
 qtg.Button(tag="example_2", text="Example 2", callback=self.event_handler, width=10),
 ```
-The answer is that the ```callback``` method ```self.event_handler``` triggers 
-a CLICKED event, and it can be processed as below:
+The answer is that the ```callback``` method ```self.event_handler``` is triggered 
+with a CLICKED event, and it can be processed as below:
 
 ```
     def event_handler(self, event: qtg.Action):
@@ -212,10 +212,134 @@ event is triggered, mostly by the application GUI controls - like Buttons.**
 
 The observant reader may notice the event instance passed to the ```event handler``` 
 is a class of ```qtg.Action``` which probably should have been named 
-```qtg.Event``` but for historical reasons that nomeclature is staying. 
+```qtg.Event``` but for historical reasons that nomenclature is staying. 
 
-The ``qtg.Action``` class has a number of very useful methods and properties, and 
+The ```qtg.Action``` class has a number of very useful methods and properties, and 
 a programmer using QTPYGUI will become very familiar with them.
+
+#### Building Your First Application:
+
+As is traditional, a "hello world" program needs to be written first, so let's 
+get to it!
+
+```
+import qtpygui as qtg
+
+class Hello_World:
+    def __init__(self):
+        self.hello_world = qtg.QtPyApp(
+            display_name="Hello World",
+            callback=self.event_handler,
+            height=100,
+            width=100,
+        )
+
+    def event_handler(self, event: qtg.Action):
+        """Handles  form events
+        Args:
+            event (qtg.Action): The triggering event
+        """
+        assert isinstance(event, qtg.Action), f"{event=}. Must be Action"
+
+        match event.event:
+            case qtg.Sys_Events.CLICKED:
+                match event.tag:
+                    case "ok":
+                        self.hello_world.app_exit()
+
+    def layout(self) -> qtg.VBoxContainer:
+        """The layout of the window
+        Returns:
+            qtg.VBoxContainer: The layout
+        """
+        return qtg.VBoxContainer(align=qtg.Align.BOTTOMRIGHT).add_row(
+            qtg.FormContainer().add_row(
+                qtg.Label(
+                    text="Hello World!",
+                    txt_fontsize=48,
+                    txt_align=qtg.Align.CENTER,
+                    txt_font=qtg.Font(backcolor="blue", forecolor="yellow"),
+                ),
+            ),
+            qtg.HBoxContainer().add_row(
+                qtg.Button(
+                    tag="ok",
+                    text="OK",
+                    callback=self.event_handler,
+                    width=10,
+                    tooltip="Exit Example 01",
+                ),
+            ),
+        )
+
+    def run(self):
+        """Run example_01"""
+        self.hello_world.run(layout=self.layout())
+
+if __name__ == "__main__":
+    hello_world = Hello_World()
+    hello_world.run()
+```
+
+This is a slightly simplified version of example_01.
+
+Copy the above source code into a hello_world.py file and run it like so:
+
+```python3 -OO hello_world.py```
+
+And the follwing screen will be displayed:
+![](./userguide_images/hello_world.png)
+
+#### Distributing Your Application
+I strongly recommend using Nuitka (https://nuitka.net/) to distribute your 
+program as it can produce a single compiled file, housing all dependencies 
+that can be copied to a host machine. 
+
+Nuitka's Kay Hayen is simply the Python GOAT when it comes to this type of thing.
+
+To compile ```hello_world.py``` the reader will need to install Nuika
+
+```pip install Nuitka```
+
+and run this command, after amending the ```--include-data-dir=``` path to the 
+readers own installed path :
+```
+python -m nuitka                                                                            \
+--show-anti-bloat-changes                                                                   \
+--assume-yes-for-downloads                                                                  \
+--lto=yes                                                                                   \
+--python-flag=-OO                                                                           \
+--python-flag=no_warnings                                                                   \
+--python-flag=isolated                                                                      \
+--standalone                                                                                \
+--onefile                                                                                   \
+--prefer-source-code                                                                        \
+--enable-plugin=pyside6                                                                     \
+--include-qt-plugins=sensible                                                               \
+--include-data-dir=/home/david/PycharmProjects/QTPYGUI/IBM-Plex-Mono=./IBM-Plex-Mono        \
+hello_world.py
+```
+This will produce a ```hello_world.bin``` file on Linux, double-click on it and 
+the ```hello_world``` application will start.
+
+Note:
+1. On occasion the ```hello_world.bin``` file will need to be made executable, and this
+is done as follows:
+
+- Right-click on the ```hello_world.bin``` file and select "Properties." This 
+will open the file properties window. select  "Permissions" and tick "Allow 
+executing file as program" and then "Close"
+
+2. At the time of writing, this will produce a 58MB ```hello_world.bin``` 
+executable file - This is simply how it is when distributing Python applications
+ as so much is included during the build process. It is worth noting that 
+PyInstaller produces even larger executables! 
+
+
+
+
+
+
 
 # TO BE CONTINUED....
 
