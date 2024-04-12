@@ -570,13 +570,12 @@ class Align(Enum):
 
 # Creates a dictionary with the keys being the values of the enum ALIGN and the values being the corresponding CSS
 # values.
-Align_SS_Text = {
-    Align.LEFT: "text-align:left",
-    Align.CENTER: "text-align:center",
-    Align.RIGHT: "text-align:right",
-    Align.TOP: "text-align:top",
-    Align.BOTTOM: "text-align:bottom",
-}
+class Align_Text(Enum):
+    LEFT = "text-align:left"
+    CENTER = "text-align:center"
+    RIGHT = "text-align:right"
+    TOP = "text-align:top"
+    BOTTOM = "text-align:bottom"
 
 
 # Font Properties
@@ -1972,7 +1971,7 @@ class _qtpyBase_Control(_qtpyBase):
     width: int = -1
     height: int = -1
     align: Align = Align.LEFT
-    txt_align: Align = Align.LEFT
+    txt_align: Align_Text = Align_Text.LEFT
     txt_font: Optional[Font] = None
     txt_fontsize: int = DEFAULT_FONT_SIZE
     tune_vsize: int = 0  # In pixels, 0 is Arbitrary
@@ -1983,7 +1982,7 @@ class _qtpyBase_Control(_qtpyBase):
     frame: Optional[Widget_Frame] = None
     enabled: bool = True
     label: str = ""
-    label_align: Align = Align.RIGHT
+    label_align: Align_Text = Align_Text.RIGHT
     editable: bool = True
     label_pad: int = -1
     label_font: Optional[Font] = None
@@ -2036,9 +2035,24 @@ class _qtpyBase_Control(_qtpyBase):
 
         assert isinstance(self.align, Align), f"{self.align=}. Must be of type ALIGN"
 
+        # Band aid for older version compatibility #TODO Remove When All Programs Are Updated
+        if isinstance(self.txt_align, Align):
+            if self.txt_align == Align.LEFT:
+                self.txt_align = Align_Text.LEFT
+            elif self.txt_align == Align.RIGHT:
+                self.txt_align = Align_Text.RIGHT
+            elif self.txt_align == Align.CENTER:
+                self.txt_align = Align_Text.CENTER
+            elif self.txt_align == Align.TOP:
+                self.txt_align = Align_Text.TOP
+            else:
+                raise RuntimeError(
+                    f"{self.txt_align=}. Must be one of Align.( LEFT, CENTER, RIGHT "
+                )
+
         assert isinstance(
-            self.txt_align, Align
-        ), f"{self.txt_align=}. Must be of type ALIGN"
+            self.txt_align, Align_Text
+        ), f"{self.txt_align=}. Must be of type Align_Text"
 
         assert (
             isinstance(self.txt_font, Font) or self.txt_font is None
@@ -2085,9 +2099,25 @@ class _qtpyBase_Control(_qtpyBase):
 
         assert isinstance(self.label, str), f"{self.label=}. Must be str"
         assert isinstance(self.editable, bool), f"{self.editable=}. Must be bool"
+
+        # Band aid for older version compatibility #TODO Remove When All Programs Are Updated
+        if isinstance(self.label_align, Align):
+            if self.label_align == Align.LEFT:
+                self.label_align = Align_Text.LEFT
+            elif self.label_align == Align.RIGHT:
+                self.label_align = Align_Text.RIGHT
+            elif self.label_align == Align.CENTER:
+                self.label_align = Align_Text.CENTER
+            elif self.label_align == Align.TOP:
+                self.label_align = Align_Text.TOP
+            else:
+                raise RuntimeError(
+                    f"{self.label_align=}. Must be one of Align.( LEFT, CENTER, RIGHT "
+                )
+
         assert isinstance(
-            self.label_align, Align
-        ), f"{self.label_align=}. Must be of type ALIGN"
+            self.label_align, Align_Text
+        ), f"{self.label_align=}. Must be of type Align_Text"
         assert isinstance(
             self.label_font, (type(None), Font)
         ), f"{self.label_font=}. Must be an instance of Font"
@@ -2439,7 +2469,7 @@ class _qtpyBase_Control(_qtpyBase):
             match self:
                 case Button():
                     self._widget = qtW.QPushButton(self.text, parent)
-                    self._widget.setStyleSheet(Align_SS_Text[self.txt_align])
+                    self._widget.setStyleSheet(self.txt_align.value)
                 case Checkbox():
                     self._widget = qtW.QCheckBox(self.text, parent)
                 case ComboBox():
@@ -2463,7 +2493,7 @@ class _qtpyBase_Control(_qtpyBase):
                     self._widget = qtW.QLabel(self.text.replace("\00", ""), parent)
                 case LCD():
                     self._widget = qtW.QLCDNumber(parent)
-                    self._widget.setStyleSheet(Align_SS_Text[self.txt_align])
+                    self._widget.setStyleSheet(self.txt_align.value)
                 case LineEdit():
                     self._widget = _Line_Edit(parent, self)
                 case ProgressBar():
@@ -6224,7 +6254,7 @@ class _Container(_qtpyBase_Control):
 class Button(_qtpyBase_Control):
     """Instantiates a Button widget and associated properties"""
 
-    txt_align: Align = Align.CENTER
+    txt_align: Align_Text = Align_Text.CENTER
     auto_repeat_interval: int = 0  # Milliseconds
 
     def __post_init__(self) -> None:
@@ -6244,9 +6274,10 @@ class Button(_qtpyBase_Control):
         Returns:
             qtW.QWidget : The button widget
         """
+
         assert isinstance(
-            self.txt_align, Align
-        ), f"{self.txt_align=}. Must be an instance of Align"
+            self.txt_align, Align_Text
+        ), f"{self.txt_align=}. Must be an instance of Align_Text"
 
         assert (
             isinstance(self.auto_repeat_interval, int)
@@ -6296,6 +6327,7 @@ class Button(_qtpyBase_Control):
         self._widget: qtW.QPushButton
 
         self._widget.setText(self.trans_str(button_text) if translate else button_text)
+
 
 class _Dialog(qtW.QDialog):
     """Provides the pop-up dialogue used in PopContainer and its descendants.
@@ -6695,6 +6727,7 @@ class PopContainer(_qtpyBase_Control):
     #         event.ignore()
     #     else:
     #         super().keyPressEvent(event)
+
 
 @dataclasses.dataclass
 class FormContainer(_Container):
@@ -8266,7 +8299,6 @@ class FolderView(_qtpyBase_Control):
 
     width: int = 40  # In Chars
     height: int = 15  # In  lines
-    txt_align: Align = Align.LEFT
     widget_align: Align = Align.LEFT
     root_dir: str = "\\"
     dir_only: bool = False
@@ -8281,7 +8313,6 @@ class FolderView(_qtpyBase_Control):
 
         assert isinstance(self.width, int), f"{self.width=}. Must beint"
         assert isinstance(self.height, int), f"{self.height=}. Must be int"
-        assert isinstance(self.txt_align, Align), f"{self.txt_align=}. Must be ALIGN"
         assert isinstance(
             self.widget_align, Align
         ), f"{self.widget_align=}. Must be ALIGN"
@@ -11950,7 +11981,14 @@ class Label(_qtpyBase_Control):
             parent_app=parent_app, parent=parent, container_tag=container_tag
         )
 
-        self._widget.setAlignment(self.txt_align.value)
+        if self.txt_align == Align_Text.LEFT:
+            self._widget.setAlignment(qtC.Qt.AlignLeft)
+        elif self.txt_align == Align_Text.CENTER:
+            self._widget.setAlignment(qtC.Qt.AlignCenter)
+        elif self.txt_align == Align_Text.RIGHT:
+            self._widget.setAlignment(qtC.Qt.AlignRight)
+        elif self.txt_align == Align_Text.TOP:
+            self._widget.setAlignment(qtC.Qt.AlignTop)
 
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
@@ -11993,7 +12031,7 @@ class LCD(_qtpyBase_Control):
     """Instantiates an LCD like number display widget"""
 
     digit_count: int = 8
-    txt_align: Align = Align.RIGHT
+    txt_align: Align_Text = Align_Text.RIGHT
 
     def __post_init__(self) -> None:
         """Constructor that checks parameters and sets instance variables"""
@@ -12061,7 +12099,9 @@ class LCD(_qtpyBase_Control):
         self._widget: qtW.QLCDNumber
 
         if isinstance(value, str):  # Check if a valid number (0..9 or .)
-            assert re.match("^[0-9\.]*$", value.strip()), f"{value=}. Must be a number"  # pylint: disable=W1401
+            assert re.match(
+                "^[0-9\.\-]*$", value.strip()
+            ), f"{value=}. Must be a number"  # pylint: disable=W1401
 
         if shiboken6.isValid(self._widget):
             self._widget.display(value)
@@ -12136,8 +12176,8 @@ class LineEdit(_qtpyBase_Control):
     ] = None
     char_length: int = MAX_CHARS
     label_font: Optional[Font] = None
-    txt_align: Align = Align.LEFT
-    label_align: Align = Align.RIGHT
+    txt_align: Align_Text = Align_Text.LEFT
+    label_align: Align_Text = Align_Text.RIGHT
     widget_align: Align = Align.LEFT
 
     def __post_init__(self) -> None:
@@ -12155,7 +12195,9 @@ class LineEdit(_qtpyBase_Control):
             self.label_font, Font
         ), f"{self.label_font=}. Must be font"
         assert isinstance(self.char_length, int), f"{self.char_length=}. Must be int"
-        assert isinstance(self.label_align, Align), f"{self.label_align}. Must be ALGN"
+        assert isinstance(
+            self.label_align, Align_Text
+        ), f"{self.label_align}. Must be Align_Text"
         assert self.validate_callback is None or callable(
             self.validate_callback
         ), f"{self.validate_callback=}. Must be None | Function | Method | Lambda"
@@ -13540,7 +13582,15 @@ class TextEdit(_qtpyBase_Control):
             curr_position = self._widget.textCursor().position()
 
             while last_position != curr_position:
-                self._widget.setAlignment(self.txt_align.value)
+                if self.txt_align == Align_Text.LEFT:
+                    self._widget.setAlignment(qtC.Qt.AlignLeft)
+                elif self.txt_align == Align_Text.CENTER:
+                    self._widget.setAlignment(qtC.Qt.AlignCenter)
+                elif self.txt_align == Align_Text.RIGHT:
+                    self._widget.setAlignment(qtC.Qt.AlignRight)
+                elif self.txt_align == Align_Text.TOP:
+                    self._widget.setAlignment(qtC.Qt.AlignTop)
+
                 self._widget.moveCursor(qtG.QTextCursor.Down)
                 last_position = curr_position
                 curr_position = self._widget.textCursor().position()

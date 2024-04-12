@@ -13,6 +13,8 @@
 5. [Application Distribution](#distributing-your-application)
 6. [Boot Camp](#boot-camp)
 7. [GUI Control Reference](#gui-control-api-reference)
+   - [Button](#button) 
+8. [QTPYGUI Classes](#qtgui-class-reference)
 
 ## Introduction
 QTPYGUI is a declarative user interface wrapper around Pyside6 and, as there are 
@@ -26,10 +28,16 @@ The next question the reader might find themselves asking is why not a web UI
 based on the old favourites of HTML, CSS and Javascript, something like React 
 perhaps? I am a firm believer in "horses for courses", so why bring a browser to
 the desktop fight and all the resources, memory/compute, that entails when a 
-well-designed widget set that has better performance and memory usage is 
+well-designed widget set with better performance and memory usage is 
 available. Worse, building web apps is a complicated business even with the
-web UI frameworks, of course, some may same the same of desktop widget sets and 
+web UI frameworks, of course some may same the same of desktop widget sets, and 
 this is where GUI wrappers like QTPYGUI come in.
+
+In closing, it is worth noting that a major advantage in utilising a GUI wrapper,
+aside from ease of programming, is that if the underlying widget set is 
+deprecated, or licensing changes, then the GUI wrapper can change widget sets.
+Although this would be a large task, the major benefit is that applications using 
+the GUI wrapper will be minimally impacted.
 
 ### What Is A Declarative User Interface?
 A declarative UI (user interface) is an application user interface coded in
@@ -40,18 +48,22 @@ and applications like dBase II and Clipper but just because it is old does not
 mean it is bad ot not relevant.
 
 ### Notes
-1. This is a very early release of QTPYGUI, and although it is used in production 
-applications, there are bound to be bugs - certainly Dateedit and Treeview need
-much more work as they are infrequently used, and the feature set of other GUI 
-components needs to be widened. Missing also is theming and this will be required 
-for a larger audience.
+1. Development of QTPYGUI started privately in 2020, moving to a public release in 2024.
+   - This version is an early public release and doco and code streamlining is onging.
+   
+   - Although QTPYGUI is used in production applications, there are bound to be bugs, 
+   certainly Dateedit and Treeview need much more work as they are infrequently 
+   used.
+    
+   - The feature set of other GUI components needs to be widened. Missing also is
+   theming and this will be required for a larger audience.
 
 2. **HELP IS WANTED AND I WELCOME ALL CONTRIBUTIONS!**
 
     - Please reach out to me via Discussions (https://github.com/David-Worboys/QTPYGUI/discussions)
     if you want to help or have ideas on improvements
    
-    - Bugs can be logged https://github.com/David-Worboys/QTPYGUI/issues  
+    - Bugs can be logged at https://github.com/David-Worboys/QTPYGUI/issues  
 
 3. QTPYGUI will always remain opensource, unlike some other similar frameworks
    that used "bait and switch" tactics
@@ -83,7 +95,9 @@ First up, QTPYGUI is pronounced "Cutey Pie GUI" which follows the "QT Groups"
 own pronunciation and appeals to my, admitably lame, sense of humour.
 ### Prerequities
 1. Pyside6
-2. Python version >= 3.8
+2. Python version >= 3.8 
+   - If Nuitka is used for application distribution, then Python versions 3.12 
+   and above are not currently supported.
 ### Installation
 1. Create your Python project folder and set up your Python project using 
 the virtual environment manager of your choice
@@ -110,7 +124,16 @@ progresses.
 1. QTPYGUI is event driven and there are no "busy" loops waiting for something
 to happen
 
-2. The basic structure of a QTPY GUI Program is as follows:
+2. By default, width and height settings are in characters
+   - Pixels can be used as an argument is provided to allow for this
+   - This works best with monospaced fonts
+   
+   - The default font is "IBM Plex Mono" and the default font size is 10
+     - This is included in the installation of QTPYGUI 
+     - If this font is missing, then QTPYGUI will try and find a system font that 
+     will work
+
+3. The basic structure of a QTPY GUI Program is as follows:
 
 ```
 import qtpygui as qtg
@@ -143,7 +166,7 @@ if __name__ == "__main__":
 1. This defines the structure of the application main.py file
 
 2. https://github.com/David-Worboys/QTPYGUI/blob/master/Examples/example_01.py
-show this in action.
+shows this in action.
 
 3. The python classes that utilise a GUI are defined as below:
 ```
@@ -390,59 +413,74 @@ executable file - This is simply how it is when distributing Python applications
 PyInstaller produces even larger executables! 
 
 ### GUI Control API Reference
-| Control           | Description                   |
-|-------------------|-------------------------------|
-| [Button](#button) |                               |
-| Checkbox          |                               | 
-| ComboBox          | A drop down selection control |
-| Label             |                               |
-| Dateedit          |                               |
-| FolderView        |                               |
-| Image             |                               |
-| LineEdit          |                               |
-| Menu              |                               |
-| ProgressBar       |                               |
-| RadioButton       |                               |
-| Switch            |                               |
-| Slider            |                               |
-| Spinbox           |                               |
-| Tab               |                               |
-| TextEdit          |                               |
-| Timeedit          |                               |
+| Control           | Description                                                                                                                  |
+|-------------------|------------------------------------------------------------------------------------------------------------------------------|
+| [Button](#button) | Creates a button, text and icon are optional                                                                                 |
+| Checkbox          | Creates a check box that a user can click on or off                                                                          | 
+| ComboBox          | Creates a drop down selection box, icon in list is <br/>optional                                                             |
+| Label             | Creates a text string                                                                                                        |
+| Dateedit          | Creates a date edit control with a dropdown calendar and <br/>an erase button                                                |
+| FolderView        | Creates a control that displays the contents of a folder in a Grid                                                           |
+| Grid              | Creates a control that displays data in a table (grid) format                                                                |
+| Image             | Creates a control that displays an image                                                                                     |
+| LineEdit          | Creates a control that allows text to be edited and displayed<br/> in a single line                                          |
+| Menu              | Creates a menu just below the title bar                                                                                      |
+| ProgressBar       | Creates a control that displays the progress of an operation                                                                 |
+| RadioButton       | Creates a radio button control. In a group only one can be <br/>selected at a time                                           |
+| Switch            | Creates a switch control that can be used to turn on and <br/>off a feature                                                  |
+| Slider            | Creates a slider control than can be used to set a value <br/>by dragging the handle                                         |
+| Spinbox           | Creates a spinbox control that allows numbers to be set <br/>via clicking up and down arrows or entering the number directly |
+| Tab               | Creates a tab control that has multiple pages, each <br/>housing their own set of GUI controls                               |
+| TextEdit          | Creates a text entry control that can span multiple lines                                                                    |
+| Timeedit          | Creates a time edit control with an erase button                                                                             |
+| Treeview          | Creates a control that displays data as a tree view                                                                          |
 
 #### Button
-| Argument             | Description                                                                 | Type                          | Optional |
-|----------------------|-----------------------------------------------------------------------------|-------------------------------|----------|
-| auto_repeat_interval | If > 0 the button keeps firing Clicked events when held down (milliseconds) | Integer >= 0                  | ✓        | 
-| callback             | The method called when the button is pressed                                | Callable                      | ✓        |
-| height               | The hight of the button                                                     | Integer > 0 (Defaults 10)     | ✓        |
-| icon                 | The icon image displayed on the button                                      | String (File Name Or QPixmap) | ✓        |
-| tag                  | The application name of the button                                          | String                        | ✓        |
-| text                 | The text displayed on the button                                            | String                        | ✓        |
-| txt_align            | Alignment of the text displayed on the button                               | [Align](#align) (Align.LEFT)  | ✓        |
-| width                | The width of the button                                                     | Integer > 0 (Defaults 10)     | ✓        |
+| Argument             | Description                                                                     | Type                                         | Optional |
+|----------------------|---------------------------------------------------------------------------------|----------------------------------------------|----------|
+| auto_repeat_interval | If > 0 the button keeps firing Clicked events when <br>held down (milliseconds) | Integer >= 0                                 | ✓        | 
+| callback             | The method called when the button is pressed                                    | Callable                                     | ✓        |
+| height               | The height of the button                                                        | Integer > 0 (Defaults 10)                    | ✓        |
+| icon                 | The icon image displayed on the button                                          | String (File Name Or QPixmap)                | ✓        |
+| label                | Displays text to the right of the button                                        | String                                       | ✓        |
+| tag                  | The application name of the button                                              | String                                       | ✓        |
+| text                 | The text displayed on the button                                                | String                                       | ✓        |
+| txt_align            | Alignment of the text displayed on the button                                   | [Align_SS TEXT](#align_ss_text) (Align.LEFT) | ✓        |
+| width                | The width of the button                                                         | Integer > 0 (Defaults 10)                    | ✓        |
 
 
 
 ### QTGUI Class Reference
-#### ALIGN
-| Property     | Description | Type                                     |
-|--------------|-------------|------------------------------------------|
- | LEFT         |             | Qt.AlignLeft                             |
-| CENTER       |             | Qt.AlignCenter                           |
-| CENTERLEFT   |             | Qt.AlignCenter \| Qt.AlignLeft           |
-| CENTERRIGHT  |             | Qt.AlignCenter \| Qt.AlignRight          |
-| RIGHT        |             | Qt.AlignRight                            |
-| TOP          |             | Qt.AlignTop                              |
-| TOPCENTER    |             | Qt.AlignTop                              |
-| TOPLEFT      |             | Qt.AlignTop \| Qt.AlignLeft              |
- | TOPRIGHT     |             | Qt.AlignTop \| Qt.AlignRight             |
-| BOTTOM       |             | Qt.AlignBottom                           |
-| VCENTER      |             | Qt.AlignVCenter                          |
-| HCENTER      |             | Qt.AlignHCenter                          |
-| BOTTOMCENTER |             | qtC.Qt.AlignBottom \| qtC.Qt.AlignCenter |
-| BOTTOMLEFT   |             | qtC.Qt.AlignBottom \| qtC.Qt.AlignLeft   |
-| BOTTOMRIGHT  |             | qtC.Qt.AlignBottom \| qtC.Qt.AlignRight  |
+#### Align
+Aligns containers and GUI controls
+| Property     | Description | Type                             |
+|--------------|-------------|----------------------------------|
+ | LEFT         |             | Qt.AlignLeft                     |
+| CENTER       |             | Qt.AlignCenter                   |
+| CENTERLEFT   |             | Qt.AlignCenter \| Qt.AlignLeft   |
+| CENTERRIGHT  |             | Qt.AlignCenter \| Qt.AlignRight  |
+| RIGHT        |             | Qt.AlignRight                    |
+| TOP          |             | Qt.AlignTop                      |
+| TOPCENTER    |             | Qt.AlignTop                      |
+| TOPLEFT      |             | Qt.AlignTop \| Qt.AlignLeft      |
+ | TOPRIGHT     |             | Qt.AlignTop \| Qt.AlignRight     |
+| BOTTOM       |             | Qt.AlignBottom                   |
+| VCENTER      |             | Qt.AlignVCenter                  |
+| HCENTER      |             | Qt.AlignHCenter                  |
+| BOTTOMCENTER |             | Qt.AlignBottom \| Qt.AlignCenter |
+| BOTTOMLEFT   |             | Qt.AlignBottom \| Qt.AlignLeft   |
+| BOTTOMRIGHT  |             | Qt.AlignBottom \| Qt.AlignRight  |
+
+#### Align_Text
+Aligns text using style sheet type declaration (Some controls will remap to Align types)
+
+| Property | Description | Type              |
+|----------|-------------|-------------------|
+ | LEFT     |             | text-align:left   |
+| CENTER   |             | text-align:center |
+| RIGHT    |             | text-align:right  |
+| TOP      |             | text-align:top    |
+| BOTTOM   |             | text-align:bottom |
 
 
 
