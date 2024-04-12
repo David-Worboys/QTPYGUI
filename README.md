@@ -2,13 +2,25 @@
 ### Author: David Worboys 
 ##### 2024-04-11 - Initial Draft
 ##### Update
+## Index
+1. [Introduction](#introduction)
+2. [Installation](#installation)
+3. [Basic Concepts](#basic-concepts)
+   - [Containers](#containers)
+   - [GUI Controls](#gui-controls)
+   - [Event Handling](#event-handling)
+4. [Hello World Application](#building-your-first-application)
+5. [Application Distribution](#distributing-your-application)
+6. [Boot Camp](#boot-camp)
+7. [GUI Control Reference](#gui-control-api-reference)
 
 ## Introduction
-QTPYGUI is a declarative user interface wrapper around Pyside6 and as there is 
-a number of GUI wrappers around various widget sets, including Pyside6, the 
-natural question is why another one? The answer lies in at least two parts, my
-dissatisfaction with how the other GUI wrappers were implemented/managed and 
-because I could and there is much to be learned with that approach.
+QTPYGUI is a declarative user interface wrapper around Pyside6 and, as there are 
+a number of GUI (Graphical User Interface) wrappers around various widget sets,
+including Pyside6, the natural question is why another one? The answer lies in 
+at least two parts, my dissatisfaction with how the other GUI wrappers were 
+implemented/managed and because I could and there is much to be learned with 
+that approach.
 
 The next question the reader might find themselves asking is why not a web UI
 based on the old favourites of HTML, CSS and Javascript, something like React 
@@ -16,11 +28,11 @@ perhaps? I am a firm believer in "horses for courses", so why bring a browser to
 the desktop fight and all the resources, memory/compute, that entails when a 
 well-designed widget set that has better performance and memory usage is 
 available. Worse, building web apps is a complicated business even with the
-web UI frameworks, of course some may same the same of desktop widget sets and 
+web UI frameworks, of course, some may same the same of desktop widget sets and 
 this is where GUI wrappers like QTPYGUI come in.
 
 ### What Is A Declarative User Interface?
-A declarative user interface is an application user interface coded in
+A declarative UI (user interface) is an application user interface coded in
 the application source code using a formal specification. There is no need for
 GUI designers, and the application programmer writes the UI as just another 
 part of the code. This is an old idea, going back at least to the early 1980's
@@ -158,9 +170,11 @@ GUI items. The following are four types of containers:
   Windows, Mac) GUI specifications
 - HBoxContainer
   - Lays out the GUI controls horizontally 
+  
 - VBoxContainer
   - Lays out the GUI controls vertically, similar to the FormContainer but does
   not adhere as tightly to the associated platform specifications
+  
 - GridContainer
   - Lays out the GUI controls as a grid.  This container is seldom used.
 
@@ -178,11 +192,51 @@ qtg.HBoxContainer(tag="button_example").add_row(
 ```
 - This will layout two Buttons Horizontally. If a FormContainer or a VBoxContainer
 was used, the buttons would be laid out vertically.
-- **Note the use of the tag, text and callback arguments as these are fundamental
-to the operation of QTPYGUI.**
 
-#### Event Handling
-The burning question in the readers mind is what happens when an operation occurs
+- **Note the use of the tag, text and callback arguments as these are fundamental
+to the operation of QTPYGUI [GUI Controls](#gui-controls)**
+  - If a Container has a text argument, it becomes a Group box.
+
+##### GUI Controls
+These are the GUI components that comprise the UI of an application. Declaring them
+utilises a standard pattern of arguments with additional arguments for specific
+GUI controls.
+
+**Note: If an argument is not supported by a GUI control, it is ignored.**
+
+Let us consider the Button GUI control
+
+````commandline
+qtg.Button(tag="example_1", text="Example 1",label="Click Me!", callback=self.event_handler)
+````
+**Note: The following arguments are common to all QTPYGUI controls**
+
+"tag" — The "tag" is the name of the control, as it is housed in a container 
+then the container "tag" and the button "tag" make a unique pair.
+- This makes it easier to code larger applications as each GUI element 
+  does not have to have a unique name.
+  
+- If a "tag" is not provided, then the application generates one automatically.
+  - This is fine for "Container" and "Label" objects where the programmer does 
+  not intend to reference an object. 
+  
+"text" — The "text" is the text displayed on the control, it is optional
+
+"label" — The "label" argument places a label to the left of the control, it is
+optional
+
+"callback" — Is the name of the method that will process the envents generated
+by the GUI control. By convention, I declare this as the "event_handler" method. 
+
+- If a callback method is not provided, then the control cannot send events to it
+
+- The "event_handler" method takes only one argument ````atg.Action```` 
+    
+    
+
+
+##### Event Handling
+The burning question in the reader's mind is what happens when an operation occurs
 on a GUI control, say if a Button (as defined below) is clicked on:
 ```
 qtg.Button(tag="example_2", text="Example 2", callback=self.event_handler, width=10),
@@ -335,8 +389,60 @@ executable file - This is simply how it is when distributing Python applications
  as so much is included during the build process. It is worth noting that 
 PyInstaller produces even larger executables! 
 
+### GUI Control API Reference
+| Control           | Description                   |
+|-------------------|-------------------------------|
+| [Button](#button) |                               |
+| Checkbox          |                               | 
+| ComboBox          | A drop down selection control |
+| Label             |                               |
+| Dateedit          |                               |
+| FolderView        |                               |
+| Image             |                               |
+| LineEdit          |                               |
+| Menu              |                               |
+| ProgressBar       |                               |
+| RadioButton       |                               |
+| Switch            |                               |
+| Slider            |                               |
+| Spinbox           |                               |
+| Tab               |                               |
+| TextEdit          |                               |
+| Timeedit          |                               |
+
+#### Button
+| Argument             | Description                                                                 | Type                          | Optional |
+|----------------------|-----------------------------------------------------------------------------|-------------------------------|----------|
+| auto_repeat_interval | If > 0 the button keeps firing Clicked events when held down (milliseconds) | Integer >= 0                  | ✓        | 
+| callback             | The method called when the button is pressed                                | Callable                      | ✓        |
+| height               | The hight of the button                                                     | Integer > 0 (Defaults 10)     | ✓        |
+| icon                 | The icon image displayed on the button                                      | String (File Name Or QPixmap) | ✓        |
+| tag                  | The application name of the button                                          | String                        | ✓        |
+| text                 | The text displayed on the button                                            | String                        | ✓        |
+| txt_align            | Alignment of the text displayed on the button                               | [Align](#align) (Align.LEFT)  | ✓        |
+| width                | The width of the button                                                     | Integer > 0 (Defaults 10)     | ✓        |
 
 
+
+### QTGUI Class Reference
+#### ALIGN
+| Property     | Description | Type                                     |
+|--------------|-------------|------------------------------------------|
+ | LEFT         |             | Qt.AlignLeft                             |
+| CENTER       |             | Qt.AlignCenter                           |
+| CENTERLEFT   |             | Qt.AlignCenter \| Qt.AlignLeft           |
+| CENTERRIGHT  |             | Qt.AlignCenter \| Qt.AlignRight          |
+| RIGHT        |             | Qt.AlignRight                            |
+| TOP          |             | Qt.AlignTop                              |
+| TOPCENTER    |             | Qt.AlignTop                              |
+| TOPLEFT      |             | Qt.AlignTop \| Qt.AlignLeft              |
+ | TOPRIGHT     |             | Qt.AlignTop \| Qt.AlignRight             |
+| BOTTOM       |             | Qt.AlignBottom                           |
+| VCENTER      |             | Qt.AlignVCenter                          |
+| HCENTER      |             | Qt.AlignHCenter                          |
+| BOTTOMCENTER |             | qtC.Qt.AlignBottom \| qtC.Qt.AlignCenter |
+| BOTTOMLEFT   |             | qtC.Qt.AlignBottom \| qtC.Qt.AlignLeft   |
+| BOTTOMRIGHT  |             | qtC.Qt.AlignBottom \| qtC.Qt.AlignRight  |
 
 
 
