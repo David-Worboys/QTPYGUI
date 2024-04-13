@@ -551,6 +551,12 @@ RADIOBUTTON_SIZE = Size(height=1, width=10)  # In CHARACTERS
 
 # Widget alignment
 class Align(Enum):
+    """Defines the widget alignment
+
+    Args:
+        Enum (Enum):Super class
+    """
+
     LEFT = qtC.Qt.AlignLeft
     CENTER = qtC.Qt.AlignCenter
     CENTERLEFT = qtC.Qt.AlignCenter | qtC.Qt.AlignLeft
@@ -568,9 +574,13 @@ class Align(Enum):
     BOTTOMRIGHT = qtC.Qt.AlignBottom | qtC.Qt.AlignRight
 
 
-# Creates a dictionary with the keys being the values of the enum ALIGN and the values being the corresponding CSS
-# values.
 class Align_Text(Enum):
+    """Defines the text alignment using style sheet type declaration
+
+    Args:
+        Enum (Enum):Super class
+    """
+
     LEFT = "text-align:left"
     CENTER = "text-align:center"
     RIGHT = "text-align:right"
@@ -580,6 +590,12 @@ class Align_Text(Enum):
 
 # Font Properties
 class Font_Weight(Enum):
+    """Defines the font weight
+
+    Args:
+        Enum (Enum):Super class
+    """
+
     THIN = qtG.QFont.Thin
     EXTRALIGHT = qtG.QFont.ExtraLight
     LIGHT = qtG.QFont.Light
@@ -591,18 +607,22 @@ class Font_Weight(Enum):
     BLACK = qtG.QFont.Black
 
 
-# Creating a dictionary that maps the font weight to a string.
-Font_Weight_Text = {
-    Font_Weight.THIN: "thin",
-    Font_Weight.EXTRALIGHT: "extralight",
-    Font_Weight.LIGHT: "light",
-    Font_Weight.NORMAL: "normal",
-    Font_Weight.MEDIUM: "medium",
-    Font_Weight.DEMIBOLD: "demibold",
-    Font_Weight.BOLD: "bold",
-    Font_Weight.EXTRABOLD: "extrabold",
-    Font_Weight.BLACK: "black",
-}
+class Font_Weight_Text(Enum):
+    """Defines the font weight using style sheet type declaration
+
+    Args:
+        Enum (Enum):Super class
+    """
+
+    THIN = "thin"
+    EXTRALIGHT = "extralight"
+    LIGHT = "light"
+    NORMAL = "normal"
+    MEDIUM = "medium"
+    DEMIBOLD = "demibold"
+    BOLD = "bold"
+    EXTRABOLD = "extrabold"
+    BLACK = "black"
 
 
 # The `FONTSTYLE` class is an enumeration of the possible font styles
@@ -1302,7 +1322,7 @@ class Font(_qtpyBase):
 
         assert isinstance(
             self.weight, Font_Weight
-        ), f"{self.weight=}. Is not a valid FONTWEIGHT"  # and self.weight in FONTWEIGHT
+        ), f"{self.weight=}. Is not a valid Font_Weight"
 
         assert isinstance(
             self.style, Font_Style
@@ -1963,45 +1983,44 @@ class _Widget_Registry:
 class _qtpyBase_Control(_qtpyBase):
     """Base control of qypy gui controls"""
 
-    text: str = ""
-    action: str = ""
-    tag: str = ""
-    tooltip: str = ""
-    callback: Optional[Callable] = None
-    width: int = -1
-    height: int = -1
+    # Public instance variables
+    allow_clear: bool = True
+    buddy_control: Optional["_qtpyBase_Control"] = None
+    buddy_callback: Optional[Callable] = None
     align: Align = Align.LEFT
+    bold: bool = False
+    callback: Optional[Callable] = None
+    container_tag: str = ""
+    control_name: str = ""
+    editable: bool = True
+    enabled: bool = True
+    frame: Optional[Widget_Frame] = None
+    icon: Union[None, qtG.QIcon, qtG.QPixmap, str] = None
+    italic: bool = False
+    height: int = -1
+    label: str = ""
+    label_align: Align_Text = Align_Text.RIGHT
+    label_pad: int = -1
+    label_font: Optional[Font] = None
+    pixel_unit: bool = False
+    size_fixed: bool = True
+    tag: str = ""
+    text: str = ""
+    tooltip: str = ""
     txt_align: Align_Text = Align_Text.LEFT
     txt_font: Optional[Font] = None
     txt_fontsize: int = DEFAULT_FONT_SIZE
     tune_vsize: int = 0  # In pixels, 0 is Arbitrary
     tune_hsize: int = 0  # In pixels, 0 is Arbitrary
-    icon: Union[None, qtG.QIcon, qtG.QPixmap, str] = None
     translate: bool = True
     text_pad: int = 0
-    frame: Optional[Widget_Frame] = None
-    enabled: bool = True
-    label: str = ""
-    label_align: Align_Text = Align_Text.RIGHT
-    editable: bool = True
-    label_pad: int = -1
-    label_font: Optional[Font] = None
-    buddy_control: Optional["_qtpyBase_Control"] = None
-    buddy_callback: Optional[Callable] = None
-    validate_callback: Optional[Callable] = None
-    container_tag: str = ""
-    bold: bool = False
-    italic: bool = False
-    # available_width:int = g_application.available_width
-    # available_height:int = g_application.available_height
-
-    pixel_unit: bool = False
+    width: int = -1
+    underline: bool = False
     user_data: any = None
-    control_name: str = ""
-    allow_clear: bool = True
-    size_fixed: bool = True
+    validate_callback: Optional[Callable] = None
     visible: bool = True
 
+    # Private instance variables
     _widget: Optional[qtW.QWidget] = None
     _event_filter: Optional[_Event_Filter] = None
 
@@ -2015,9 +2034,8 @@ class _qtpyBase_Control(_qtpyBase):
         self.control_name: str = self.__class__.__name__
 
         assert isinstance(self.text, str), f"{self.text=} <{self.text}> must be str"
-        assert isinstance(
-            self.action, str
-        ), f"{self.action=} <{self.action}> must be str"
+        assert isinstance(self.text, str), f"{self.text=} <{self.text}> must be str"
+        assert isinstance(self.text, str), f"{self.text=} <{self.text}> must be str"
         assert isinstance(self.tag, str), f"{self.tag=} <{self.tag}> must be str"
         assert isinstance(
             self.tooltip, str
@@ -2160,6 +2178,7 @@ class _qtpyBase_Control(_qtpyBase):
 
         assert isinstance(self.bold, bool), f"{self.bold=}. Must be bool"
         assert isinstance(self.italic, bool), f"{self.italic=}. Must be bool"
+        assert isinstance(self.underline, bool), f"{self.underline=}. Must be bool"
 
         # print(f"@@A {self.available_width=}")
         # print(f"@@@ {self.available_height=}")
@@ -2463,6 +2482,7 @@ class _qtpyBase_Control(_qtpyBase):
         ), f"{container_tag=}. Must be a non-empty str"
 
         # ===== Helper
+
         def _run_widget_factory() -> None:
             """Creates the appropriate low level qt widget"""
 
@@ -2470,6 +2490,7 @@ class _qtpyBase_Control(_qtpyBase):
                 case Button():
                     self._widget = qtW.QPushButton(self.text, parent)
                     self._widget.setStyleSheet(self.txt_align.value)
+
                 case Checkbox():
                     self._widget = qtW.QCheckBox(self.text, parent)
                 case ComboBox():
@@ -2557,18 +2578,28 @@ class _qtpyBase_Control(_qtpyBase):
 
         self._widget.installEventFilter(self._event_filter)
 
-        widget_font = (
-            parent_app.app_font_def if self.txt_font is None else self.txt_font
+        widget_font_def = (
+            self.parent_app.app_font_def if self.txt_font is None else self.txt_font
         )
-        widget_font.size = self.txt_fontsize
+        self.font_set(
+            app_font=self.parent_app.app_font_def, widget_font=widget_font_def
+        )
+
+        widget_font = self._widget.font()
+
+        if self.txt_fontsize > 0:
+            widget_font.setPointSize(self.txt_fontsize)
 
         if self.bold:
-            widget_font.weight = Font_Weight.BOLD
+            widget_font.setWeight(Font_Weight.BOLD.value)
 
         if self.italic:
-            widget_font.style = Font_Style.ITALIC
+            widget_font.setItalic(True)
 
-        self.font_set(app_font=parent_app.app_font_def, widget_font=widget_font)
+        if self.underline:
+            widget_font.setUnderline(True)
+
+        self._widget.setFont(widget_font)
 
         char_pixel_size = self.pixel_char_size(1, 1)
 
@@ -3013,7 +3044,10 @@ class _qtpyBase_Control(_qtpyBase):
             widget_font, Font
         ), f"{widget_font=}. Must be an instance of Font"
 
-        widget_instance = widget or self._widget
+        if widget is None:
+            widget_instance = self._widget
+        else:
+            widget_instance = widget
 
         assert isinstance(
             widget_instance, qtW.QWidget
@@ -3072,6 +3106,7 @@ class _qtpyBase_Control(_qtpyBase):
         control_font = (
             widget_instance.font() if hasattr(widget_instance, "font") else qtG.QFont()
         )
+
         control_font.setFamily(widget_font.font_name)
         control_font.setWeight(widget_font.weight.value)
         control_font.setPointSize(widget_font.size)
@@ -4749,12 +4784,11 @@ class _Container(_qtpyBase_Control):
             if debug:
                 widget_group.setStyleSheet(
                     "QGroupBox {border:1px solid"
-                    f" cyan;font-weight:{Font_Weight_Text[self.txt_font.weight]}}} "
+                    f" cyan;font-weight:{self.txt_font.weight.value}}} "
                 )
             else:
                 widget_group.setStyleSheet(
-                    "QGroupBox"
-                    f" {{font-weight:{Font_Weight_Text[self.txt_font.weight]}}} "
+                    "QGroupBox" f" {{font-weight:{self.txt_font.weight.value}}} "
                 )
 
         widget_group.setContentsMargins(0, 0, 0, 0)

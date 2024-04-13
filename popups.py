@@ -41,11 +41,11 @@ import sqldb
 import sys_consts
 from file_utils import App_Path
 from qtpygui import (Action, Align, Button, Col_Def, Combo_Data, Combo_Item,
-                   ComboBox, Command_Button_Container, Cursor, FolderView,
-                   Font, Frame, Frame_Style, Grid, Grid_Col_Value,
-                   GridContainer, HBoxContainer, Image, Label, LineEdit,
-                   PopContainer, RadioButton, Spacer, Sys_Events, Sys_Icon,
-                   TextEdit, VBoxContainer, Widget_Frame, sys_cursor)
+                     ComboBox, Command_Button_Container, Cursor, FolderView,
+                     Font, Frame, Frame_Style, Grid, Grid_Col_Value,
+                     GridContainer, HBoxContainer, Image, Label, LineEdit,
+                     PopContainer, RadioButton, Spacer, Sys_Events, Sys_Icon,
+                     TextEdit, VBoxContainer, Widget_Frame, sys_cursor, Align_Text)
 from sys_consts import PROGRAM_NAME, SDELIM
 from utils import Countries, Text_To_File_Name
 
@@ -98,7 +98,7 @@ class PopAbout(PopContainer):
                     text=self.app_text,
                     tag="app_text",
                     width=self.width,
-                    txt_align=Align.CENTER,
+                    txt_align=Align_Text.CENTER,
                     txt_font=Font(size=16),
                 )
             )
@@ -116,7 +116,7 @@ class PopAbout(PopContainer):
                     width=self.width - 2,
                     height=self.height - 3,
                     editable=False,
-                    txt_align=Align.CENTER,
+                    txt_align=Align_Text.CENTER,
                     txt_font=self.informative_font,
                 )  # border=self.border)
             )
@@ -553,7 +553,7 @@ class PopMessage(PopContainer):
                     frame=Widget_Frame(
                         frame=Frame.SUNKEN, frame_style=Frame_Style.STYLED
                     ),
-                    txt_align=Align.CENTER,
+                    txt_align=Align_Text.CENTER,
                 ),
             )
         else:
@@ -568,7 +568,7 @@ class PopMessage(PopContainer):
                     frame=Widget_Frame(
                         frame=Frame.SUNKEN, frame_style=Frame_Style.STYLED
                     ),
-                    txt_align=Align.CENTER,
+                    txt_align=Align_Text.CENTER,
                 )
             )
 
