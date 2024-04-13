@@ -1991,7 +1991,6 @@ class _qtpyBase_Control(_qtpyBase):
     bold: bool = False
     callback: Optional[Callable] = None
     container_tag: str = ""
-    control_name: str = ""
     editable: bool = True
     enabled: bool = True
     frame: Optional[Widget_Frame] = None
@@ -2028,11 +2027,6 @@ class _qtpyBase_Control(_qtpyBase):
         """
         Checks that the values of the attributes of the class are of the correct type and that they are valid
         """
-        assert (
-            isinstance(self.control_name, str) and self.control_name == ""
-        ), f"{self.control_name=}. Can not be set by dev!"
-        self.control_name: str = self.__class__.__name__
-
         assert isinstance(self.text, str), f"{self.text=} <{self.text}> must be str"
         assert isinstance(self.text, str), f"{self.text=} <{self.text}> must be str"
         assert isinstance(self.text, str), f"{self.text=} <{self.text}> must be str"
@@ -2666,8 +2660,11 @@ class _qtpyBase_Control(_qtpyBase):
         if self.tooltip.strip() != "":
             self.tooltip_set(self.tooltip)
 
-        if hasattr(self._widget, "enabled"):
-            self.enable_set(self.enabled)
+        if hasattr(self._widget, "setEnabled"):
+            if isinstance(self, Tab):
+                self.enable_set(self.tag, self.enabled)
+            else:
+                self.enable_set(self.enabled)
 
         pixel_size = self.pixel_char_size(self.height, self.width)
 
@@ -4118,7 +4115,6 @@ class Action(_qtpyBase):
             f"{self.parent_widget=}. Must be an instance _qtpyBase, _qtpySDI_Frame or"
             " None"
         )
-        assert isinstance(self.control_name, str), f"{self.control_name=}. Must be str"
 
         self._tag_dict = self.widget_dict
         super().__init__(parent=self)
@@ -4434,7 +4430,7 @@ class _Container(_qtpyBase_Control):
     align: Align = Align.LEFT
     colpad: bool = True
     scroll: bool = False
-    controls_enabled: bool = True
+    controls_enabled: bool | None = None
     scroll_frame_off: Optional[Widget_Frame] = None
     scroll_frame_on: Optional[Widget_Frame] = None
     margin_left: int = -1
@@ -4473,9 +4469,9 @@ class _Container(_qtpyBase_Control):
 
         assert isinstance(self.colpad, bool), f"{self.colpad=}. Must be bool"
         assert isinstance(self.scroll, bool), f"{self.scroll=}. Must be bool"
-        assert isinstance(
-            self.controls_enabled, bool
-        ), f"{self.controls_enabled=}. Must be bool"
+        assert (
+            isinstance(self.controls_enabled, bool) or self.controls_enabled is None
+        ), f"{self.controls_enabled=}. Must be bool Or None"
         assert self.scroll_frame_off is None or isinstance(
             self.scroll_frame_off, Widget_Frame
         ), f"{self.scroll_frame_off=}. Must be an instance of widget_frame"
@@ -5570,13 +5566,16 @@ class _Container(_qtpyBase_Control):
                 else:
                     widget.enable_set(enabled)
 
-    def controls_enable(self, enable: bool) -> None:
+    def controls_enable(self, enable: bool | None) -> None:
         """Enables or disables all the widgets in the container.
 
         Args:
-            enable (bool): True, controls enabled or False, controls disabled
+            enable (bool): True, controls enabled, False, controls disabled, None let the
+            widget decide
         """
-        assert isinstance(enable, bool), f"{enable=}. Must be bool"
+        assert (
+            isinstance(enable, bool) or enable is None
+        ), f"{enable=}. Must be bool | None"
 
         if self._parent_app is None:
             raise AssertionError(f"{self._parent_app=}. Not set!")
@@ -5593,9 +5592,11 @@ class _Container(_qtpyBase_Control):
             try:
                 if hasattr(widget, "enable_set"):
                     if isinstance(widget, Tab):
-                        widget.enable_set("", enable)
+                        widget.enable_set(
+                            "", widget.enabled if enable is None else enable
+                        )
                     else:
-                        widget.enable_set(enable)
+                        widget.enable_set(widget.enabled if enable is None else enable)
             except:
                 print(f"Enable Failed {enable=} {widget.tag=} {widget.control_name=}")
 
@@ -12004,6 +12005,8 @@ class Label(_qtpyBase_Control):
             QWidget : The label widget or the container housing it.
         """
         # self.width = utils.amper_length(self.text.strip())
+        # if self.label_pad > 0:
+        #    self.label = self.label.ljust(self.label_pad,'_')
 
         if self.height <= 0:
             self.height = LINEEDIT_SIZE.height
@@ -14257,7 +14260,7 @@ class Tab(_qtpyBase_Control):
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
-        assert isinstance(tag, str), f"{tag=}. Must be astr"
+        assert isinstance(tag, str), f"{tag=}. Must be a str"
         assert isinstance(enable, bool), f"{enable=}. Must be bool"
 
         if self.tag == tag:

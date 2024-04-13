@@ -436,17 +436,23 @@ PyInstaller produces even larger executables!
 | Treeview          | Creates a control that displays data as a tree view                                                                          |
 
 #### Button
-| Argument             | Description                                                                     | Type                                         | Optional |
-|----------------------|---------------------------------------------------------------------------------|----------------------------------------------|----------|
-| auto_repeat_interval | If > 0 the button keeps firing Clicked events when <br>held down (milliseconds) | Integer >= 0                                 | ✓        | 
-| callback             | The method called when the button is pressed                                    | Callable                                     | ✓        |
-| height               | The height of the button                                                        | Integer > 0 (Defaults 10)                    | ✓        |
-| icon                 | The icon image displayed on the button                                          | String (File Name Or QPixmap)                | ✓        |
-| label                | Displays text to the right of the button                                        | String                                       | ✓        |
-| tag                  | The application name of the button                                              | String                                       | ✓        |
-| text                 | The text displayed on the button                                                | String                                       | ✓        |
-| txt_align            | Alignment of the text displayed on the button                                   | [Align_SS TEXT](#align_ss_text) (Align.LEFT) | ✓        |
-| width                | The width of the button                                                         | Integer > 0 (Defaults 10)                    | ✓        |
+| Argument             | Description                                                                     | Type                                        | Optional |
+|----------------------|---------------------------------------------------------------------------------|---------------------------------------------|----------|
+| auto_repeat_interval | If > 0 the button keeps firing Clicked events when <br>held down (milliseconds) | Integer >= 0 (0)                            | ✓        |
+| bold                 | Sets the button text bold if True otherwise not                                 | bool (False)                                | ✓        |
+| callback             | The method called when the button is pressed                                    | Callable                                    | ✓        |
+| enabled              | Enables/Disables the button                                                     | bool (True)                                 | ✓        |
+| height               | The height of the button                                                        | Integer > 0 (10)                            | ✓        |
+| icon                 | The icon image displayed on the button                                          | String [File Name]<br/>,QIcon,QPixmap       | ✓        |
+| italic               | Sets the button text italic if True otherwise not                               | bool (False)                                | ✓        |
+| label                | Displays text to the right of the button                                        | String                                      | ✓        |
+| label_align          | Alignment of the text displayed in the label                                    | Align_Text](#align_text) (Align_Text.LEFT)  | ✓        |
+| tag                  | The application name of the button                                              | String                                      | ✓        |
+| text                 | The text displayed on the button                                                | String                                      | ✓        |
+| txt_align            | Alignment of the text displayed on the button                                   | [Align_Text](#align_text) (Align_Text.LEFT) | ✓        |
+| underline            | Underlines the button text if True otherwise not                                | bool (False)                                | ✓        |
+| visible              | Makes the controls visible if True otherwise invisible                          | bool (True)                                 | ✓        |
+| width                | The width of the button                                                         | Integer > 0 (10)                            | ✓        |
 
 
 
