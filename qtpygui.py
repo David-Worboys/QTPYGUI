@@ -2023,7 +2023,6 @@ class _qtpyBase_Control(_qtpyBase):
     tune_vsize: int = 0  # In pixels, 0 is Arbitrary
     tune_hsize: int = 0  # In pixels, 0 is Arbitrary
     translate: bool = True
-    text_pad: int = 0
     width: int = -1
     underline: bool = False
     user_data: any = None
@@ -2716,12 +2715,12 @@ class _qtpyBase_Control(_qtpyBase):
         else:
             if self.size_fixed:
                 self._widget.setFixedSize(
-                    (self.width + 1) * (char_pixel_size.width - 1),
+                    (self.width + 1) * (char_pixel_size.width - 1) + self.tune_hsize,
                     height + self.tune_vsize,
                 )
             else:
                 self._widget.setMinimumSize(
-                    (self.width + 1) * (char_pixel_size.width - 1),
+                    (self.width + 1) * (char_pixel_size.width - 1) + self.tune_hsize,
                     height + self.tune_vsize,
                 )
 

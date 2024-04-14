@@ -442,27 +442,62 @@ Calling Button() in a layout will generate a button control on a form. The "tag"
 suggested to set width and height as the font selected might not 
 automatically size correctly.  
 
-| Argument             | Description                                                                          | Type                                        | Optional |
-|----------------------|--------------------------------------------------------------------------------------|---------------------------------------------|----------|
-| auto_repeat_interval | If > 0 the button keeps firing Clicked events when <br>held down (milliseconds)      | int >= 0 (0)                                | ✓        |
-| bold                 | Sets the button text bold if True otherwise not                                      | bool (False)                                | ✓        |
-| callback             | The method called when the button is pressed                                         | Callable                                    | ✓        |
-| enabled              | Enables/Disables the button                                                          | bool (True)                                 | ✓        |
-| height               | The height of the button (in characters if pixel_unit is<br> False,Otherwise pixels) | int > 0 (10)                                | ✓        |
-| icon                 | The icon image displayed on the button                                               | str [File Name]<br/>,QIcon,QPixmap          | ✓        |
-| italic               | Sets the button text italic if True otherwise not                                    | bool (False)                                | ✓        |
-| label                | Displays text to the right of the button                                             | str                                         | ✓        |
-| label_align          | Alignment of the text displayed in the label                                         | Align_Text](#align_text) (Align_Text.LEFT)  | ✓        |
-| pixel_unit           | unit of width/height is pixels if True, Otherwise False                              | bool (False)                                | ✓        |
-| tag                  | The application name of the button                                                   | str                                         | ✓        |
-| text                 | The text displayed on the button                                                     | str                                         | ✓        |
-| txt_align            | Alignment of the text displayed on the button                                        | [Align_Text](#align_text) (Align_Text.LEFT) | ✓        |
-| txt_font             | The font definition for the button                                                   | [Font](#font)                               | ✓        |
-| underline            | Underlines the button text if True otherwise not                                     | bool (False)                                | ✓        |
-| visible              | Makes the controls visible if True otherwise invisible                               | bool (True)                                 | ✓        |
-| width                | The width of the button (in characters if pixel_unit is<br> False,Otherwise pixels)  | int > 0 (10)                                | ✓        |
+| Argument             | Description                                                                                          | Type                                        | Optional |
+|----------------------|------------------------------------------------------------------------------------------------------|---------------------------------------------|----------|
+| auto_repeat_interval | If > 0 the button keeps firing Clicked events when <br>held down (milliseconds)                      | int >= 0 (0)                                | ✓        |
+| bold                 | Sets the button text bold if True otherwise not                                                      | bool (False)                                | ✓        |
+| callback             | The method called when the button is pressed                                                         | Callable (None)                             | ✓        |
+| enabled              | Enables/Disables the button                                                                          | bool (True)                                 | ✓        |
+| height               | The height of the button (in characters if pixel_unit is<br> False,Otherwise pixels)                 | int > 0 (10)                                | ✓        |
+| icon                 | The icon image displayed on the button                                                               | str [File Name]<br/>,QIcon,QPixmap          | ✓        |
+| italic               | Sets the button text italic if True otherwise not                                                    | bool (False)                                | ✓        |
+| label                | Displays text to the right of the button                                                             | str ("")                                    | ✓        |
+| label_align          | Alignment of the text displayed in the label                                                         | Align_Text](#align_text) (Align_Text.LEFT)  | ✓        |
+| label_font           | The font definition for the label                                                                    | [Font](#font)                               | ✓        |
+| label_width          | Sets the label width (in characters if pixel_unit is<br> False,Otherwise pixels)                     | int > 0 (0)                                 | ✓        |
+| pixel_unit           | Use pixels for width/height, pixels if True, Otherwise characters                                    | bool (False)                                | ✓        |
+| tag                  | The application name of the button                                                                   | str (System Generated)                      | ✓        |
+| text                 | The text displayed on the button                                                                     | str  ("")                                   | ✓        |
+| txt_align            | Alignment of the text displayed on the button                                                        | [Align_Text](#align_text) (Align_Text.LEFT) | ✓        |
+| txt_font             | The font definition for the button (style will override<br> italic,size will override txt_fontsize ) | [Font](#font)                               | ✓        |
+| txt_fontsize         | The point size of the text                                                                           | int (10)                                    | ✓        |
+| tune_hsize           | Add or subtracts pixels units to the width. Used in aligning controls                                | int (0)                                     | ✓        |
+| tune_vsize           | Add or subtracts pixels units to the height. Used in aligning controls                               | int (0)                                     | ✓        |
+| tooltip              | Sets the tooltip displayed when the button is hovered over                                           | str                                         | ✓        |
+| translate            | Translates text if True Otherwise does not translate                                                 | bool (True)                                 | ✓        |
+| user_data            | Any data item the user wants to attach to the button                                                 | any (None )                                 | ✓        |
+| underline            | Underlines the button text if True otherwise not                                                     | bool (False)                                | ✓        |
+| visible              | Makes the controls visible if True otherwise invisible                                               | bool (True)                                 | ✓        |
+| width                | The width of the button (in characters if pixel_unit is<br> False,Otherwise pixels)                  | int > 0 (10)                                | ✓        |
 
+A fully loaded button declaration:
+- **Note: Only "tag", "text" and "callback" are usually needed**
 
+```
+Button(
+                        tag="button_1",
+                        text="Button",
+                        label="Button 1",
+                        label_align=qtg.Align_Text.CENTER,
+                        label_width=10,
+                        label_font=qtg.Font(style=qtg.Font_Style.OBLIQUE,size=14),
+                        callback=self.event_handler,
+                        width=10,
+                        height=1,
+                        txt_align=qtg.Align_Text.CENTER,
+                        txt_font =qtg.Font(style=qtg.Font_Style.NORMAL,size=15),
+                        txt_fontsize=12,
+                        bold=True,
+                        italic=True,
+                        underline=True,
+                        enabled=True,                        
+                        visible=True,
+                        tooltip="Button 1 Press Me",
+                        tune_hsize=15,
+                        tune_vsize=15,
+                        user_data = {"key":"value"}
+                    )
+```
 
 ### QTPYGUI Enumerated Types/Class Reference
 
