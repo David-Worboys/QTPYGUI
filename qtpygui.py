@@ -626,11 +626,10 @@ class Font_Weight_Text(Enum):
 
 
 # The `FONTSTYLE` class is an enumeration of the possible font styles
-class Font_Style(IntEnum):
-    NORMAL = 0
-    ITALIC = 1
-    OBLIQUE = 2
-    UNDERLINE = 3
+class Font_Style(Enum):
+    NORMAL = qtG.QFont.StyleNormal
+    ITALIC = qtG.QFont.StyleItalic
+    OBLIQUE = qtG.QFont.StyleOblique
 
 
 # Widget frame appearance
@@ -1331,6 +1330,18 @@ class Font(_qtpyBase):
         assert isinstance(self.forecolor, str), f"{self.forecolor=}. Must be str"
         assert isinstance(self.selectback, str), f"{self.selectback=}. Must be str"
         assert isinstance(self.selectfore, str), f"{self.selectfore=}. Must be str"
+        assert (
+            self.backcolor in TEXT_COLORS
+        ), f"{self.backcolor=}. Must be a valid color"
+        assert (
+            self.forecolor in TEXT_COLORS()
+        ), f"{self.forecolor=}. Must be a valid color"
+        assert (
+            self.selectback in TEXT_COLORS()
+        ), f"{self.selectback=}. Must be a valid color"
+        assert (
+            self.selectfore in TEXT_COLORS()
+        ), f"{self.selectfore=}. Must be a valid color"
 
 
 # Private Classes
@@ -2593,6 +2604,14 @@ class _qtpyBase_Control(_qtpyBase):
         if self.underline:
             widget_font.setUnderline(True)
 
+        if self.txt_font is not None:
+            if self.txt_font.font_name:
+                widget_font.setFamily(self.txt_font.font_name)
+            if self.txt_font.size > 0:
+                widget_font.setPointSize(self.txt_font.size)
+            widget_font.setWeight(self.txt_font.weight.value)
+            widget_font.setStyle(self.txt_font.style.value)
+
         self._widget.setFont(widget_font)
 
         char_pixel_size = self.pixel_char_size(1, 1)
@@ -2989,8 +3008,23 @@ class _qtpyBase_Control(_qtpyBase):
         font_metrics = qtG.QFontMetrics(font)
 
         # Monspaced all the same width, proportional this might not be quite right
-        width = math.ceil(font_metrics.horizontalAdvance("W", char_width) * width_fudge)
-        height = math.ceil(font_metrics.height() * char_height * height_fudge)
+        max_width = -1
+        max_height = -1
+        max_char = ""
+        for character in (
+            string.ascii_lowercase + string.ascii_uppercase + string.digits
+        ):
+            if font_metrics.boundingRect(character).width() > max_width:
+                max_width = font_metrics.boundingRect(character).width()
+                max_char = character
+
+            if font_metrics.boundingRect(character).height() > max_height:
+                max_height = font_metrics.boundingRect(character).height()
+
+        width = math.ceil(
+            font_metrics.horizontalAdvance(max_char, char_width) * width_fudge
+        )
+        height = math.ceil(max_height * char_height * height_fudge)
 
         return Char_Pixel_Size(height=height, width=width)
 
@@ -3109,9 +3143,11 @@ class _qtpyBase_Control(_qtpyBase):
         control_font.setPointSize(widget_font.size)
 
         if widget_font.style == Font_Style.ITALIC:
-            control_font.setItalic(True)
-        elif widget_font.style == Font_Style.UNDERLINE:
-            control_font.setUnderline(True)
+            control_font.setStyle(Font_Style.ITALIC.value)
+        elif widget_font.style == Font_Style.NORMAL:
+            control_font.setStyle(Font_Style.NORMAL.value)
+        elif widget_font.style == Font_Style.OBLIQUE:
+            control_font.setStyle(Font_Style.OBLIQUE.value)
 
         if hasattr(widget_instance, "setFont"):
             widget_instance.setFont(control_font)
@@ -3825,12 +3861,19 @@ class QtPyApp(_qtpyBase):
 
         font_metrics = qtG.QFontMetrics(new_font)
 
-        rect = font_metrics.boundingRect("W")
-        width = rect.width()
+        max_width = -1
+        max_height = -1
 
-        height = font_metrics.height()
+        for character in string.ascii_lowercase + string.digits:
+            font_metrics.boundingRect(character)
 
-        return Char_Pixel_Size(height=height, width=width)
+            if font_metrics.boundingRect(character).width() > max_width:
+                max_width = font_metrics.boundingRect(character).width()
+
+            if font_metrics.boundingRect(character).height() > max_height:
+                max_height = font_metrics.boundingRect(character).height()
+
+        return Char_Pixel_Size(height=max_height, width=max_width)
 
     def run(self, layout: "_Container", windows_ui: bool = False) -> NoReturn:
         """Creates a main window, sets the title & icon, and then shows the window
@@ -12017,6 +12060,32 @@ class Label(_qtpyBase_Control):
         widget = super()._create_widget(
             parent_app=parent_app, parent=parent, container_tag=container_tag
         )
+
+        if False == True and self.label_font is not None:
+            # self.font_set(
+            #    app_font=parent_app.app_font_def, widget_font=self.label_font
+            # )
+            widget_font = self._widget.font()
+            if self.label_font.font_name:
+                widget_font.setFamily(self.label_font.font_name)
+
+            if self.label_font.size > 0:
+                widget_font.setPointSize(self.label_font.size)
+            # if self.label_font.bold:
+
+            self._widget.setFont(widget_font)
+
+            txt_height, txt_width = self.text_pixel_size(self.label)
+            char_height = Char_Pixel_Size(height=1, width=1).height
+            char_width = Char_Pixel_Size(height=1, width=1).width
+            self.height = char_height * txt_height
+            self.width = char_width * txt_width
+            str_height = self.pixel_str_size(self.label).height
+            str_width = self.pixel_str_size(self.label).width
+            self._widget.resize(str_width, str_height)
+            print(
+                f"{self.label=}, {str_height=} {str_width=} {txt_height=}, {txt_width=}, {self.height=}, {self.width=}"
+            )
 
         if self.txt_align == Align_Text.LEFT:
             self._widget.setAlignment(qtC.Qt.AlignLeft)

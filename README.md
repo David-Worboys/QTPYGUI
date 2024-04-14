@@ -12,9 +12,9 @@
 4. [Hello World Application](#building-your-first-application)
 5. [Application Distribution](#distributing-your-application)
 6. [Boot Camp](#boot-camp)
-7. [GUI Control Reference](#gui-control-api-reference)
+7. [QTPYGUI Control Reference](#qtpygui-control-api-reference)
    - [Button](#button) 
-8. [QTPYGUI Classes](#qtgui-class-reference)
+8. [QTPYGUI Enumerated Types/Classes](#qtpygui-enumerated-typesclass-reference)
 
 ## Introduction
 QTPYGUI is a declarative user interface wrapper around Pyside6 and, as there are 
@@ -412,7 +412,7 @@ executable file - This is simply how it is when distributing Python applications
  as so much is included during the build process. It is worth noting that 
 PyInstaller produces even larger executables! 
 
-### GUI Control API Reference
+### QTPYGUI Control API Reference
 | Control           | Description                                                                                                                  |
 |-------------------|------------------------------------------------------------------------------------------------------------------------------|
 | [Button](#button) | Creates a button, text and icon are optional                                                                                 |
@@ -436,29 +436,43 @@ PyInstaller produces even larger executables!
 | Treeview          | Creates a control that displays data as a tree view                                                                          |
 
 #### Button
-| Argument             | Description                                                                     | Type                                        | Optional |
-|----------------------|---------------------------------------------------------------------------------|---------------------------------------------|----------|
-| auto_repeat_interval | If > 0 the button keeps firing Clicked events when <br>held down (milliseconds) | Integer >= 0 (0)                            | ✓        |
-| bold                 | Sets the button text bold if True otherwise not                                 | bool (False)                                | ✓        |
-| callback             | The method called when the button is pressed                                    | Callable                                    | ✓        |
-| enabled              | Enables/Disables the button                                                     | bool (True)                                 | ✓        |
-| height               | The height of the button                                                        | Integer > 0 (10)                            | ✓        |
-| icon                 | The icon image displayed on the button                                          | String [File Name]<br/>,QIcon,QPixmap       | ✓        |
-| italic               | Sets the button text italic if True otherwise not                               | bool (False)                                | ✓        |
-| label                | Displays text to the right of the button                                        | String                                      | ✓        |
-| label_align          | Alignment of the text displayed in the label                                    | Align_Text](#align_text) (Align_Text.LEFT)  | ✓        |
-| tag                  | The application name of the button                                              | String                                      | ✓        |
-| text                 | The text displayed on the button                                                | String                                      | ✓        |
-| txt_align            | Alignment of the text displayed on the button                                   | [Align_Text](#align_text) (Align_Text.LEFT) | ✓        |
-| underline            | Underlines the button text if True otherwise not                                | bool (False)                                | ✓        |
-| visible              | Makes the controls visible if True otherwise invisible                          | bool (True)                                 | ✓        |
-| width                | The width of the button                                                         | Integer > 0 (10)                            | ✓        |
+
+Calling Button() in a layout will generate a button control on a form. The "tag"
+,"text" and "callback" arguments are generally the only arguments used. It is 
+suggested to set width and height as the font selected might not 
+automatically size correctly.  
+
+| Argument             | Description                                                                          | Type                                        | Optional |
+|----------------------|--------------------------------------------------------------------------------------|---------------------------------------------|----------|
+| auto_repeat_interval | If > 0 the button keeps firing Clicked events when <br>held down (milliseconds)      | int >= 0 (0)                                | ✓        |
+| bold                 | Sets the button text bold if True otherwise not                                      | bool (False)                                | ✓        |
+| callback             | The method called when the button is pressed                                         | Callable                                    | ✓        |
+| enabled              | Enables/Disables the button                                                          | bool (True)                                 | ✓        |
+| height               | The height of the button (in characters if pixel_unit is<br> False,Otherwise pixels) | int > 0 (10)                                | ✓        |
+| icon                 | The icon image displayed on the button                                               | str [File Name]<br/>,QIcon,QPixmap          | ✓        |
+| italic               | Sets the button text italic if True otherwise not                                    | bool (False)                                | ✓        |
+| label                | Displays text to the right of the button                                             | str                                         | ✓        |
+| label_align          | Alignment of the text displayed in the label                                         | Align_Text](#align_text) (Align_Text.LEFT)  | ✓        |
+| pixel_unit           | unit of width/height is pixels if True, Otherwise False                              | bool (False)                                | ✓        |
+| tag                  | The application name of the button                                                   | str                                         | ✓        |
+| text                 | The text displayed on the button                                                     | str                                         | ✓        |
+| txt_align            | Alignment of the text displayed on the button                                        | [Align_Text](#align_text) (Align_Text.LEFT) | ✓        |
+| txt_font             | The font definition for the button                                                   | [Font](#font)                               | ✓        |
+| underline            | Underlines the button text if True otherwise not                                     | bool (False)                                | ✓        |
+| visible              | Makes the controls visible if True otherwise invisible                               | bool (True)                                 | ✓        |
+| width                | The width of the button (in characters if pixel_unit is<br> False,Otherwise pixels)  | int > 0 (10)                                | ✓        |
 
 
 
-### QTGUI Class Reference
+### QTPYGUI Enumerated Types/Class Reference
+
+The following enumerated types and classes are used to define the features and 
+behaviour of QTPYGUI 
+
 #### Align
-Aligns containers and GUI controls
+
+Used in defining the alignment of containers and GUI controls
+
 | Property     | Description | Type                             |
 |--------------|-------------|----------------------------------|
  | LEFT         |             | Qt.AlignLeft                     |
@@ -478,7 +492,8 @@ Aligns containers and GUI controls
 | BOTTOMRIGHT  |             | Qt.AlignBottom \| Qt.AlignRight  |
 
 #### Align_Text
-Aligns text using style sheet type declaration (Some controls will remap to Align types)
+Aligns text using style sheet type declaration (Some controls will remap to 
+[Align](#align) types)
 
 | Property | Description | Type              |
 |----------|-------------|-------------------|
@@ -487,6 +502,48 @@ Aligns text using style sheet type declaration (Some controls will remap to Alig
 | RIGHT    |             | text-align:right  |
 | TOP      |             | text-align:top    |
 | BOTTOM   |             | text-align:bottom |
+
+#### Font
+Defines the [font](#font) properties, utilised in font related arguments in GUI control 
+definitions.
+
+Colours are checked to ensure they are valid and will raise an assertion error 
+if they are not. 
+
+| Property   | Description                 | Type                                 |
+|------------|-----------------------------|--------------------------------------|
+| backcolor  | Background colour           | str ("")                             |
+| forecolor  | Foreground colour           | str ("")                             |
+| font_name  | The font name               | str ("")                             |
+| selectback | Selection background colour | str ("")                             |
+| selectfore | Selection foreground colour | str ("")                             |
+| size       | The font point size         | int (10)                             |
+| style      | The font style              | [Font_Style](#font_style) (NORMAL)   |
+| weight     | The font weight             | [Font_Weight](#font_weight) (NORMAL) |
+
+#### Font_Style
+Defines the style of the [font](#font)
+
+| Property | Description                   | Type               |
+|----------|-------------------------------|--------------------|
+| NORMAL   | Font has no special features  | QFont.StyleNormal  |
+| ITALIC   | Defines font as italic style  | QFont.StyleItalic  |
+| OBLIQUE  | Defines font as oblique style | QFont.StyleOblique |
+
+#### Font_Weight
+Defines the weight of the [font](#font)
+
+| Property   | Description                                         | Type       |
+|------------|-----------------------------------------------------|------------|
+| BLACK      | Defines the font as black                           | Enumerated |
+| BOLD       | Defines the font as bold                            | Enumerated |
+| DEMIBOLD   | Defines the font as demibold                        | Enumerated |
+| EXTRABOLD  | Defines the font as extra bold                      | Enumerated |
+| EXTRALIGHT | Defines the font as extra light                     | Enumerated |
+| LIGHT      | Defines the font as light                           | Enumerated |
+| MEDIUM     | Defines the font as medium                          | Enumerated |
+| NORMAL     | Defines the font as normal with no special features | Enumerated |
+| THIN       | Defines the font as thin                            | Enumerated |
 
 
 
