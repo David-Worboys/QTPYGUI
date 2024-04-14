@@ -2111,10 +2111,6 @@ class _qtpyBase_Control(_qtpyBase):
 
         assert isinstance(self.translate, bool), f"{self.translate=}. Must be bool"
         assert (
-            isinstance(self.text_pad, int) and self.text_pad >= 0
-        ), f"{self.text_pad=}. Must be an int >= 0"
-
-        assert (
             isinstance(self.frame, Widget_Frame) or self.frame is None
         ), f"{self.frame=}. Must be Widget_Frame or None"
         assert isinstance(self.enabled, bool), f"{self.enabled=}. Must be bool"
@@ -2623,7 +2619,6 @@ class _qtpyBase_Control(_qtpyBase):
                 tag="l_" + self.tag,
                 txt_font=self.label_font,
                 txt_align=self.label_align,
-                text_pad=self.label_width,
                 width=-1 if self.label_width <= 0 else self.label_width,
                 pixel_unit=self.pixel_unit,
             )

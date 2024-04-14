@@ -446,6 +446,7 @@ automatically size correctly.
 |----------------------|------------------------------------------------------------------------------------------------------|---------------------------------------------|----------|
 | auto_repeat_interval | If > 0 the button keeps firing Clicked events when <br>held down (milliseconds)                      | int >= 0 (0)                                | ✓        |
 | bold                 | Sets the button text bold if True otherwise not                                                      | bool (False)                                | ✓        |
+| buddy_control        | Control or container with controls that sit to the right of the button                               | Container or GUI Control                    | ✓        | 
 | callback             | The method called when the button is pressed                                                         | Callable (None)                             | ✓        |
 | enabled              | Enables/Disables the button                                                                          | bool (True)                                 | ✓        |
 | height               | The height of the button (in characters if pixel_unit is<br> False,Otherwise pixels)                 | int > 0 (10)                                | ✓        |
@@ -495,7 +496,11 @@ Button(
                         tooltip="Button 1 Press Me",
                         tune_hsize=15,
                         tune_vsize=15,
-                        user_data = {"key":"value"}
+                        user_data = {"key":"value"},
+                        buddy_control=qtg.HBoxContainer().add_row(
+                            qtg.Spacer(width=1),
+                                    qtg.Checkbox(tag="button_check", text="Tick Me!", callback=self.event_handler, width=12)
+                        ),
                     )
 ```
 
