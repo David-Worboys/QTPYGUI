@@ -2010,7 +2010,7 @@ class _qtpyBase_Control(_qtpyBase):
     height: int = -1
     label: str = ""
     label_align: Align_Text = Align_Text.RIGHT
-    label_pad: int = -1
+    label_width: int = -1
     label_font: Optional[Font] = None
     pixel_unit: bool = False
     size_fixed: bool = True
@@ -2145,14 +2145,14 @@ class _qtpyBase_Control(_qtpyBase):
             self.label_font, (type(None), Font)
         ), f"{self.label_font=}. Must be an instance of Font"
 
-        assert isinstance(self.label_pad, int) and (
-            self.label_pad == -1 or self.label_pad >= 0
-        ), f"{self.label_pad=}. Must be an int > 0 or  -1"
+        assert isinstance(self.label_width, int) and (
+            self.label_width == -1 or self.label_width >= 0
+        ), f"{self.label_width=}. Must be an int > 0 or  -1"
 
         if (
-            self.label.strip() != "" and self.label_pad == -1
+            self.label.strip() != "" and self.label_width == -1
         ):  # Change 29 3 2021 - add strip
-            self.label_pad = amper_length(self.trans_str(self.label))
+            self.label_width = amper_length(self.trans_str(self.label))
 
         assert isinstance(
             self.buddy_control, (type(None), _qtpyBase_Control)
@@ -2617,15 +2617,16 @@ class _qtpyBase_Control(_qtpyBase):
         char_pixel_size = self.pixel_char_size(1, 1)
 
         if self.label != "&" and (
-            amper_length(self.label.strip()) > 0 or self.label_pad > 0
+            amper_length(self.label.strip()) > 0 or self.label_width > 0
         ):
             label = Label(
-                text=self.label,  # self.label.strip() if self.label_pad == 0 else self.label,
+                text=self.label,  # self.label.strip() if self.label_width == 0 else self.label,
                 tag="l_" + self.tag,
                 txt_font=self.label_font,
                 txt_align=self.label_align,
-                text_pad=self.label_pad,
-                width=-1 if self.label_pad == 0 else self.label_pad,
+                text_pad=self.label_width,
+                width=-1 if self.label_width <= 0 else self.label_width,
+                pixel_unit=self.pixel_unit,
             )
             label_widget = label._create_widget(
                 parent_app=parent_app, parent=parent, container_tag=container_tag
@@ -4645,7 +4646,7 @@ class _Container(_qtpyBase_Control):
                                             )
                                         )
                                         container_control.label = ""
-                                        container_control.label_pad = -1
+                                        container_control.label_width = -1
 
                         elif hasattr(col_control, "label") and col_control.label != "":
                             form_labels[col_control.tag] = self.trans_str(
@@ -4653,13 +4654,17 @@ class _Container(_qtpyBase_Control):
                             )
 
                             col_control.label = ""
-                            col_control.label_pad = -1
-                    elif hasattr(col_control, "label") and col_control.label_pad != -1:
-                        col_control.label_pad = (
-                            max_text_len - 1
-                            if row_list.index(col_control) == 0
-                            else col_control.label_pad - 1
-                        )
+                            col_control.label_width = -1
+                    elif (
+                        hasattr(col_control, "label") and col_control.label_width != -1
+                    ):
+                        pass
+                        # TODO : Remove This block if no layout errors noted
+                        # col_control.label_width = (
+                        #    max_text_len - 1
+                        #    if row_list.index(col_control) == 0
+                        #    else col_control.label_width - 1
+                        # )
 
             return form_labels
 
@@ -12047,10 +12052,6 @@ class Label(_qtpyBase_Control):
         Returns:
             QWidget : The label widget or the container housing it.
         """
-        # self.width = utils.amper_length(self.text.strip())
-        # if self.label_pad > 0:
-        #    self.label = self.label.ljust(self.label_pad,'_')
-
         if self.height <= 0:
             self.height = LINEEDIT_SIZE.height
 
