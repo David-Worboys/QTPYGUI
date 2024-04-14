@@ -12061,32 +12061,6 @@ class Label(_qtpyBase_Control):
             parent_app=parent_app, parent=parent, container_tag=container_tag
         )
 
-        if False == True and self.label_font is not None:
-            # self.font_set(
-            #    app_font=parent_app.app_font_def, widget_font=self.label_font
-            # )
-            widget_font = self._widget.font()
-            if self.label_font.font_name:
-                widget_font.setFamily(self.label_font.font_name)
-
-            if self.label_font.size > 0:
-                widget_font.setPointSize(self.label_font.size)
-            # if self.label_font.bold:
-
-            self._widget.setFont(widget_font)
-
-            txt_height, txt_width = self.text_pixel_size(self.label)
-            char_height = Char_Pixel_Size(height=1, width=1).height
-            char_width = Char_Pixel_Size(height=1, width=1).width
-            self.height = char_height * txt_height
-            self.width = char_width * txt_width
-            str_height = self.pixel_str_size(self.label).height
-            str_width = self.pixel_str_size(self.label).width
-            self._widget.resize(str_width, str_height)
-            print(
-                f"{self.label=}, {str_height=} {str_width=} {txt_height=}, {txt_width=}, {self.height=}, {self.width=}"
-            )
-
         if self.txt_align == Align_Text.LEFT:
             self._widget.setAlignment(qtC.Qt.AlignLeft)
         elif self.txt_align == Align_Text.CENTER:
