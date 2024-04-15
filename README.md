@@ -417,7 +417,7 @@ PyInstaller produces even larger executables!
 |-----------------------|------------------------------------------------------------------------------------------------------------------------------|
 | [Button](#button)     | Creates a button, text and icon are optional                                                                                 |
 | [Checkbox](#checkbox) | Creates a check box that a user can click on or off                                                                          | 
-| ComboBox              | Creates a drop down selection box, icon in list is <br/>optional                                                             |
+| [ComboBox](#combobox) | Creates a drop down selection box, icon in list is <br/>optional                                                             |
 | Label                 | Creates a text string                                                                                                        |
 | Dateedit              | Creates a date edit control with a dropdown calendar and <br/>an erase button                                                |
 | FolderView            | Creates a control that displays the contents of a folder in a Grid                                                           |
@@ -517,7 +517,7 @@ automatically size correctly.
 | buddy_control | Control or container with controls that sit to the right of the checkbox                               | Container or GUI Control                    | ✓        | 
 | callback      | The method called when the checkbox is checked                                                         | Callable (None)                             | ✓        |
 | enabled       | Enables/Disables the checkbox                                                                          | bool (True)                                 | ✓        |
-| height        | The height of the checkbox (in characters if pixel_unit is<br> False,Otherwise pixels)                 | int > 0 (10)                                | ✓        |
+| height        | The height of the checkbox (in characters if pixel_unit is False,Otherwise pixels)                     | int > 0 (10)                                | ✓        |
 | italic        | Sets the checkbox text italic if True otherwise not                                                    | bool (False)                                | ✓        |
 | label         | Displays text to the left of the checkbox                                                              | str ("")                                    | ✓        |
 | label_align   | Alignment of the text displayed in the label                                                           | [Align_Text](#align_text) (Align_Text.LEFT) | ✓        |
@@ -536,7 +536,7 @@ automatically size correctly.
 | user_data     | Any data item the user wants to attach to the checkbox                                                 | any (None )                                 | ✓        |
 | underline     | Underlines the checkbox text if True otherwise not                                                     | bool (False)                                | ✓        |
 | visible       | Makes the checkbox visible if True otherwise invisible                                                 | bool (True)                                 | ✓        |
-| width         | The width of the checkbox (in characters if pixel_unit is<br> False,Otherwise pixels)                  | int > 0 (10)                                | ✓        |
+| width         | The width of the checkbox (in characters if pixel_unit is False,Otherwise pixels)                      | int > 0 (10)                                | ✓        |
 
 A fully loaded checkbox declaration:
 - **Note: Only "tag", "text" and "callback" are usually needed**
@@ -571,6 +571,100 @@ Checkbox(
 
                     )
 ```
+#### ComboBox
+
+Calling ComboBox in a layout will generate a dropdown combobox control on a form. The "tag"
+,"text" and "callback" arguments are generally the only arguments used. It is 
+suggested to set width and height as the font selected might not 
+automatically size correctly.
+
+
+| Argument          | Description                                                                                                          | Type                                        | Optional |
+|-------------------|----------------------------------------------------------------------------------------------------------------------|---------------------------------------------|----------|
+| bold              | Sets the combobox text bold if True otherwise not                                                                    | bool (False)                                | ✓        |
+| buddy_control     | Control or container with controls that sit to the right of the combobox                                             | Container or GUI Control                    | ✓        | 
+| callback          | The method called when the combobox is modified                                                                      | Callable (None)                             | ✓        |
+| display_na        | Displays N/A (Not Applicable/Available) in the drop down list if True Otherwise not                                  | bool (True)                                 | ✓        |
+| dropdown_width    | The width of the combobox (in characters if pixel_unit is False,Otherwise pixels)                                    | int > 0 (10)                                | ✓        |
+| enabled           | Enables/Disables the combobox                                                                                        | bool (True)                                 | ✓        |
+| height            | The height of the combobox (in characters if pixel_unit is False,Otherwise pixels)                                   | int > 0 (10)                                | ✓        |
+| italic            | Sets the combobox text italic if True otherwise not                                                                  | bool (False)                                | ✓        |
+| items             | Items to add to the dropdown list                                                                                    | list or tuple [Combo_Item](#combo_item)     | ✓        |
+| label             | Displays text to the left of the combobox                                                                            | str ("")                                    | ✓        |
+| label_align       | Alignment of the text displayed in the label                                                                         | [Align_Text](#align_text) (Align_Text.LEFT) | ✓        |
+| label_font        | The font definition for the label                                                                                    | [Font](#font)                               | ✓        |
+| label_width       | Sets the label width (in characters if pixel_unit is<br> False,Otherwise pixels)                                     | int > 0 (0)                                 | ✓        |
+| num_visible_items | Number of items displayed in the dropdown list                                                                       | int >= 1 (15)                               | ✓        |
+| pixel_unit        | Use pixels for width/height, pixels if True, Otherwise characters                                                    | bool (False)                                | ✓        |
+| tag               | The application name of the combobox                                                                                 | str (System Generated)                      | ✓        |
+| txt_font          | The font definition for the combobox dropdown list (style will override<br> italic,size will override txt_fontsize ) | [Font](#font)                               | ✓        |
+| txt_fontsize      | The point size of the text   in the combobox dropdown list                                                           | int (10)                                    | ✓        |
+| tune_hsize        | Add or subtracts pixels units to the width. Used in aligning controls                                                | int (0)                                     | ✓        |
+| tune_vsize        | Add or subtracts pixels units to the height. Used in aligning controls                                               | int (0)                                     | ✓        |
+| tooltip           | Sets the tooltip displayed when the combobox is hovered over                                                         | str                                         | ✓        |
+| translate         | Translates dropdown text if True Otherwise does not translate                                                        | bool (True)                                 | ✓        |
+| user_data         | Any data item the user wants to attach to the combobox                                                               | any (None )                                 | ✓        |
+| underline         | Underlines the combobox dropdown text if True otherwise not                                                          | bool (False)                                | ✓        |
+| visible           | Makes the combobox visible if True otherwise invisible                                                               | bool (True)                                 | ✓        |
+| width             | The width of the combobox (in characters if pixel_unit is False,Otherwise pixels)                                    | int > 0 (10)                                | ✓        |
+
+A fully loaded combobox declaration:
+- **Note: Only "tag", "text" ,"callback" and "items" are usually needed**
+```
+ComboBox(
+                        tag="combo_box",
+                        label="Combo Box",
+                        display_na=True,
+                        dropdown_width=35,
+                        items=[
+                            qtg.Combo_Item(
+                                display="Item 1",
+                                data=None,
+                                icon=qtg.Sys_Icon.computericon.get(),
+                                user_data=None,
+                            ),
+                            qtg.Combo_Item(
+                                display="Item 2", data=None, icon=None, user_data=None
+                            ),
+                            qtg.Combo_Item(
+                                display="Item 3", data=None, icon=None, user_data=None
+                            ),
+                        ],
+                        callback=self.event_handler,
+                        label_align=qtg.Align_Text.CENTER,
+                        label_width=10,
+                        label_font=qtg.Font(style=qtg.Font_Style.OBLIQUE, size=14),
+                        width=8,
+                        height=1,
+                        txt_font=qtg.Font(style=qtg.Font_Style.ITALIC, size=12),
+                        txt_fontsize=12,
+                        bold=True,
+                        italic=True,
+                        underline=True,
+                        enabled=True,
+                        visible=True,
+                        tooltip="Check Box Press Me",
+                        tune_hsize=15,
+                        tune_vsize=1,
+                        user_data={"key": "value"},
+                        buddy_control=qtg.HBoxContainer().add_row(
+                            qtg.Spacer(width=1),
+                            qtg.Button(tag="button_push2", text="Push Me 2!", callback=self.event_handler, width=12)
+                        ),
+                    ),
+```
+#### Methods
+
+| Method            | Description                                | Arguments                                               | Returns                        |
+|-------------------|--------------------------------------------|---------------------------------------------------------|--------------------------------|
+| count_items       | Returns the number of items in the list    |                                                         | int >= 1                       |    
+| display_width_set | Sets the combobox display width            |                                                         |                                |
+|                   |                                            | display_width : int                                     |                                |
+| icon_set          | Sets the icon at a given row               |                                                         |                                |
+|                   |                                            | combo_index : int >= 0 <= number of items in list : int |                                |
+ |                   |                                            | icon : str [File Name], QIcon,QPixmap                   |                                |
+| get_items         | Returns all the items in the dropdown list |                                                         | list [Combo_Data](#combo_data) |
+
 
 ### QTPYGUI Enumerated Types/Class Reference
 
@@ -600,6 +694,7 @@ Used in defining the alignment of containers and GUI controls
 | BOTTOMRIGHT  |             | Qt.AlignBottom \| Qt.AlignRight  |
 
 #### Align_Text
+
 Aligns text using style sheet type declaration (Some controls will remap to 
 [Align](#align) types)
 
@@ -611,7 +706,30 @@ Aligns text using style sheet type declaration (Some controls will remap to
 | TOP      |             | text-align:top    |
 | BOTTOM   |             | text-align:bottom |
 
+#### Combo_Data
+
+Combo_Data is a class used to store data sourced from combo box items
+
+| Property  | Description                          | Type                                                                |
+|-----------|--------------------------------------|---------------------------------------------------------------------|
+| display   | Text displayed in dropdown row       | str                                                                 |
+| data      | user data held in dropdown row       | str, int, float, bytes, bool (None)                                 |
+| index     | Row index of data item               | int >= 0                                                            |
+| user_data | Data stored by user  in dropdown row | None , str, int , float , bytes , bool , tuple , list , dict (None) |
+
+#### Combo_Item
+
+Combo_Item is a class used to set combo box items
+
+| Property  | Description                            | Type                                                                |
+|-----------|----------------------------------------|---------------------------------------------------------------------|
+| display   | Text displayed in dropdown row         | str                                                                 |
+| data      | user data held in dropdown row         | str, int, float, bytes, bool (None)                                 |
+| icon      | The icon image displayed on the button | str [File Name]<br/>,QIcon,QPixmap (None)                           |
+| user_data | Data stored by user  in dropdown row   | None , str, int , float , bytes , bool , tuple , list , dict (None) |
+
 #### Font
+
 Defines the [font](#font) properties, utilised in font related arguments in GUI control 
 definitions.
 

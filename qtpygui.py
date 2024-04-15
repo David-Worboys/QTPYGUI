@@ -7163,10 +7163,9 @@ class ComboBox(_qtpyBase_Control):
                     self.pixel_char_size(char_height=1, char_width=max_len).width
                 )
 
-        self.enable_set(enabled)
-
+        self.enable_set(enabled)        
         self._widget.setMaxVisibleItems(self.num_visible_items)
-
+        
         return widget
 
     def display_width_set(self, display_width: int) -> None:
@@ -7642,41 +7641,6 @@ class ComboBox(_qtpyBase_Control):
                 self._widget.setCurrentIndex(index)
 
         return None
-
-
-class _calendar_widget(qtW.QCalendarWidget):
-    """A subclass of the QCalendarWidget that overrides the setSelectedDate method to set the current page to the current
-    date
-    """
-
-    def __init__(self, parent: "Dateedit") -> None:
-        """Constructor for the calendar widget.
-
-        Args:
-            parent (Dateedit): The parent widget.
-        """
-        super().__init__()
-
-        self._parent = parent
-
-    def setSelectedDate(self, date: qtC.QDate) -> None:
-        """Method that is called when the user clicks on a date in the calendar widget
-
-        Args:
-            date (qtC.QDate): The date that was clicked on.
-        """
-        date_tuple = self._parent.date_get(date_tuple=True)
-
-        if date_tuple[0] == 100 and date_tuple[1] == 1 and date_tuple[2] == 1:
-            # If the date is 1/1/100 (minimum date) then set the date to the current date
-            default_date = qtC.QDate.currentDate().toString(self._parent.format)
-        else:
-            default_date = self._parent.date_get()
-
-        # super().setSelectedDate(qtC.QDate.fromString(default_date,self._parent.format))
-        the_date = qtC.QDate.fromString(default_date, self._parent.format)
-        self.setCurrentPage(the_date.year(), the_date.month())
-
 
 class SimpleDateValidator(qtG.QValidator):
     """A validator that ensures that the text in the line edit is a valid date, and that the date is greater than
