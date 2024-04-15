@@ -413,31 +413,31 @@ executable file - This is simply how it is when distributing Python applications
 PyInstaller produces even larger executables! 
 
 ### QTPYGUI Control API Reference
-| Control           | Description                                                                                                                  |
-|-------------------|------------------------------------------------------------------------------------------------------------------------------|
-| [Button](#button) | Creates a button, text and icon are optional                                                                                 |
-| Checkbox          | Creates a check box that a user can click on or off                                                                          | 
-| ComboBox          | Creates a drop down selection box, icon in list is <br/>optional                                                             |
-| Label             | Creates a text string                                                                                                        |
-| Dateedit          | Creates a date edit control with a dropdown calendar and <br/>an erase button                                                |
-| FolderView        | Creates a control that displays the contents of a folder in a Grid                                                           |
-| Grid              | Creates a control that displays data in a table (grid) format                                                                |
-| Image             | Creates a control that displays an image                                                                                     |
-| LineEdit          | Creates a control that allows text to be edited and displayed<br/> in a single line                                          |
-| Menu              | Creates a menu just below the title bar                                                                                      |
-| ProgressBar       | Creates a control that displays the progress of an operation                                                                 |
-| RadioButton       | Creates a radio button control. In a group only one can be <br/>selected at a time                                           |
-| Switch            | Creates a switch control that can be used to turn on and <br/>off a feature                                                  |
-| Slider            | Creates a slider control than can be used to set a value <br/>by dragging the handle                                         |
-| Spinbox           | Creates a spinbox control that allows numbers to be set <br/>via clicking up and down arrows or entering the number directly |
-| Tab               | Creates a tab control that has multiple pages, each <br/>housing their own set of GUI controls                               |
-| TextEdit          | Creates a text entry control that can span multiple lines                                                                    |
-| Timeedit          | Creates a time edit control with an erase button                                                                             |
-| Treeview          | Creates a control that displays data as a tree view                                                                          |
+| Control               | Description                                                                                                                  |
+|-----------------------|------------------------------------------------------------------------------------------------------------------------------|
+| [Button](#button)     | Creates a button, text and icon are optional                                                                                 |
+| [Checkbox](#checkbox) | Creates a check box that a user can click on or off                                                                          | 
+| ComboBox              | Creates a drop down selection box, icon in list is <br/>optional                                                             |
+| Label                 | Creates a text string                                                                                                        |
+| Dateedit              | Creates a date edit control with a dropdown calendar and <br/>an erase button                                                |
+| FolderView            | Creates a control that displays the contents of a folder in a Grid                                                           |
+| Grid                  | Creates a control that displays data in a table (grid) format                                                                |
+| Image                 | Creates a control that displays an image                                                                                     |
+| LineEdit              | Creates a control that allows text to be edited and displayed<br/> in a single line                                          |
+| Menu                  | Creates a menu just below the title bar                                                                                      |
+| ProgressBar           | Creates a control that displays the progress of an operation                                                                 |
+| RadioButton           | Creates a radio button control. In a group only one can be <br/>selected at a time                                           |
+| Switch                | Creates a switch control that can be used to turn on and <br/>off a feature                                                  |
+| Slider                | Creates a slider control than can be used to set a value <br/>by dragging the handle                                         |
+| Spinbox               | Creates a spinbox control that allows numbers to be set <br/>via clicking up and down arrows or entering the number directly |
+| Tab                   | Creates a tab control that has multiple pages, each <br/>housing their own set of GUI controls                               |
+| TextEdit              | Creates a text entry control that can span multiple lines                                                                    |
+| Timeedit              | Creates a time edit control with an erase button                                                                             |
+| Treeview              | Creates a control that displays data as a tree view                                                                          |
 
 #### Button
 
-Calling Button() in a layout will generate a button control on a form. The "tag"
+Calling Button in a layout will generate a button control on a form. The "tag"
 ,"text" and "callback" arguments are generally the only arguments used. It is 
 suggested to set width and height as the font selected might not 
 automatically size correctly.  
@@ -452,8 +452,8 @@ automatically size correctly.
 | height               | The height of the button (in characters if pixel_unit is<br> False,Otherwise pixels)                 | int > 0 (10)                                | ✓        |
 | icon                 | The icon image displayed on the button                                                               | str [File Name]<br/>,QIcon,QPixmap          | ✓        |
 | italic               | Sets the button text italic if True otherwise not                                                    | bool (False)                                | ✓        |
-| label                | Displays text to the right of the button                                                             | str ("")                                    | ✓        |
-| label_align          | Alignment of the text displayed in the label                                                         | Align_Text](#align_text) (Align_Text.LEFT)  | ✓        |
+| label                | Displays text to the left of the button                                                              | str ("")                                    | ✓        |
+| label_align          | Alignment of the text displayed in the label                                                         | [Align_Text](#align_text) (Align_Text.LEFT) | ✓        |
 | label_font           | The font definition for the label                                                                    | [Font](#font)                               | ✓        |
 | label_width          | Sets the label width (in characters if pixel_unit is<br> False,Otherwise pixels)                     | int > 0 (0)                                 | ✓        |
 | pixel_unit           | Use pixels for width/height, pixels if True, Otherwise characters                                    | bool (False)                                | ✓        |
@@ -468,7 +468,7 @@ automatically size correctly.
 | translate            | Translates text if True Otherwise does not translate                                                 | bool (True)                                 | ✓        |
 | user_data            | Any data item the user wants to attach to the button                                                 | any (None )                                 | ✓        |
 | underline            | Underlines the button text if True otherwise not                                                     | bool (False)                                | ✓        |
-| visible              | Makes the controls visible if True otherwise invisible                                               | bool (True)                                 | ✓        |
+| visible              | Makes the button visible if True otherwise invisible                                                 | bool (True)                                 | ✓        |
 | width                | The width of the button (in characters if pixel_unit is<br> False,Otherwise pixels)                  | int > 0 (10)                                | ✓        |
 
 A fully loaded button declaration:
@@ -501,6 +501,74 @@ Button(
                             qtg.Spacer(width=1),
                                     qtg.Checkbox(tag="button_check", text="Tick Me!", callback=self.event_handler, width=12)
                         ),
+                    )
+```
+
+#### Checkbox
+
+Calling Checkbox in a layout will generate a checkbox control on a form. The "tag"
+,"text" and "callback" arguments are generally the only arguments used. It is 
+suggested to set width and height as the font selected might not 
+automatically size correctly.
+
+| Argument      | Description                                                                                            | Type                                        | Optional |
+|---------------|--------------------------------------------------------------------------------------------------------|---------------------------------------------|----------|
+| bold          | Sets the checkbox text bold if True otherwise not                                                      | bool (False)                                | ✓        |
+| buddy_control | Control or container with controls that sit to the right of the checkbox                               | Container or GUI Control                    | ✓        | 
+| callback      | The method called when the checkbox is checked                                                         | Callable (None)                             | ✓        |
+| enabled       | Enables/Disables the checkbox                                                                          | bool (True)                                 | ✓        |
+| height        | The height of the checkbox (in characters if pixel_unit is<br> False,Otherwise pixels)                 | int > 0 (10)                                | ✓        |
+| italic        | Sets the checkbox text italic if True otherwise not                                                    | bool (False)                                | ✓        |
+| label         | Displays text to the left of the checkbox                                                              | str ("")                                    | ✓        |
+| label_align   | Alignment of the text displayed in the label                                                           | [Align_Text](#align_text) (Align_Text.LEFT) | ✓        |
+| label_font    | The font definition for the label                                                                      | [Font](#font)                               | ✓        |
+| label_width   | Sets the label width (in characters if pixel_unit is<br> False,Otherwise pixels)                       | int > 0 (0)                                 | ✓        |
+| pixel_unit    | Use pixels for width/height, pixels if True, Otherwise characters                                      | bool (False)                                | ✓        |
+| tag           | The application name of the checkbox                                                                   | str (System Generated)                      | ✓        |
+| text          | The text displayed next to the checkbox                                                                | str  ("")                                   | ✓        |
+| txt_align     | Alignment of the text displayed next to the checkbox                                                   | [Align_Text](#align_text) (Align_Text.LEFT) | ✓        |
+| txt_font      | The font definition for the checkbox (style will override<br> italic,size will override txt_fontsize ) | [Font](#font)                               | ✓        |
+| txt_fontsize  | The point size of the text                                                                             | int (10)                                    | ✓        |
+| tune_hsize    | Add or subtracts pixels units to the width. Used in aligning controls                                  | int (0)                                     | ✓        |
+| tune_vsize    | Add or subtracts pixels units to the height. Used in aligning controls                                 | int (0)                                     | ✓        |
+| tooltip       | Sets the tooltip displayed when the checkbox is hovered over                                           | str                                         | ✓        |
+| translate     | Translates text if True Otherwise does not translate                                                   | bool (True)                                 | ✓        |
+| user_data     | Any data item the user wants to attach to the checkbox                                                 | any (None )                                 | ✓        |
+| underline     | Underlines the checkbox text if True otherwise not                                                     | bool (False)                                | ✓        |
+| visible       | Makes the checkbox visible if True otherwise invisible                                                 | bool (True)                                 | ✓        |
+| width         | The width of the checkbox (in characters if pixel_unit is<br> False,Otherwise pixels)                  | int > 0 (10)                                | ✓        |
+
+A fully loaded checkbox declaration:
+- **Note: Only "tag", "text" and "callback" are usually needed**
+
+```
+Checkbox(
+                        tag="checkbox",
+                        text="Tick Me!",
+                        label="Check Box",
+                        callback=self.event_handler,
+                        label_align=qtg.Align_Text.CENTER,
+                        label_width=10,
+                        label_font=qtg.Font(style=qtg.Font_Style.OBLIQUE, size=14),
+                        width=6,
+                        height=1,
+                        txt_align=qtg.Align_Text.CENTER,
+                        txt_font=qtg.Font(style=qtg.Font_Style.NORMAL, size=20),
+                        txt_fontsize=12,
+                        bold=True,
+                        italic=True,
+                        underline=True,
+                        enabled=True,
+                        visible=True,
+                        tooltip="Check Box Press Me",
+                        tune_hsize=15,
+                        tune_vsize=15,
+                        user_data={"key": "value"},
+                        buddy_control=qtg.HBoxContainer().add_row(
+                            qtg.Spacer(width=1),
+                            qtg.Button(tag="button_push", text="Push Me!", callback=self.event_handler, width=12)
+                        ),
+
                     )
 ```
 
