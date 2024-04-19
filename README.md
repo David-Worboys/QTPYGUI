@@ -429,7 +429,7 @@ PyInstaller produces even larger executables!
 | ProgressBar           | Creates a control that displays the progress of an operation                                                                 |
 | RadioButton           | Creates a radio button control. In a group only one can be <br/>selected at a time                                           |
 | Switch                | Creates a switch control that can be used to turn on and <br/>off a feature                                                  |
-| Slider                | Creates a slider control than can be used to set a value <br/>by dragging the handle                                         |
+| [Slider](#slider)     | Creates a slider control than can be used to set a value <br/>by dragging the handle                                         |
 | Spinbox               | Creates a spinbox control that allows numbers to be set <br/>via clicking up and down arrows or entering the number directly |
 | Tab                   | Creates a tab control that has multiple pages, each <br/>housing their own set of GUI controls                               |
 | TextEdit              | Creates a text entry control that can span multiple lines                                                                    |
@@ -445,41 +445,41 @@ used to set the behavior of the GUI control when instantiated.
 - Not all properties will be supported or used by descendant GUI controls and will be ignored
 - Some properties will be overridden by descendant GUI controls
 
-| **Property**      | **Type**                                        | **Description**                                                                                                                                   |
-|-------------------|-------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
-| align             | [Align](#align) = Align.LEFT                    | Used to align GUI controls in containers                                                                                                          |
-| allow_clear       | bool = True                                     | True, allow GUI controls that can be cleared to be cleared, Otherwise not                                                                         |
-| bold              | bool = False                                    | True, sets GUI controls that have text bold, Otherwise not                                                                                        |
-| buddy_control     | _qtpyBase_Control \| None = None                | Set the buddy GUI control or Container                                                                                                            | 
-| buddy_callback    | Callable \| None =None                          | Sets the callback for the buddy GUI control                                                                                                       |
-| callback          | Callable \| None = None                         | Sets the callback for the GUI control                                                                                                             |
-| container_tag     | str = ""                                        | Sets the container_tag for the GUI control. If "" then system generated                                                                           |
-| editable          | bool = True                                     | True, sets GUI controls that support editing into edit mode, Otherwise not                                                                        |
-| enabled           | bool = True                                     | True, enables the GUI control, Otherwise disable the GUI control                                                                                  |
-| frame             | [Widget_Frame](#widget_frame) \| None = None    | Sets the frame of a GUI control tht supports frames                                                                                               |
-| icon              | None \| qtG.QIcon \| qtG.QPixmap \| str = None | Sets the icon on a GUI control were supported. If a str then this is the filename  of the icon                                                    |
-| italic            | bool = False                                    | True, sets GUI controls that have text italic, Otherwise not                                                                                      |
-| height            | int = -1                                        | The height of the GUI control in characters if pixel_unit is False, Otherwise the height is in pixels.<br> -1 automatically calculates the height |
-| label             | str = ""                                        | The label string, if not provided no label is shown                                                                                               |
-| label_align       | [Align_Text](#align_text) = Align_Text.RIGHT    | The alignment of the label text                                                                                                                   |
-| label_width       | int = -1                                        | The width of the label in  characters if pixel_unit is False, Otherwise the width is in pixels.<br> -1 automatically calculates the width         |
-| label_font        | [Font](#font) \| None = None                    | The Font of the label                                                                                                                             |
-| pixel_unit        | bool = False                                    | True, width and height settings are in pxels, Otherwise in characters                                                                             |
-| size_fixed        | bool = True                                     | True, Sets the size of the GUI controls as fixed, Otherwise not fixed. TODO: fix this setting as it has no effect                                 |
-| tag               | str = ""                                        | The tag of the GUI control, system generated. If "" then system generated                                                                         |
-| text              | str = ""                                        | The text displayed on the GUI control if this is supported by the GUI control                                                                     |
-| tooltip           | str = ""                                        | The tooltip displayed when the mouse hovers over the GUI control                                                                                  |
-| txt_align         | [Align_Text](#align_text) = Align_Text.LEFT     | Aligns the GUI controls text, if supported.                                                                                                       |
-| txt_font          | [Font](#None)\| None = None                     | The font of the GUI controls text, if supported                                                                                                   |
-| txt_fontsize      | int = DEFAULT_FONT_SIZE                         | The fontsize in points of the GUI control text, if supported                                                                                      |
-| tune_vsize        | int = 0                                         | Used to adjust the vertical size of the GUI control. In pixels                                                                                    |
-| tune_hsize        | int = 0                                         | Used to adjust the horizontal size of the GUI control. In pixels                                                                                  |
-| translate         | bool = True                                     | True, translate the text on the GUI control, if supported, Otherwiise not                                                                         |
-| width             | int = -1                                        | The width of the GUI control in characters if pixel_unit is False, Otherwise the width is in pixels.<br> -1 automatically calculates the width    |
-| underline         | bool = False                                    | True, sets GUI controls that have text underline, Otherwise not                                                                                   |
-| user_data         | any = None                                      | User sepecified data attached to the GUI control                                                                                                  |
-| validate_callback | Callable \| None = None                         | A callback to validate the contents of the GUI control. Applicable only to GUI controls that allow the entry of text                              |
-| visible           | bool = True                                     | True, make the GUI control visible,Otherwise hide the GUI control                                                                                 |
+| **Property**      | **Type**                                       | **Description**                                                                                                                                   |
+|-------------------|------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| align             | [Align](#align) (Align.LEFT)                   | Used to align GUI controls in containers                                                                                                          |
+| allow_clear       | bool (True)                                    | True, allow GUI controls that can be cleared to be cleared, Otherwise not                                                                         |
+| bold              | bool (False)                                   | True, sets GUI controls that have text bold, Otherwise not                                                                                        |
+| buddy_control     | _qtpyBase_Control \| None (None)               | Set the buddy GUI control or Container                                                                                                            | 
+| buddy_callback    | Callable \| None (None)                        | Sets the callback for the buddy GUI control                                                                                                       |
+| callback          | Callable \| None (None)                        | Sets the callback for the GUI control                                                                                                             |
+| container_tag     | str ("")                                       | Sets the container_tag for the GUI control. If "" then system generated                                                                           |
+| editable          | bool (True)                                    | True, sets GUI controls that support editing into edit mode, Otherwise not                                                                        |
+| enabled           | bool (True)                                    | True, enables the GUI control, Otherwise disable the GUI control                                                                                  |
+| frame             | [Widget_Frame](#widget_frame) \| None (None)   | Sets the frame of a GUI control tht supports frames                                                                                               |
+| icon              | None \| qtG.QIcon \| qtG.QPixmap \| str (None) | Sets the icon on a GUI control were supported. If a str then this is the filename  of the icon                                                    |
+| italic            | bool (False)                                   | True, sets GUI controls that have text italic, Otherwise not                                                                                      |
+| height            | int (-1)                                       | The height of the GUI control in characters if pixel_unit is False, Otherwise the height is in pixels.<br> -1 automatically calculates the height |
+| label             | str ("")                                       | The label string, if not provided no label is shown                                                                                               |
+| label_align       | [Align_Text](#align_text) (Align_Text.RIGHT)   | The alignment of the label text                                                                                                                   |
+| label_width       | int (-1)                                       | The width of the label in  characters if pixel_unit is False, Otherwise the width is in pixels.<br> -1 automatically calculates the width         |
+| label_font        | [Font](#font) \| None (None)                   | The Font of the label                                                                                                                             |
+| pixel_unit        | bool (False)                                   | True, width and height settings are in pxels, Otherwise in characters                                                                             |
+| size_fixed        | bool (True)                                    | True, Sets the size of the GUI controls as fixed, Otherwise not fixed. TODO: fix this setting as it has no effect                                 |
+| tag               | str ("")                                       | The tag of the GUI control, system generated. If "" then system generated                                                                         |
+| text              | str ("")                                       | The text displayed on the GUI control if this is supported by the GUI control                                                                     |
+| tooltip           | str ("")                                       | The tooltip displayed when the mouse hovers over the GUI control                                                                                  |
+| txt_align         | [Align_Text](#align_text) (Align_Text.LEFT)    | Aligns the GUI controls text, if supported.                                                                                                       |
+| txt_font          | [Font](#None)\| None (None)                    | The font of the GUI controls text, if supported                                                                                                   |
+| txt_fontsize      | int (DEFAULT_FONT_SIZE)                        | The fontsize in points of the GUI control text, if supported                                                                                      |
+| tune_vsize        | int (0)                                        | Used to adjust the vertical size of the GUI control. In pixels                                                                                    |
+| tune_hsize        | int (0)                                        | Used to adjust the horizontal size of the GUI control. In pixels                                                                                  |
+| translate         | bool (True)                                    | True, translate the text on the GUI control, if supported, Otherwiise not                                                                         |
+| width             | int (-1)                                       | The width of the GUI control in characters if pixel_unit is False, Otherwise the width is in pixels.<br> -1 automatically calculates the width    |
+| underline         | bool (False)                                   | True, sets GUI controls that have text underline, Otherwise not                                                                                   |
+| user_data         | any (None)                                     | User sepecified data attached to the GUI control                                                                                                  |
+| validate_callback | Callable \| None (None)                        | A callback to validate the contents of the GUI control. Applicable only to GUI controls that allow the entry of text                              |
+| visible           | bool (True)                                    | True, make the GUI control visible,Otherwise hide the GUI control                                                                                 |
 
 **Methods** 
 - Not all methods will be used by descendant GUI controls
@@ -508,14 +508,14 @@ used to set the behavior of the GUI control when instantiated.
 |                     | width_fudge     | float                                   | Fudge factor multiplier to provide width adjustment                                                                       |              |
 | text_pixel_size     |                 | None                                    | <br><b>Returns:</b><br> The height and width of the text in pixels.<br>                                                   |              |
 |                     | text            | str                                     | The text to be measured.                                                                                                  |              |
-| fonts_available_get |                 | None                                    | <br><b>Returns:</b><br> A tuple of faont name strings.<br>                                                                |              |
+| fonts_available_get |                 | None                                    | <br><b>Returns:</b><br> A tuple of font name strings.<br>                                                                 |              |
 | font_set            |                 | None                                    | Sets the font on the GUI control                                                                                          |              |
 |                     | app_font        | Font                                    | Application font                                                                                                          |              |
 |                     | widget_font     | Font                                    | Control font                                                                                                              |              |
 | font_system_get     |                 | None                                    | Gets the sstem font <br><b>Returns:</b><br> A QFont object.<br>                                                           |              |
 |                     | fixed           | bool                                    | bool = True. Defaults to True                                                                                             |              |
 | frame_style_set     |                 | None                                    | Sets the frame style of the GUI control, where supported                                                                  |              |
-|                     | frame           | Widget_Frame                            | Frame definition object.                                                                                                  |              |
+|                     | frame           | [Widget_Frame](#widget_frame)           | Frame definition object.                                                                                                  |              |
 | icon_set            |                 | None                                    |                                                                                                                           |              |
 |                     | icon            | None \| qtG.QIcon \| qtG.QPixmap \| str | Sets the icon on a GUI control were supported. If a str then this is the filename  of the icon                            |
 | tooltip_get         |                 | str                                     | <br><b>Returns:</b><br> The tooltip text.<br>                                                                             |              |
@@ -565,7 +565,7 @@ Calling Button in a layout will generate a button control on a form. The "tag"
 suggested to set width and height as the font selected might not 
 automatically size correctly.  
 
-| Argument             | Description                                                                                          | Type                                        | Optional |
+| ***Property***       | Description                                                                                          | Type                                        | Optional |
 |----------------------|------------------------------------------------------------------------------------------------------|---------------------------------------------|----------|
 | auto_repeat_interval | If > 0 the button keeps firing Clicked events when <br>held down (milliseconds)                      | int >= 0 (0)                                | ✓        |
 | bold                 | Sets the button text bold if True otherwise not                                                      | bool (False)                                | ✓        |
@@ -634,32 +634,32 @@ Calling Checkbox in a layout will generate a checkbox control on a form. The "ta
 suggested to set width and height as the font selected might not 
 automatically size correctly.
 
-| Argument      | Description                                                                                            | Type                                        | Optional |
-|---------------|--------------------------------------------------------------------------------------------------------|---------------------------------------------|----------|
-| bold          | Sets the checkbox text bold if True otherwise not                                                      | bool (False)                                | ✓        |
-| buddy_control | Control or container with controls that sit to the right of the checkbox                               | Container or GUI Control                    | ✓        | 
-| callback      | The method called when the checkbox is checked                                                         | Callable (None)                             | ✓        |
-| enabled       | Enables/Disables the checkbox                                                                          | bool (True)                                 | ✓        |
-| height        | The height of the checkbox (in characters if pixel_unit is False,Otherwise pixels)                     | int > 0 (10)                                | ✓        |
-| italic        | Sets the checkbox text italic if True otherwise not                                                    | bool (False)                                | ✓        |
-| label         | Displays text to the left of the checkbox                                                              | str ("")                                    | ✓        |
-| label_align   | Alignment of the text displayed in the label                                                           | [Align_Text](#align_text) (Align_Text.LEFT) | ✓        |
-| label_font    | The font definition for the label                                                                      | [Font](#font)                               | ✓        |
-| label_width   | Sets the label width (in characters if pixel_unit is<br> False,Otherwise pixels)                       | int > 0 (0)                                 | ✓        |
-| pixel_unit    | Use pixels for width/height, pixels if True, Otherwise characters                                      | bool (False)                                | ✓        |
-| tag           | The application name of the checkbox                                                                   | str (System Generated)                      | ✓        |
-| text          | The text displayed next to the checkbox                                                                | str  ("")                                   | ✓        |
-| txt_align     | Alignment of the text displayed next to the checkbox                                                   | [Align_Text](#align_text) (Align_Text.LEFT) | ✓        |
-| txt_font      | The font definition for the checkbox (style will override<br> italic,size will override txt_fontsize ) | [Font](#font)                               | ✓        |
-| txt_fontsize  | The point size of the text                                                                             | int (10)                                    | ✓        |
-| tune_hsize    | Add or subtracts pixels units to the width. Used in aligning controls                                  | int (0)                                     | ✓        |
-| tune_vsize    | Add or subtracts pixels units to the height. Used in aligning controls                                 | int (0)                                     | ✓        |
-| tooltip       | Sets the tooltip displayed when the checkbox is hovered over                                           | str                                         | ✓        |
-| translate     | Translates text if True Otherwise does not translate                                                   | bool (True)                                 | ✓        |
-| user_data     | Any data item the user wants to attach to the checkbox                                                 | any (None )                                 | ✓        |
-| underline     | Underlines the checkbox text if True otherwise not                                                     | bool (False)                                | ✓        |
-| visible       | Makes the checkbox visible if True otherwise invisible                                                 | bool (True)                                 | ✓        |
-| width         | The width of the checkbox (in characters if pixel_unit is False,Otherwise pixels)                      | int > 0 (10)                                | ✓        |
+| **Property**  | **Description**                                                                                        | **Type**                                    | **Optional** |
+|---------------|--------------------------------------------------------------------------------------------------------|---------------------------------------------|--------------|
+| bold          | Sets the checkbox text bold if True otherwise not                                                      | bool (False)                                | ✓            |
+| buddy_control | Control or container with controls that sit to the right of the checkbox                               | Container or GUI Control                    | ✓            | 
+| callback      | The method called when the checkbox is checked                                                         | Callable (None)                             | ✓            |
+| enabled       | Enables/Disables the checkbox                                                                          | bool (True)                                 | ✓            |
+| height        | The height of the checkbox (in characters if pixel_unit is False,Otherwise pixels)                     | int > 0 (10)                                | ✓            |
+| italic        | Sets the checkbox text italic if True otherwise not                                                    | bool (False)                                | ✓            |
+| label         | Displays text to the left of the checkbox                                                              | str ("")                                    | ✓            |
+| label_align   | Alignment of the text displayed in the label                                                           | [Align_Text](#align_text) (Align_Text.LEFT) | ✓            |
+| label_font    | The font definition for the label                                                                      | [Font](#font)                               | ✓            |
+| label_width   | Sets the label width (in characters if pixel_unit is<br> False,Otherwise pixels)                       | int > 0 (0)                                 | ✓            |
+| pixel_unit    | Use pixels for width/height, pixels if True, Otherwise characters                                      | bool (False)                                | ✓            |
+| tag           | The application name of the checkbox                                                                   | str (System Generated)                      | ✓            |
+| text          | The text displayed next to the checkbox                                                                | str  ("")                                   | ✓            |
+| txt_align     | Alignment of the text displayed next to the checkbox                                                   | [Align_Text](#align_text) (Align_Text.LEFT) | ✓            |
+| txt_font      | The font definition for the checkbox (style will override<br> italic,size will override txt_fontsize ) | [Font](#font)                               | ✓            |
+| txt_fontsize  | The point size of the text                                                                             | int (10)                                    | ✓            |
+| tune_hsize    | Add or subtracts pixels units to the width. Used in aligning controls                                  | int (0)                                     | ✓            |
+| tune_vsize    | Add or subtracts pixels units to the height. Used in aligning controls                                 | int (0)                                     | ✓            |
+| tooltip       | Sets the tooltip displayed when the checkbox is hovered over                                           | str                                         | ✓            |
+| translate     | Translates text if True Otherwise does not translate                                                   | bool (True)                                 | ✓            |
+| user_data     | Any data item the user wants to attach to the checkbox                                                 | any (None )                                 | ✓            |
+| underline     | Underlines the checkbox text if True otherwise not                                                     | bool (False)                                | ✓            |
+| visible       | Makes the checkbox visible if True otherwise invisible                                                 | bool (True)                                 | ✓            |
+| width         | The width of the checkbox (in characters if pixel_unit is False,Otherwise pixels)                      | int > 0 (10)                                | ✓            |
 
 A fully loaded checkbox declaration:
 - **Note: Only "tag", "text" and "callback" are usually needed**
@@ -702,34 +702,34 @@ suggested to set width and height as the font selected might not
 automatically size correctly.
 
 
-| Argument          | Description                                                                                                          | Type                                        | Optional |
-|-------------------|----------------------------------------------------------------------------------------------------------------------|---------------------------------------------|----------|
-| bold              | Sets the combobox text bold if True otherwise not                                                                    | bool (False)                                | ✓        |
-| buddy_control     | Control or container with controls that sit to the right of the combobox                                             | Container or GUI Control                    | ✓        | 
-| callback          | The method called when the combobox is modified                                                                      | Callable (None)                             | ✓        |
-| display_na        | Displays N/A (Not Applicable/Available) in the drop down list if True Otherwise not                                  | bool (True)                                 | ✓        |
-| dropdown_width    | The width of the combobox (in characters if pixel_unit is False,Otherwise pixels)                                    | int > 0 (10)                                | ✓        |
-| enabled           | Enables/Disables the combobox                                                                                        | bool (True)                                 | ✓        |
-| height            | The height of the combobox (in characters if pixel_unit is False,Otherwise pixels)                                   | int > 0 (10)                                | ✓        |
-| italic            | Sets the combobox text italic if True otherwise not                                                                  | bool (False)                                | ✓        |
-| items             | Items to add to the dropdown list                                                                                    | list or tuple [Combo_Item](#combo_item)     | ✓        |
-| label             | Displays text to the left of the combobox                                                                            | str ("")                                    | ✓        |
-| label_align       | Alignment of the text displayed in the label                                                                         | [Align_Text](#align_text) (Align_Text.LEFT) | ✓        |
-| label_font        | The font definition for the label                                                                                    | [Font](#font)                               | ✓        |
-| label_width       | Sets the label width (in characters if pixel_unit is<br> False,Otherwise pixels)                                     | int > 0 (0)                                 | ✓        |
-| num_visible_items | Number of items displayed in the dropdown list                                                                       | int >= 1 (15)                               | ✓        |
-| pixel_unit        | Use pixels for width/height, pixels if True, Otherwise characters                                                    | bool (False)                                | ✓        |
-| tag               | The application name of the combobox                                                                                 | str (System Generated)                      | ✓        |
-| txt_font          | The font definition for the combobox dropdown list (style will override<br> italic,size will override txt_fontsize ) | [Font](#font)                               | ✓        |
-| txt_fontsize      | The point size of the text   in the combobox dropdown list                                                           | int (10)                                    | ✓        |
-| tune_hsize        | Add or subtracts pixels units to the width. Used in aligning controls                                                | int (0)                                     | ✓        |
-| tune_vsize        | Add or subtracts pixels units to the height. Used in aligning controls                                               | int (0)                                     | ✓        |
-| tooltip           | Sets the tooltip displayed when the combobox is hovered over                                                         | str                                         | ✓        |
-| translate         | Translates dropdown text if True Otherwise does not translate                                                        | bool (True)                                 | ✓        |
-| user_data         | Any data item the user wants to attach to the combobox                                                               | any (None )                                 | ✓        |
-| underline         | Underlines the combobox dropdown text if True otherwise not                                                          | bool (False)                                | ✓        |
-| visible           | Makes the combobox visible if True otherwise invisible                                                               | bool (True)                                 | ✓        |
-| width             | The width of the combobox (in characters if pixel_unit is False,Otherwise pixels)                                    | int > 0 (10)                                | ✓        |
+| **Property**      | **Description**                                                                                                      | **Type**                                    | **Optional** |
+|-------------------|----------------------------------------------------------------------------------------------------------------------|---------------------------------------------|--------------|
+| bold              | Sets the combobox text bold if True otherwise not                                                                    | bool (False)                                | ✓            |
+| buddy_control     | Control or container with controls that sit to the right of the combobox                                             | Container or GUI Control                    | ✓            | 
+| callback          | The method called when the combobox is modified                                                                      | Callable (None)                             | ✓            |
+| display_na        | Displays N/A (Not Applicable/Available) in the drop down list if True Otherwise not                                  | bool (True)                                 | ✓            |
+| dropdown_width    | The width of the combobox (in characters if pixel_unit is False,Otherwise pixels)                                    | int > 0 (10)                                | ✓            |
+| enabled           | Enables/Disables the combobox                                                                                        | bool (True)                                 | ✓            |
+| height            | The height of the combobox (in characters if pixel_unit is False,Otherwise pixels)                                   | int > 0 (10)                                | ✓            |
+| italic            | Sets the combobox text italic if True otherwise not                                                                  | bool (False)                                | ✓            |
+| items             | Items to add to the dropdown list                                                                                    | list or tuple [Combo_Item](#combo_item)     | ✓            |
+| label             | Displays text to the left of the combobox                                                                            | str ("")                                    | ✓            |
+| label_align       | Alignment of the text displayed in the label                                                                         | [Align_Text](#align_text) (Align_Text.LEFT) | ✓            |
+| label_font        | The font definition for the label                                                                                    | [Font](#font)                               | ✓            |
+| label_width       | Sets the label width (in characters if pixel_unit is<br> False,Otherwise pixels)                                     | int > 0 (0)                                 | ✓            |
+| num_visible_items | Number of items displayed in the dropdown list                                                                       | int >= 1 (15)                               | ✓            |
+| pixel_unit        | Use pixels for width/height, pixels if True, Otherwise characters                                                    | bool (False)                                | ✓            |
+| tag               | The application name of the combobox                                                                                 | str (System Generated)                      | ✓            |
+| txt_font          | The font definition for the combobox dropdown list (style will override<br> italic,size will override txt_fontsize ) | [Font](#font)                               | ✓            |
+| txt_fontsize      | The point size of the text   in the combobox dropdown list                                                           | int (10)                                    | ✓            |
+| tune_hsize        | Add or subtracts pixels units to the width. Used in aligning controls                                                | int (0)                                     | ✓            |
+| tune_vsize        | Add or subtracts pixels units to the height. Used in aligning controls                                               | int (0)                                     | ✓            |
+| tooltip           | Sets the tooltip displayed when the combobox is hovered over                                                         | str                                         | ✓            |
+| translate         | Translates dropdown text if True Otherwise does not translate                                                        | bool (True)                                 | ✓            |
+| user_data         | Any data item the user wants to attach to the combobox                                                               | any (None )                                 | ✓            |
+| underline         | Underlines the combobox dropdown text if True otherwise not                                                          | bool (False)                                | ✓            |
+| visible           | Makes the combobox visible if True otherwise invisible                                                               | bool (True)                                 | ✓            |
+| width             | The width of the combobox (in characters if pixel_unit is False,Otherwise pixels)                                    | int > 0 (10)                                | ✓            |
 
 A fully loaded combobox declaration:
 - **Note: Only "tag", "text" ,"callback" and "items" are usually needed**
@@ -778,51 +778,59 @@ ComboBox(
 ```
 #### Methods
 
-| Method            | Description                                | Arguments     | Type                                    | Description                                                                       | Optional |
-|-------------------|--------------------------------------------|---------------|-----------------------------------------|-----------------------------------------------------------------------------------|----------|
-| count_items       | Returns the number of items in the list    |               | int                                     | \>= 0 <= number of items in list                                                  |          |  
-| display_width_set | Sets the combobox display width            |               |                                         |                                                                                   |          |
-|                   |                                            | display_width | int                                     |                                                                                   | ❌        |
-| get_items         | Returns all the items in the dropdown list |               | list [Combo_Data](#combo_data)          |                                                                                   |          |
-| icon_set          | Sets the icon at a given row               |               | int                                     | 1 if icon set, Otherwise -1                                                       |          |
-|                   |                                            | combo_index   | int                                     | \>=0 and <= count_items, Row index in the combobox where the icon is to be placed | ❌        |
- |                   |                                            | icon          | str [File Name], QIcon,QPixmap          | A QPixmap, QIcon or the icon file name                                            | ❌        |
-| load_csv_file     | Loads a CSV file into the combobox         |               | int                                     | Length of the maximum item if load ok, Otherwise -1                               |          |
-|                   |                                            | data_index    | int (1)                                 | The column in the file to load into user data                                     | ✓        |
-|                   |                                            | delimiter     | str (",")                               | CSV file field separator                                                          | ✓        |
-|                   |                                            | file_name     | str                                     | The path to the CSV file                                                          | ❌        |
-|                   |                                            | ignore_header | bool (true)                             | Set True if the CSV file has a header row                                         | ✓        |
-|                   |                                            | line_start    | int (1)                                 | The line in the file to start loading data from                                   | ✓        |
-|                   |                                            | select_text   | str (")                                 | The text to select after load                                                     | ✓        |
-|                   |                                            | text_index    | int (1)                                 | The column in the CSV file to load into display                                   | ✓        |
-| load_items        | Loads items into the combobox dropdown     |               | int                                     | Length of the maximum item                                                        |          |
-|                   |                                            | auto_na       | bool (True)                             | True puts na_string (Not Available) in combobox, Otherwise not                    | ✓        |
-|                   |                                            | clear_items   | bool (True)                             | Clears existing items from the combobox                                           | ✓        |
-|                   |                                            | items         | list or tuple [Combo_Item](#combo_item) | The items to be placed in the combobox                                            | ❌        |
-|                   |                                            | na_string     | str ("N/A")                             | The "Not Available" string                                                        | ✓        |
+| **Method**        | **Description**                            | **Arguments** | **Type**                                | **Description**                                                                   | **Optional** |
+|-------------------|--------------------------------------------|---------------|-----------------------------------------|-----------------------------------------------------------------------------------|--------------|
+| count_items       | Returns the number of items in the list    |               | int                                     | \>= 0 <= number of items in list                                                  |              |  
+| display_width_set | Sets the combobox display width            |               |                                         |                                                                                   |              |
+|                   |                                            | display_width | int                                     |                                                                                   | ❌            |
+| get_items         | Returns all the items in the dropdown list |               | list [Combo_Data](#combo_data)          |                                                                                   |              |
+| icon_set          | Sets the icon at a given row               |               | int                                     | 1 if icon set, Otherwise -1                                                       |              |
+|                   |                                            | combo_index   | int                                     | \>=0 and <= count_items, Row index in the combobox where the icon is to be placed | ❌            |
+ |                   |                                            | icon          | str [File Name], QIcon,QPixmap          | A QPixmap, QIcon or the icon file name                                            | ❌            |
+| load_csv_file     | Loads a CSV file into the combobox         |               | int                                     | Length of the maximum item if load ok, Otherwise -1                               |              |
+|                   |                                            | data_index    | int (1)                                 | The column in the file to load into user data                                     | ✓            |
+|                   |                                            | delimiter     | str (",")                               | CSV file field separator                                                          | ✓            |
+|                   |                                            | file_name     | str                                     | The path to the CSV file                                                          | ❌            |
+|                   |                                            | ignore_header | bool (true)                             | Set True if the CSV file has a header row                                         | ✓            |
+|                   |                                            | line_start    | int (1)                                 | The line in the file to start loading data from                                   | ✓            |
+|                   |                                            | select_text   | str (")                                 | The text to select after load                                                     | ✓            |
+|                   |                                            | text_index    | int (1)                                 | The column in the CSV file to load into display                                   | ✓            |
+| load_items        | Loads items into the combobox dropdown     |               | int                                     | Length of the maximum item                                                        |              |
+|                   |                                            | auto_na       | bool (True)                             | True puts na_string (Not Available) in combobox, Otherwise not                    | ✓            |
+|                   |                                            | clear_items   | bool (True)                             | Clears existing items from the combobox                                           | ✓            |
+|                   |                                            | items         | list or tuple [Combo_Item](#combo_item) | The items to be placed in the combobox                                            | ❌            |
+|                   |                                            | na_string     | str ("N/A")                             | The "Not Available" string                                                        | ✓            |
 
 
 ### Slider
  
 Instantiates a Slider widget and associated properties
+
+| **Property**         | **Description**                                                     | **Type**           | **Optional** |
+|----------------------|---------------------------------------------------------------------|--------------------|--------------|
+| orientation          | "vertical" or "horizonral" presentation of the slider               | str ("horizontal") | ✓            |
+| page_step            | The step size when the page up/down is pressed                      | int (10)           | ✓            |
+| range_max            | The maximum value of the slider                                     | int (100)          | ✓            |
+| range_min            | The minimum value of the slider                                     | int (0)            | ✓            |
+| scale_factor_percent | Scales the value internally by a certain perentage (_Experimental_) | float (0.0)        | ✓            |
+| single_step          | The step size when a single step is taken                           | int (1)            | ✓            |
+
+
+
  
-| **Method**     | **Arguments** | **Type** | **Description**                                                                              | **Optional** |
-|----------------|---------------|----------|----------------------------------------------------------------------------------------------|--------------|
-| __post_init__  |               | None     |                                                                                              |              |
-| _create_widget |               | None     | Creates a Slider widget.<br><br><br><b>Returns:</b><br> - qtW.QWidget: The slider widget<br> |              |
-|                | parent_app    | QtPyApp  | The parent app.                                                                              |              |
-|                | container_tag | str      | The tag of the container that the widget is in.                                              |              |
-| scale_factor   |               | float    |                                                                                              |              |
-| scale_factor   |               | None     |                                                                                              |              |
-|                | value         | float    |                                                                                              |              |
-| range_min_set  |               | None     | Sets the minimum value of the slider.<br><br>                                                |              |
-|                | range_min     | int      | The minimum value of the slider.                                                             |              |
-| range_max_set  |               | None     | Sets the maximum value of the slider.<br><br>                                                |              |
-|                | range_max     | int      | The maximum value of the slider.                                                             |              |
-| value_get      |               | int      | <br><b>Returns:</b><br> - int: The value of the slider.<br>                                  |              |
-| value_set      |               | None     | Sets the value of the slider.<br><br>                                                        |              |
-|                | value         | int      | The value to set the slider to.                                                              |              |
-|                | block_signals | bool     |                                                                                              |              |
+| **Method**    | **Arguments** | **Type**     | **Description**                                                     | **Optional** |
+|---------------|---------------|--------------|---------------------------------------------------------------------|--------------|
+| scale_factor  |               | float        | The scale factor calculated from the percentage                     |              |
+| scale_factor  |               | None         | Sets the scale factor as a percentage.                              |              |
+|               | value         | float        | The scale factor as a percentage                                    | ❌            |
+| range_min_set |               | None         | Sets the minimum value of the slider.<br><br>                       |              |
+|               | range_min     | int          | The minimum value of the slider.                                    | ❌            |
+| range_max_set |               | None         | Sets the maximum value of the slider.<br><br>                       |              |
+|               | range_max     | int          | The maximum value of the slider.                                    | ❌            |
+| value_get     |               | int          | <br><b>Returns:</b><br> - int: The value of the slider.<br>         |              |
+| value_set     |               | None         | Sets the value of the slider.<br><br>                               |              |
+|               | value         | int          | The value to set the slider to.                                     | ❌            |
+|               | block_signals | bool (False) | True, stop the slider from emitting signals, Otherwise emit signals | ✓            |
 
 #### Widget_Frame
  Widget_Frame` is a class that defines the style of the frame around a widget
