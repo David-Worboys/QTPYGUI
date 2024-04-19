@@ -435,7 +435,8 @@ class Size:
 
 
 @dataclasses.dataclass(slots=True)
-# `Col_Def` is a class used by combo boxes that has four attributes: `label`, `tag`, `width`, and `editable`
+# `Col_Def` is a class used by grid controls that has four attributes: `label`,
+# `tag`, `width`, and `editable`
 class Col_Def:
     label: str
     tag: str
@@ -447,7 +448,7 @@ class Col_Def:
         # Checking the arguments passed to the constructor are of the correct type.
         assert isinstance(self.label, str), f"{self.label=}. Must be a str"
         assert isinstance(self.tag, str), f"{self.tag=}. Must be a str"
-        assert isinstance(self.width, int), f"{self.width=}. Must be a int"
+        assert isinstance(self.width, int) and self.width > 0, f"{self.width=}. Must be a int"
         assert isinstance(self.editable, bool), f"{self.editable=}. Must be bool"
         assert isinstance(self.checkable, bool), f"{self.checkable=}. Must be bool"
 
@@ -2250,15 +2251,25 @@ class _qtpyBase_Control(_qtpyBase):
 
         return 1
 
-    def block_signals(self, block_signals: bool = True):
+    def block_signals(self, block_signals: bool = True) -> None:
+        """Blocks or unblocks signals for the widget
+
+        Args:
+            block_signals (bool, optional): True, stop this widget from generating
+            signals (events), Otherwise do  not do not stop signals (events)
+            being generaed by this widget. Defaults to True.
+
+        """
         assert isinstance(block_signals, bool), f"{block_signals=}. Must be a bool"
 
         self._widget.blockSignals(block_signals)
 
+        return None
+
     @property
     def guiwidget_get(self) -> qtW.QWidget:
         """Returns the QT gui widget
-            If the widget is not created yet, raise an error
+            If the widget is not created yet, raises an error
 
         Returns:
             qtW.QWidget : The QT GUI widget.
@@ -3378,7 +3389,7 @@ class _qtpyBase_Control(_qtpyBase):
 
         Args:
             text (str): The text to be translated.
-            force_translate (bool): bool = False. Defaults to False
+            force_translate (bool): Translate text if True,Otherwise do not translate text. Defaults to False
 
         Returns:
             str : The translated text.
@@ -3439,23 +3450,60 @@ class _qtpyBase_Control(_qtpyBase):
 
     @overload
     def value_set(self, value: bool) -> None: ...
+    """Sets  a value
+
+    Args:
+        value (bool): True or False value setting .
+    """
+
+    @overload
+    def value_set(self, value: int) -> None: ...
+    """Sets a value
+
+    Args:
+        value (float): The value setting.
+    """
 
     @overload
     def value_set(self, value: float) -> None: ...
+    """Sets a value
+
+    Args:
+        value (float): The value setting.
+    """
 
     @overload
     def value_set(self, value: Combo_Data): ...
+    """Sets the widget value
+
+    Args:
+        value (Combo_Data): The value setting.
+    """
 
     @overload
     def value_set(self, value: str): ...
+    """Sets the widget value
+
+    Args:
+        value (str): The value setting.
+    """
 
     def value_set(self, value: datetime.date) -> None: ...
+    """Sets the widget value
+
+    Args:
+        value (datetime.date): The value setting.
+    """
 
     @overload
     def value_set(self, value: datetime.datetime) -> None: ...
+    """Sets the widget value
 
-    @overload
-    def value_set(self, value: Union[str, int, float]): ...
+    Args:
+        value (datetime.datetime): The value setting.
+    """
+
+    
 
     # @overload
     # def value_set(self, hour: int = 0, min: int = 0, sec: int = 0, msec: int = 0):
@@ -7043,7 +7091,8 @@ class ComboBox(_qtpyBase_Control):
     class _USER_DATA:
         data: any
         user_data: any
-
+    
+          
     @property
     def is_combo_child(self) -> bool:
         """Returns True if this combobox is a child of another combo box.
@@ -7058,8 +7107,7 @@ class ComboBox(_qtpyBase_Control):
             return True
 
     def __post_init__(self) -> None:
-        """Constructor event that checks arguments and sets internal variables."""
-        """Checks class parameter types"""
+        """Constructor event that checks arguments and sets internal variables."""        
         super().__post_init__()
 
         assert self.validate_callback is None or callable(
@@ -7195,12 +7243,15 @@ class ComboBox(_qtpyBase_Control):
 
     def icon_set(
         self, combo_index: int, icon: Union[str, qtG.QIcon, qtG.QPixmap]
-    ) -> None:  # noqa LISKOV != good
+    ) -> int:  
         """Sets an icon at a given row in the combo box
 
         Args:
             combo_index (int): Row index in the combobox where the icon is to be placed
             icon (Union[str, qtG.QIcon, qtG.QPixmap]): A QPixmap, QIcon or the icon file name
+
+        Returns:
+            int: 1 if successful, -1 if not
         """
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
@@ -7215,15 +7266,18 @@ class ComboBox(_qtpyBase_Control):
         ), f"{icon=}. Must be str | QIcon | QPixmap"
 
         if isinstance(icon, str):
-            assert qtC.QFile.exists(icon), icon + " : does not exist!"
+            if not qtC.QFile.exists(icon):
+                return -1
         elif isinstance(icon, qtG.QPixmap):
             pass  # All Good
         elif isinstance(icon, qtG.QIcon):
             pass  # All Good
         else:
-            raise AssertionError(f"{icon=}. Not a valid icon type")
+            -1
 
         self._widget.setItemIcon(combo_index, qtG.QIcon(icon))
+
+        return 1
 
     def load_csv_file(
         self,
@@ -7248,7 +7302,7 @@ class ComboBox(_qtpyBase_Control):
             delimiter (str) : CSV field separator (default: {","})
 
         Returns:
-            int: Length of maximum item
+            int: Length of maximum item if load OK, Otherwise -1
         """
 
         assert (
@@ -7272,40 +7326,44 @@ class ComboBox(_qtpyBase_Control):
         if select_text == "":
             select_text = self.text
 
-        assert os.path.isfile(file_name) and os.access(
+        if not os.path.isfile(file_name) or not os.access(
             file_name, os.R_OK
-        ), f"File {file_name} doesn't exist or is not readable"
-
+        ):
+            return -1
+        
         line_list = []
 
-        with open(file_name, "r") as csv_file:
-            for line_no, line in enumerate(csv_file.readlines()):
-                if line_no == 0 and ignore_header:
-                    continue
-                elif line_no + 1 < line_start:
-                    continue
+        try:
+            with open(file_name, "r") as csv_file:
+                for line_no, line in enumerate(csv_file.readlines()):
+                    if line_no == 0 and ignore_header:
+                        continue
+                    elif line_no + 1 < line_start:
+                        continue
 
-                line_split = line.strip().split(delimiter)
-                col_count = len(line_split)
+                    line_split = line.strip().split(delimiter)
+                    col_count = len(line_split)
 
-                if col_count < (text_index - 1) or col_count < (data_index - 1):
-                    continue
+                    if col_count < (text_index - 1) or col_count < (data_index - 1):
+                        continue
 
-                line_list.append(
-                    Combo_Item(
-                        display=line_split[text_index - 1],
-                        data=line_split[data_index - 1],
-                        icon=None,
-                        user_data=None,
+                    line_list.append(
+                        Combo_Item(
+                            display=line_split[text_index - 1],
+                            data=line_split[data_index - 1],
+                            icon=None,
+                            user_data=None,
+                        )
                     )
-                )
 
-        max_len = self.load_items(line_list)
+            max_len = self.load_items(line_list)
 
-        if select_text.strip() != "":
-            self.select_text(select_text)
+            if select_text.strip() != "":
+                self.select_text(select_text)
 
-        return max_len
+            return max_len
+        except Exception as e:            
+            return -1
 
     @property
     def count_items(self) -> int:
@@ -13683,6 +13741,7 @@ class TextEdit(_qtpyBase_Control):
 @dataclasses.dataclass
 class Timeedit(_qtpyBase_Control):
     """Instantiates a Timeedit widget and associated properties
+
     h 	the hour without a leading zero (0 to 23 or 1 to 12 if AM/PM display)
     hh 	the hour with a leading zero (00 to 23 or 01 to 12 if AM/PM display)
     m 	the minute without a leading zero (0 to 59)
@@ -13944,7 +14003,7 @@ class Timeedit(_qtpyBase_Control):
         """Returns the time value as a time_struct (hour,min,sec,msec)
 
         Returns:
-            time_struct: tims_struct (hour,min,sec,msec)
+            time_struct: time_struct (hour,min,sec,msec)
         """
         self._widget: qtW.QTimeEdit
 

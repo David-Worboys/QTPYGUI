@@ -413,6 +413,7 @@ executable file - This is simply how it is when distributing Python applications
 PyInstaller produces even larger executables! 
 
 ### QTPYGUI Control API Reference
+
 | Control               | Description                                                                                                                  |
 |-----------------------|------------------------------------------------------------------------------------------------------------------------------|
 | [Button](#button)     | Creates a button, text and icon are optional                                                                                 |
@@ -434,6 +435,128 @@ PyInstaller produces even larger executables!
 | TextEdit              | Creates a text entry control that can span multiple lines                                                                    |
 | Timeedit              | Creates a time edit control with an erase button                                                                             |
 | Treeview              | Creates a control that displays data as a tree view                                                                          |
+
+### _qtpyBase_Control
+ 
+This is the ancestor of all QTPYGUI GUI controls, and the properties here are 
+used to set the behavior of the GUI control when instantiated.
+  
+**Properties** 
+- Not all properties will be supported or used by descendant GUI controls and will be ignored
+- Some properties will be overridden by descendant GUI controls
+
+| **Property**      | **Type**                                        | **Description**                                                                                                                                   |
+|-------------------|-------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| align             | [Align](#align) = Align.LEFT                    | Used to align GUI controls in containers                                                                                                          |
+| allow_clear       | bool = True                                     | True, allow GUI controls that can be cleared to be cleared, Otherwise not                                                                         |
+| bold              | bool = False                                    | True, sets GUI controls that have text bold, Otherwise not                                                                                        |
+| buddy_control     | _qtpyBase_Control \| None = None                | Set the buddy GUI control or Container                                                                                                            | 
+| buddy_callback    | Callable \| None =None                          | Sets the callback for the buddy GUI control                                                                                                       |
+| callback          | Callable \| None = None                         | Sets the callback for the GUI control                                                                                                             |
+| container_tag     | str = ""                                        | Sets the container_tag for the GUI control. If "" then system generated                                                                           |
+| editable          | bool = True                                     | True, sets GUI controls that support editing into edit mode, Otherwise not                                                                        |
+| enabled           | bool = True                                     | True, enables the GUI control, Otherwise disable the GUI control                                                                                  |
+| frame             | [Widget_Frame](#widget_frame) \| None = None    | Sets the frame of a GUI control tht supports frames                                                                                               |
+| icon              | None \| qtG.QIcon \| qtG.QPixmap \| str = None | Sets the icon on a GUI control were supported. If a str then this is the filename  of the icon                                                    |
+| italic            | bool = False                                    | True, sets GUI controls that have text italic, Otherwise not                                                                                      |
+| height            | int = -1                                        | The height of the GUI control in characters if pixel_unit is False, Otherwise the height is in pixels.<br> -1 automatically calculates the height |
+| label             | str = ""                                        | The label string, if not provided no label is shown                                                                                               |
+| label_align       | [Align_Text](#align_text) = Align_Text.RIGHT    | The alignment of the label text                                                                                                                   |
+| label_width       | int = -1                                        | The width of the label in  characters if pixel_unit is False, Otherwise the width is in pixels.<br> -1 automatically calculates the width         |
+| label_font        | [Font](#font) \| None = None                    | The Font of the label                                                                                                                             |
+| pixel_unit        | bool = False                                    | True, width and height settings are in pxels, Otherwise in characters                                                                             |
+| size_fixed        | bool = True                                     | True, Sets the size of the GUI controls as fixed, Otherwise not fixed. TODO: fix this setting as it has no effect                                 |
+| tag               | str = ""                                        | The tag of the GUI control, system generated. If "" then system generated                                                                         |
+| text              | str = ""                                        | The text displayed on the GUI control if this is supported by the GUI control                                                                     |
+| tooltip           | str = ""                                        | The tooltip displayed when the mouse hovers over the GUI control                                                                                  |
+| txt_align         | [Align_Text](#align_text) = Align_Text.LEFT     | Aligns the GUI controls text, if supported.                                                                                                       |
+| txt_font          | [Font](#None)\| None = None                     | The font of the GUI controls text, if supported                                                                                                   |
+| txt_fontsize      | int = DEFAULT_FONT_SIZE                         | The fontsize in points of the GUI control text, if supported                                                                                      |
+| tune_vsize        | int = 0                                         | Used to adjust the vertical size of the GUI control. In pixels                                                                                    |
+| tune_hsize        | int = 0                                         | Used to adjust the horizontal size of the GUI control. In pixels                                                                                  |
+| translate         | bool = True                                     | True, translate the text on the GUI control, if supported, Otherwiise not                                                                         |
+| width             | int = -1                                        | The width of the GUI control in characters if pixel_unit is False, Otherwise the width is in pixels.<br> -1 automatically calculates the width    |
+| underline         | bool = False                                    | True, sets GUI controls that have text underline, Otherwise not                                                                                   |
+| user_data         | any = None                                      | User sepecified data attached to the GUI control                                                                                                  |
+| validate_callback | Callable \| None = None                         | A callback to validate the contents of the GUI control. Applicable only to GUI controls that allow the entry of text                              |
+| visible           | bool = True                                     | True, make the GUI control visible,Otherwise hide the GUI control                                                                                 |
+
+**Methods** 
+- Not all methods will be used by descendant GUI controls
+- Some methods will be overridden
+
+| **Method**          | **Arguments**   | **Type**                                | **Description**                                                                                                           | **Optional** |
+|---------------------|-----------------|-----------------------------------------|---------------------------------------------------------------------------------------------------------------------------|--------------|
+| block_signals       |                 | None                                    |                                                                                                                           |              |
+|                     | block_signals   | bool                                    | True, stop this widget from generating signals (events), Otherwise do  not do not stop signals (events)  being generaed . |              |
+| guiwidget_get       |                 | _qtpyBase_Control                       | <br><b>Returns:</b><br> The QT GUI widget.<br>                                                                            |              |
+| guiwidget_set       |                 | None                                    | Sets the GUI Control                                                                                                      |              |
+| buddy_text_set      |                 | None                                    | Sets the text on the buddy control, where supported                                                                       |              |
+|                     | value           | str                                     | The text to set on the buddy widget.                                                                                      |              |
+| ediitable_set       |                 | None                                    | Controls the edit setting of a GUI control, where supported.                                                              |              |
+|                     | editable        | bool                                    | True, set the GUI control editable, where supported, Otherwise not.                                                       |              |
+| clear               |                 | None                                    | Clears the contents of the GUI control, if supported                                                                      |              |
+| enable_get          |                 | bool                                    | <br><b>Returns:</b><br> The enable value of the widget.<br>                                                               |              |
+| enable_set          |                 | int                                     | Enables/Disables the GUI control <br><b>Returns:</b><br> 1 - set ok, -1 - set failed<br>                                  |              |
+|                     | enable          | bool                                    | True enable control, Otherwise disable the control.                                                                       |              |
+| pixel_str_size      |                 | Char_Pixel_Size                         | <br><b>Returns:</b><br> The pixel size of the string in  CHAR_PIXEL_SIZE instance   .<br>                                 |              |
+|                     | text            | str                                     | The text to be measured                                                                                                   |              |
+| pixel_char_size     |                 | Char_Pixel_Size                         | The size of a char in pixels<br><b>Returns:</b><br> CHAR_PIXEL_SIZE <br>                                                  |              |
+|                     | char_height     | int                                     | Character height in chars                                                                                                 |              |
+|                     | char_width      | int                                     | Character width in chars                                                                                                  |              |
+|                     | height_fudge    | float                                   | Fudge factor multiplier to provide height adjustment                                                                      |              |
+|                     | width_fudge     | float                                   | Fudge factor multiplier to provide width adjustment                                                                       |              |
+| text_pixel_size     |                 | None                                    | <br><b>Returns:</b><br> The height and width of the text in pixels.<br>                                                   |              |
+|                     | text            | str                                     | The text to be measured.                                                                                                  |              |
+| fonts_available_get |                 | None                                    | <br><b>Returns:</b><br> A tuple of faont name strings.<br>                                                                |              |
+| font_set            |                 | None                                    | Sets the font on the GUI control                                                                                          |              |
+|                     | app_font        | Font                                    | Application font                                                                                                          |              |
+|                     | widget_font     | Font                                    | Control font                                                                                                              |              |
+| font_system_get     |                 | None                                    | Gets the sstem font <br><b>Returns:</b><br> A QFont object.<br>                                                           |              |
+|                     | fixed           | bool                                    | bool = True. Defaults to True                                                                                             |              |
+| frame_style_set     |                 | None                                    | Sets the frame style of the GUI control, where supported                                                                  |              |
+|                     | frame           | Widget_Frame                            | Frame definition object.                                                                                                  |              |
+| icon_set            |                 | None                                    |                                                                                                                           |              |
+|                     | icon            | None \| qtG.QIcon \| qtG.QPixmap \| str | Sets the icon on a GUI control were supported. If a str then this is the filename  of the icon                            |
+| tooltip_get         |                 | str                                     | <br><b>Returns:</b><br> The tooltip text.<br>                                                                             |              |
+| tooltip_set         |                 | None                                    |                                                                                                                           |              |
+|                     | tooltip         | str                                     | The text to display in the tooltip.                                                                                       |              |
+|                     | width           | int                                     | The width of the tooltip in pixels. Defaults to 200 - currently 400 for testing.                                          |              |
+|                     | txt_color       | str                                     | The color of the tooltip text. Defaults to black.                                                                         |              |
+|                     | bg_color        | str                                     | The background color of the tooltip. Defaults to white.                                                                   |              |
+|                     | border          | str                                     | The border style of the tooltip. Defaults to "1px solid #000000".                                                         |              |
+| tooltipsvisible_get |                 | bool                                    | <br><b>Returns:</b><br> True - visible, False - not visible.<br>                                                          |              |
+| tooltipsvisible_set |                 | None                                    |                                                                                                                           |              |
+|                     | visible         | bool                                    | True - Visible, False - not visible.                                                                                      |              |
+| trans_get           |                 | bool                                    | <br><b>Returns:</b><br> True - translate, False - do not translate<br>                                                    |              |
+| trans_set           |                 | None                                    |                                                                                                                           |              |
+|                     | no_trans        | bool                                    | True - no translation, False - translate                                                                                  |              |
+| trans_str           |                 | str                                     | <br><b>Returns:</b><br> The translated text.<br>                                                                          |              |
+|                     | text            | str                                     | The text to be translated.                                                                                                |              |
+|                     | force_translate | bool                                    | Translate text if True,Otherwise do not translate text. Defaults to False                                                 |              |
+| validate            |                 | bool                                    | <br><b>Returns:</b><br> True if validation ok, otherwise False<br>                                                        |              |
+| value_get           |                 | any                                     | <br><b>Returns:</b><br> The value of the widget.<br>                                                                      |              |
+| userdata_get        |                 | any                                     | <br><b>Returns:</b><br> The user data stored on the widget                                                                |              |
+| userdata_set        |                 | None                                    | Sets the user data on the widget.                                                                                         |              |
+|                     | user_data       | any                                     | The user data can be of any type                                                                                          |              |
+| value_set           |                 | None                                    | Sets the widget value - These are overloaded types                                                                        |              |
+|                     | value           | bool                                    | Sets the bool value set of the widget.                                                                                    |              |
+| value_set           |                 | None                                    | Sets the widget value - These are overloaded types                                                                        |              |
+|                     | value           | int                                     | Sets the int value set of the widget.                                                                                     |              |
+| value_set           |                 | None                                    | Sets the widget value - These are overloaded types                                                                        |              |
+|                     | value           | float                                   | Sets the float value set of the widget.                                                                                   |              |
+| value_set           |                 | None                                    | Sets the widget value - These are overloaded types                                                                        |              |
+|                     | value           | Combo_Data                              | Sets the [Combo_Data](#combo_data) value set of the widget.                                                               |              |
+| value_set           |                 | None                                    | Sets the widget value - These are overloaded types                                                                        |              |
+|                     | value           | str                                     | Sets the str value set of the widget.                                                                                     |              |
+| value_set           |                 | None                                    | Sets the widget value - These are overloaded types                                                                        |              |
+|                     | value           | datetime.date                           | Sets the date value set of the widget                                                                                     |
+| value_set           |                 | None                                    | Sets the widget value - These are overloaded types                                                                        |              |
+|                     | value           | datetime.datetime                       | Sets the datetime value set of the widget                                                                                 |
+| visible_get         |                 | bool                                    | <br><b>Returns:</b><br> True - widget visible, False - widget hidden.<br>                                                 |              |
+| visible_set         |                 | None                                    |                                                                                                                           |              |
+|                     | visible         | bool                                    | True - widget visible, False - widget hidden.                                                                             |              |
+
 
 #### Button
 
@@ -655,16 +778,61 @@ ComboBox(
 ```
 #### Methods
 
-| Method            | Description                                | Arguments                                               | Returns                        |
-|-------------------|--------------------------------------------|---------------------------------------------------------|--------------------------------|
-| count_items       | Returns the number of items in the list    |                                                         | int >= 1                       |    
-| display_width_set | Sets the combobox display width            |                                                         |                                |
-|                   |                                            | display_width : int                                     |                                |
-| icon_set          | Sets the icon at a given row               |                                                         |                                |
-|                   |                                            | combo_index : int >= 0 <= number of items in list : int |                                |
- |                   |                                            | icon : str [File Name], QIcon,QPixmap                   |                                |
-| get_items         | Returns all the items in the dropdown list |                                                         | list [Combo_Data](#combo_data) |
+| Method            | Description                                | Arguments     | Type                                    | Description                                                                       | Optional |
+|-------------------|--------------------------------------------|---------------|-----------------------------------------|-----------------------------------------------------------------------------------|----------|
+| count_items       | Returns the number of items in the list    |               | int                                     | \>= 0 <= number of items in list                                                  |          |  
+| display_width_set | Sets the combobox display width            |               |                                         |                                                                                   |          |
+|                   |                                            | display_width | int                                     |                                                                                   | ❌        |
+| get_items         | Returns all the items in the dropdown list |               | list [Combo_Data](#combo_data)          |                                                                                   |          |
+| icon_set          | Sets the icon at a given row               |               | int                                     | 1 if icon set, Otherwise -1                                                       |          |
+|                   |                                            | combo_index   | int                                     | \>=0 and <= count_items, Row index in the combobox where the icon is to be placed | ❌        |
+ |                   |                                            | icon          | str [File Name], QIcon,QPixmap          | A QPixmap, QIcon or the icon file name                                            | ❌        |
+| load_csv_file     | Loads a CSV file into the combobox         |               | int                                     | Length of the maximum item if load ok, Otherwise -1                               |          |
+|                   |                                            | data_index    | int (1)                                 | The column in the file to load into user data                                     | ✓        |
+|                   |                                            | delimiter     | str (",")                               | CSV file field separator                                                          | ✓        |
+|                   |                                            | file_name     | str                                     | The path to the CSV file                                                          | ❌        |
+|                   |                                            | ignore_header | bool (true)                             | Set True if the CSV file has a header row                                         | ✓        |
+|                   |                                            | line_start    | int (1)                                 | The line in the file to start loading data from                                   | ✓        |
+|                   |                                            | select_text   | str (")                                 | The text to select after load                                                     | ✓        |
+|                   |                                            | text_index    | int (1)                                 | The column in the CSV file to load into display                                   | ✓        |
+| load_items        | Loads items into the combobox dropdown     |               | int                                     | Length of the maximum item                                                        |          |
+|                   |                                            | auto_na       | bool (True)                             | True puts na_string (Not Available) in combobox, Otherwise not                    | ✓        |
+|                   |                                            | clear_items   | bool (True)                             | Clears existing items from the combobox                                           | ✓        |
+|                   |                                            | items         | list or tuple [Combo_Item](#combo_item) | The items to be placed in the combobox                                            | ❌        |
+|                   |                                            | na_string     | str ("N/A")                             | The "Not Available" string                                                        | ✓        |
 
+
+### Slider
+ 
+Instantiates a Slider widget and associated properties
+ 
+| **Method**     | **Arguments** | **Type** | **Description**                                                                              | **Optional** |
+|----------------|---------------|----------|----------------------------------------------------------------------------------------------|--------------|
+| __post_init__  |               | None     |                                                                                              |              |
+| _create_widget |               | None     | Creates a Slider widget.<br><br><br><b>Returns:</b><br> - qtW.QWidget: The slider widget<br> |              |
+|                | parent_app    | QtPyApp  | The parent app.                                                                              |              |
+|                | container_tag | str      | The tag of the container that the widget is in.                                              |              |
+| scale_factor   |               | float    |                                                                                              |              |
+| scale_factor   |               | None     |                                                                                              |              |
+|                | value         | float    |                                                                                              |              |
+| range_min_set  |               | None     | Sets the minimum value of the slider.<br><br>                                                |              |
+|                | range_min     | int      | The minimum value of the slider.                                                             |              |
+| range_max_set  |               | None     | Sets the maximum value of the slider.<br><br>                                                |              |
+|                | range_max     | int      | The maximum value of the slider.                                                             |              |
+| value_get      |               | int      | <br><b>Returns:</b><br> - int: The value of the slider.<br>                                  |              |
+| value_set      |               | None     | Sets the value of the slider.<br><br>                                                        |              |
+|                | value         | int      | The value to set the slider to.                                                              |              |
+|                | block_signals | bool     |                                                                                              |              |
+
+#### Widget_Frame
+ Widget_Frame` is a class that defines the style of the frame around a widget
+
+| Property      | Description | Type                        |
+|---------------|-------------|-----------------------------|
+| frame         |             | [Frame](#frame)             |
+| frame_style   |             | [Frame_Style](#frame_style) |
+| line_width    |             | int =3                      |
+| midline_width |             | int = 0                     |
 
 ### QTPYGUI Enumerated Types/Class Reference
 
@@ -710,23 +878,36 @@ Aligns text using style sheet type declaration (Some controls will remap to
 
 Combo_Data is a class used to store data sourced from combo box items
 
-| Property  | Description                          | Type                                                                |
-|-----------|--------------------------------------|---------------------------------------------------------------------|
-| display   | Text displayed in dropdown row       | str                                                                 |
-| data      | user data held in dropdown row       | str, int, float, bytes, bool (None)                                 |
-| index     | Row index of data item               | int >= 0                                                            |
-| user_data | Data stored by user  in dropdown row | None , str, int , float , bytes , bool , tuple , list , dict (None) |
+| Property  | Description                          | Type                                                               |
+|-----------|--------------------------------------|--------------------------------------------------------------------|
+| display   | Text displayed in dropdown row       | str                                                                |
+| data      | user data held in dropdown row       | str, int, float, bytes, bool, None                                 |
+| index     | Row index of data item               | int >= 0                                                           |
+| user_data | Data stored by user  in dropdown row | None , str, int , float , bytes , bool , tuple , list , dict, None |
 
 #### Combo_Item
 
-Combo_Item is a class used to set combo box items
+Combo_Item is a class used to set combo box items.  All attributes are mandatory.
 
-| Property  | Description                            | Type                                                                |
-|-----------|----------------------------------------|---------------------------------------------------------------------|
-| display   | Text displayed in dropdown row         | str                                                                 |
-| data      | user data held in dropdown row         | str, int, float, bytes, bool (None)                                 |
-| icon      | The icon image displayed on the button | str [File Name]<br/>,QIcon,QPixmap (None)                           |
-| user_data | Data stored by user  in dropdown row   | None , str, int , float , bytes , bool , tuple , list , dict (None) |
+| Property  | Description                            | Type                                                               |
+|-----------|----------------------------------------|--------------------------------------------------------------------|
+| display   | Text displayed in dropdown row         | str                                                                |
+| data      | user data held in dropdown row         | str, int, float, bytes, bool, None                                 |
+| icon      | The icon image displayed on the button | str [File Name]<br/>,QIcon,QPixmap, None                           |
+| user_data | Data stored by user  in dropdown row   | None , str, int , float , bytes , bool , tuple , list , dict, None |
+
+#### Col_Def
+
+Col_Def is a class used to set the column attributes of grid controls. All attributes are mandatory.
+
+| Property  | Description                                                                                   | Type    |
+|-----------|-----------------------------------------------------------------------------------------------|---------|
+| checkable | The column rows have a check-box if True, Otherwise no checkbox is displayed                  | bool    |
+| editable  | The column rows can be edited if True, Otherwise the column rows can not be edited            | bool    |
+| label     | the label displayed in the columns first  row denoting the column name                        | str     |
+| tag       | The application name for the column                                                           | str     |
+| width     | The width of the column in chars if GUI control argument pixel_unit is True, Otherwise pixels | int > 0 |
+
 
 #### Font
 
@@ -770,6 +951,31 @@ Defines the weight of the [font](#font)
 | MEDIUM     | Defines the font as medium                          | Enumerated |
 | NORMAL     | Defines the font as normal with no special features | Enumerated |
 | THIN       | Defines the font as thin                            | Enumerated |
+
+#### Frame
+Defines the frame of a GUI control where supported
+
+| Property | Description    | Type              |
+|----------|----------------|-------------------|
+| PLAIN    | A flat frame   | qtW.QFrame.Plain  |
+| RAISED   | A raised frame | qtW.QFrame.Raised |
+| SUNKEN   | A sunken frame | qtW.QFrame.Sunken |
+
+#### Frame_Style
+Defines the frame of a GUI control where supported
+
+| Property | Description             | Type                   |
+|----------|-------------------------|------------------------|
+| BOX      | A box frame             | qtW.QFrame.Box         |
+| PANEL    | A panel frame           | qtW.QFrame.Panel       |
+| HLINE    | A horizontal line frame | qtW.QFrame.HLine       |
+| NONE     | No frame                | qtW.QFrame.NoFrame     |
+| VLINE    | A vertical line frame   | qtW.QFrame.VLine       |
+| WPANEL   | A window panel frame    | qtW.QFrame.WinPanel    |
+| STYLED   | A Styled panel frame    | qtW.QFrame.StyledPanel |
+
+
+
 
 
 
