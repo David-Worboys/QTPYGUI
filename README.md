@@ -414,27 +414,27 @@ PyInstaller produces even larger executables!
 
 ### QTPYGUI Control API Reference
 
-| Control               | Description                                                                                                                  |
-|-----------------------|------------------------------------------------------------------------------------------------------------------------------|
-| [Button](#button)     | Creates a button, text and icon are optional                                                                                 |
-| [Checkbox](#checkbox) | Creates a check box that a user can click on or off                                                                          | 
-| [ComboBox](#combobox) | Creates a drop down selection box, icon in list is <br/>optional                                                             |
-| Label                 | Creates a text string                                                                                                        |
-| Dateedit              | Creates a date edit control with a dropdown calendar and <br/>an erase button                                                |
-| FolderView            | Creates a control that displays the contents of a folder in a Grid                                                           |
-| Grid                  | Creates a control that displays data in a table (grid) format                                                                |
-| Image                 | Creates a control that displays an image                                                                                     |
-| LineEdit              | Creates a control that allows text to be edited and displayed<br/> in a single line                                          |
-| Menu                  | Creates a menu just below the title bar                                                                                      |
-| ProgressBar           | Creates a control that displays the progress of an operation                                                                 |
-| RadioButton           | Creates a radio button control. In a group only one can be <br/>selected at a time                                           |
-| Switch                | Creates a switch control that can be used to turn on and <br/>off a feature                                                  |
-| [Slider](#slider)     | Creates a slider control than can be used to set a value <br/>by dragging the handle                                         |
-| Spinbox               | Creates a spinbox control that allows numbers to be set <br/>via clicking up and down arrows or entering the number directly |
-| Tab                   | Creates a tab control that has multiple pages, each <br/>housing their own set of GUI controls                               |
-| TextEdit              | Creates a text entry control that can span multiple lines                                                                    |
-| Timeedit              | Creates a time edit control with an erase button                                                                             |
-| Treeview              | Creates a control that displays data as a tree view                                                                          |
+| Control                   | Description                                                                                                                  |
+|---------------------------|------------------------------------------------------------------------------------------------------------------------------|
+| [Button](#button)         | Creates a button, text and icon are optional                                                                                 |
+| [Checkbox](#checkbox)     | Creates a check box that a user can click on or off                                                                          | 
+| [ComboBox](#combobox)     | Creates a drop down selection box, icon in list is <br/>optional                                                             |
+| [Dateedit](#dateedit)     | Creates a date edit control with a dropdown calendar and <br/>an erase button                                                |
+| [FolderView](#folderview) | Creates a control that displays the contents of a folder in a Grid                                                           |
+| Grid                      | Creates a control that displays data in a table (grid) format                                                                |
+| Image                     | Creates a control that displays an image                                                                                     |
+| Label                     | Creates a text string                                                                                                        |
+| LineEdit                  | Creates a control that allows text to be edited and displayed<br/> in a single line                                          |
+| Menu                      | Creates a menu just below the title bar                                                                                      |
+| ProgressBar               | Creates a control that displays the progress of an operation                                                                 |
+| RadioButton               | Creates a radio button control. In a group only one can be <br/>selected at a time                                           |
+| [Slider](#slider)         | Creates a slider control than can be used to set a value <br/>by dragging the handle                                         |
+| Spinbox                   | Creates a spinbox control that allows numbers to be set <br/>via clicking up and down arrows or entering the number directly |
+| Switch                    | Creates a switch control that can be used to turn on and <br/>off a feature                                                  |
+| Tab                       | Creates a tab control that has multiple pages, each <br/>housing their own set of GUI controls                               |
+| TextEdit                  | Creates a text entry control that can span multiple lines                                                                    |
+| Timeedit                  | Creates a time edit control with an erase button                                                                             |
+| Treeview                  | Creates a control that displays data as a tree view                                                                          |
 
 ### _qtpyBase_Control
  
@@ -464,7 +464,7 @@ used to set the behavior of the GUI control when instantiated.
 | label_align       | [Align_Text](#align_text) (Align_Text.RIGHT)   | The alignment of the label text                                                                                                                   |
 | label_width       | int (-1)                                       | The width of the label in  characters if pixel_unit is False, Otherwise the width is in pixels.<br> -1 automatically calculates the width         |
 | label_font        | [Font](#font) \| None (None)                   | The Font of the label                                                                                                                             |
-| pixel_unit        | bool (False)                                   | True, width and height settings are in pxels, Otherwise in characters                                                                             |
+| pixel_unit        | bool (False)                                   | True, width and height settings are in pixels, Otherwise in characters                                                                             |
 | size_fixed        | bool (True)                                    | True, Sets the size of the GUI controls as fixed, Otherwise not fixed. TODO: fix this setting as it has no effect                                 |
 | tag               | str ("")                                       | The tag of the GUI control, system generated. If "" then system generated                                                                         |
 | text              | str ("")                                       | The text displayed on the GUI control if this is supported by the GUI control                                                                     |
@@ -489,26 +489,14 @@ used to set the behavior of the GUI control when instantiated.
 |---------------------|-----------------|-----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|--------------|
 | block_signals       |                 | None                                    | Blocks or unblocks signals for the widget (Used rarely where signals might be generated very frequently e.g. [Slider](#slider))      |              |
 |                     | block_signals   | bool (True)                             | True, stop this widget from generating signals (events), Otherwise do  not do not stop signals (events)  being generated .           | ✓            |
-| guiwidget_get       |                 | qtW.QWidget                             | Returns the underlying QT widget so that specialised operations can be performed<br><b>Returns:</b><br> The QT GUI widget.<br>       |              |
-| guiwidget_set       |                 | None                                    | Sets the GUI Control (Almost never used by QTPYGUI programmers)                                                                      |              |
-|                     | widget          | qtW.QWidget \| qtG.QAction              | The widget being set                                                                                                                 | ❌            | 
+| clear               |                 | None                                    | Clears the contents of the GUI control, if supported                                                                                 |              | 
 | buddy_text_set      |                 | None                                    | Sets the text on the buddy control, where supported                                                                                  |              |
 |                     | value           | str                                     | The label text set to the left of the buddy widget.                                                                                  | ❌            |
 | ediitable_set       |                 | None                                    | Controls the edit setting of a GUI control, where supported.                                                                         |              |
 |                     | editable        | bool (False)                            | True, set the GUI control editable, where supported, Otherwise not.                                                                  | ✓            |
-| clear               |                 | None                                    | Clears the contents of the GUI control, if supported                                                                                 |              |
 | enable_get          |                 | bool                                    | <br><b>Returns:</b><br> The enable value of the widget.<br>                                                                          |              |
 | enable_set          |                 | int                                     | Enables/Disables the GUI control where supported <br><b>Returns:</b><br> 1 - set ok, -1 - set failed<br>                             |              |
 |                     | enable          | bool                                    | True enable control, Otherwise disable the control.                                                                                  | ❌            |
-| pixel_str_size      |                 | [Char_Pixel_Size](#char_pixel_size)     | <br><b>Returns:</b><br> The pixel size of the string in a [Char_Pixel_Size](#char_pixel_size) instance   .<br>                       |              |
-|                     | text            | str                                     | The text to be measured                                                                                                              | ❌            |
-| pixel_char_size     |                 | [Char_Pixel_Size](#char_pixel_size)     | The size of a char in pixels<br><b>Returns:</b><br> [Char_Pixel_Size](#char_pixel_size) <br>                                         |              |
-|                     | char_height     | int                                     | Character height in chars                                                                                                            | ❌            |
-|                     | char_width      | int                                     | Character width in chars                                                                                                             | ❌            |
-|                     | height_fudge    | float (1.1)                             | Fudge factor multiplier to provide height adjustment                                                                                 | ✓            |
-|                     | width_fudge     | float (1.1)                             | Fudge factor multiplier to provide width adjustment                                                                                  | ✓            |
-| text_pixel_size     |                 | tuple[int,int]                          | Returns the height and width of a string of text in pixels <br><b>Returns:</b><br> The [height,width] of the text in pixels.<br>     |              |
-|                     | text            | str                                     | The text to be measured.                                                                                                             | ❌            |
 | fonts_available_get |                 | tuple[str]                              | <br><b>Returns:</b><br> A tuple of font name strings.<br>                                                                            |              |
 | font_set            |                 | None                                    | Sets the font on the GUI control (Usually used internally as the [Font](#font) property is set when the GUI control is instantiated) |              |
 |                     | app_font        | Font                                    | Application font                                                                                                                     | ❌            |
@@ -520,6 +508,18 @@ used to set the behavior of the GUI control when instantiated.
 |                     | frame           | [Widget_Frame](#widget_frame)           | Frame definition object.                                                                                                             | ✓            |
 | icon_set            |                 | None                                    |                                                                                                                                      |              |
 |                     | icon            | None \| qtG.QIcon \| qtG.QPixmap \| str | Sets the icon on a GUI control were supported. If a str then this is the filename  of the icon                                       | ❌            |
+| guiwidget_get       |                 | qtW.QWidget                             | Returns the underlying QT widget so that specialised operations can be performed<br><b>Returns:</b><br> The QT GUI widget.<br>       |              |
+| guiwidget_set       |                 | None                                    | Sets the GUI Control (Almost never used by QTPYGUI programmers)                                                                      |              |
+|                     | widget          | qtW.QWidget \| qtG.QAction              | The widget being set                                                                                                                 | ❌            |
+| pixel_str_size      |                 | [Char_Pixel_Size](#char_pixel_size)     | <br><b>Returns:</b><br> The pixel size of the string in a [Char_Pixel_Size](#char_pixel_size) instance   .<br>                       |              |
+|                     | text            | str                                     | The text to be measured                                                                                                              | ❌            |
+| pixel_char_size     |                 | [Char_Pixel_Size](#char_pixel_size)     | The size of a char in pixels<br><b>Returns:</b><br> [Char_Pixel_Size](#char_pixel_size) <br>                                         |              |
+|                     | char_height     | int                                     | Character height in chars                                                                                                            | ❌            |
+|                     | char_width      | int                                     | Character width in chars                                                                                                             | ❌            |
+|                     | height_fudge    | float (1.1)                             | Fudge factor multiplier to provide height adjustment                                                                                 | ✓            |
+|                     | width_fudge     | float (1.1)                             | Fudge factor multiplier to provide width adjustment                                                                                  | ✓            |
+| text_pixel_size     |                 | tuple[int,int]                          | Returns the height and width of a string of text in pixels <br><b>Returns:</b><br> The [height,width] of the text in pixels.<br>     |              |
+|                     | text            | str                                     | The text to be measured.                                                                                                             | ❌            |
 | tooltip_get         |                 | str                                     | <br><b>Returns:</b><br> The tooltip text.<br>                                                                                        |              |
 | tooltip_set         |                 | None                                    |                                                                                                                                      |              |
 |                     | tooltip         | str                                     | The text to display in the tooltip.                                                                                                  | ❌            |
@@ -567,67 +567,78 @@ Calling Button in a layout will generate a button control on a form. The "tag"
 suggested to set width and height as the font selected might not 
 automatically size correctly.  
 
-| ***Property***       | Description                                                                                          | Type                                        | Optional |
-|----------------------|------------------------------------------------------------------------------------------------------|---------------------------------------------|----------|
-| auto_repeat_interval | If > 0 the button keeps firing Clicked events when <br>held down (milliseconds)                      | int >= 0 (0)                                | ✓        |
-| bold                 | Sets the button text bold if True otherwise not                                                      | bool (False)                                | ✓        |
-| buddy_control        | Control or container with controls that sit to the right of the button                               | Container or GUI Control                    | ✓        | 
-| callback             | The method called when the button is pressed                                                         | Callable (None)                             | ✓        |
-| enabled              | Enables/Disables the button                                                                          | bool (True)                                 | ✓        |
-| height               | The height of the button (in characters if pixel_unit is<br> False,Otherwise pixels)                 | int > 0 (10)                                | ✓        |
-| icon                 | The icon image displayed on the button                                                               | str [File Name]<br/>,QIcon,QPixmap          | ✓        |
-| italic               | Sets the button text italic if True otherwise not                                                    | bool (False)                                | ✓        |
-| label                | Displays text to the left of the button                                                              | str ("")                                    | ✓        |
-| label_align          | Alignment of the text displayed in the label                                                         | [Align_Text](#align_text) (Align_Text.LEFT) | ✓        |
-| label_font           | The font definition for the label                                                                    | [Font](#font)                               | ✓        |
-| label_width          | Sets the label width (in characters if pixel_unit is<br> False,Otherwise pixels)                     | int > 0 (0)                                 | ✓        |
-| pixel_unit           | Use pixels for width/height, pixels if True, Otherwise characters                                    | bool (False)                                | ✓        |
-| tag                  | The application name of the button                                                                   | str (System Generated)                      | ✓        |
-| text                 | The text displayed on the button                                                                     | str  ("")                                   | ✓        |
-| txt_align            | Alignment of the text displayed on the button                                                        | [Align_Text](#align_text) (Align_Text.LEFT) | ✓        |
-| txt_font             | The font definition for the button (style will override<br> italic,size will override txt_fontsize ) | [Font](#font)                               | ✓        |
-| txt_fontsize         | The point size of the text                                                                           | int (10)                                    | ✓        |
-| tune_hsize           | Add or subtracts pixels units to the width. Used in aligning controls                                | int (0)                                     | ✓        |
-| tune_vsize           | Add or subtracts pixels units to the height. Used in aligning controls                               | int (0)                                     | ✓        |
-| tooltip              | Sets the tooltip displayed when the button is hovered over                                           | str                                         | ✓        |
-| translate            | Translates text if True Otherwise does not translate                                                 | bool (True)                                 | ✓        |
-| user_data            | Any data item the user wants to attach to the button                                                 | any (None )                                 | ✓        |
-| underline            | Underlines the button text if True otherwise not                                                     | bool (False)                                | ✓        |
-| visible              | Makes the button visible if True otherwise invisible                                                 | bool (True)                                 | ✓        |
-| width                | The width of the button (in characters if pixel_unit is<br> False,Otherwise pixels)                  | int > 0 (10)                                | ✓        |
+<br>**Properties**
+<br>The following properties apply when a button is instantiated with the Button call as below 
+
+| **Property**         | **Description**                                                                                      | **Type**                                    | **Optional** |
+|----------------------|------------------------------------------------------------------------------------------------------|---------------------------------------------|--------------|
+| auto_repeat_interval | If > 0 the button keeps firing Clicked events when <br>held down (milliseconds)                      | int >= 0 (0)                                | ✓            |
+| bold                 | Sets the button text bold if True otherwise not                                                      | bool (False)                                | ✓            |
+| buddy_control        | Control or container with controls that sit to the right of the button                               | Container or GUI Control                    | ✓            | 
+| callback             | The method called when the button is pressed                                                         | Callable (None)                             | ✓            |
+| enabled              | Enables/Disables the button                                                                          | bool (True)                                 | ✓            |
+| height               | The height of the button (in characters if pixel_unit is<br> False,Otherwise pixels)                 | int > 0 (10)                                | ✓            |
+| icon                 | The icon image displayed on the button                                                               | str [File Name]<br/>,QIcon,QPixmap          | ✓            |
+| italic               | Sets the button text italic if True otherwise not                                                    | bool (False)                                | ✓            |
+| label                | Displays text to the left of the button                                                              | str ("")                                    | ✓            |
+| label_align          | Alignment of the text displayed in the label                                                         | [Align_Text](#align_text) (Align_Text.LEFT) | ✓            |
+| label_font           | The font definition for the label                                                                    | [Font](#font)                               | ✓            |
+| label_width          | Sets the label width (in characters if pixel_unit is<br> False,Otherwise pixels)                     | int > 0 (0)                                 | ✓            |
+| pixel_unit           | Use pixels for width/height, pixels if True, Otherwise characters                                    | bool (False)                                | ✓            |
+| tag                  | The application name of the button                                                                   | str (System Generated)                      | ✓            |
+| text                 | The text displayed on the button                                                                     | str  ("")                                   | ✓            |
+| txt_align            | Alignment of the text displayed on the button                                                        | [Align_Text](#align_text) (Align_Text.LEFT) | ✓            |
+| txt_font             | The font definition for the button (style will override<br> italic,size will override txt_fontsize ) | [Font](#font)                               | ✓            |
+| txt_fontsize         | The point size of the text                                                                           | int (10)                                    | ✓            |
+| tune_hsize           | Add or subtracts pixels units to the width. Used in aligning controls                                | int (0)                                     | ✓            |
+| tune_vsize           | Add or subtracts pixels units to the height. Used in aligning controls                               | int (0)                                     | ✓            |
+| tooltip              | Sets the tooltip displayed when the button is hovered over                                           | str                                         | ✓            |
+| translate            | Translates text if True Otherwise does not translate                                                 | bool (True)                                 | ✓            |
+| user_data            | Any data item the user wants to attach to the button                                                 | any (None )                                 | ✓            |
+| underline            | Underlines the button text if True otherwise not                                                     | bool (False)                                | ✓            |
+| visible              | Makes the button visible if True otherwise invisible                                                 | bool (True)                                 | ✓            |
+| width                | The width of the button (in characters if pixel_unit is<br> False,Otherwise pixels)                  | int > 0 (10)                                | ✓            |
 
 A fully loaded button declaration:
 - **Note: Only "tag", "text" and "callback" are usually needed**
 
 ```
 Button(
-                        tag="button_1",
-                        text="Button",
-                        label="Button 1",
-                        label_align=qtg.Align_Text.CENTER,
-                        label_width=10,
-                        label_font=qtg.Font(style=qtg.Font_Style.OBLIQUE,size=14),
-                        callback=self.event_handler,
-                        width=10,
-                        height=1,
-                        txt_align=qtg.Align_Text.CENTER,
-                        txt_font =qtg.Font(style=qtg.Font_Style.NORMAL,size=15),
-                        txt_fontsize=12,
-                        bold=True,
-                        italic=True,
-                        underline=True,
-                        enabled=True,                        
-                        visible=True,
-                        tooltip="Button 1 Press Me",
-                        tune_hsize=15,
-                        tune_vsize=15,
-                        user_data = {"key":"value"},
-                        buddy_control=qtg.HBoxContainer().add_row(
-                            qtg.Spacer(width=1),
-                                    qtg.Checkbox(tag="button_check", text="Tick Me!", callback=self.event_handler, width=12)
-                        ),
-                    )
+        tag="button_1",
+        text="Button",
+        label="Button 1",
+        label_align=qtg.Align_Text.CENTER,
+        label_width=10,
+        label_font=qtg.Font(style=qtg.Font_Style.OBLIQUE,size=14),
+        callback=self.event_handler,
+        width=10,
+        height=1,
+        txt_align=qtg.Align_Text.CENTER,
+        txt_font =qtg.Font(style=qtg.Font_Style.NORMAL,size=15),
+        txt_fontsize=12,
+        bold=True,
+        italic=True,
+        underline=True,
+        enabled=True,                        
+        visible=True,
+        tooltip="Button 1 Press Me",
+        tune_hsize=15,
+        tune_vsize=15,
+        user_data = {"key":"value"},
+        buddy_control=qtg.HBoxContainer().add_row(
+            qtg.Spacer(width=1),
+                    qtg.Checkbox(tag="button_check", text="Tick Me!", callback=self.event_handler, width=12)
+        ),
+    )
 ```
+<br>**Methods**
+<br>A subset of the [_qtpyBase_Control](#_qtpybase_control) methods apply to Button instances 
+
+| **Method** | **Arguments** | **Type**    | **Description**                     | **Optional** |
+|------------|---------------|-------------|-------------------------------------|--------------|
+| text_set   |               | None        | Sets the text on the button         |              |
+|            | button_text   | str         | The text to be placed on the button | ❌            |
+|            | translate     | bool (True) | Translate the text                  | ✓            |
 
 #### Checkbox
 
@@ -635,6 +646,9 @@ Calling Checkbox in a layout will generate a checkbox control on a form. The "ta
 ,"text" and "callback" arguments are generally the only arguments used. It is 
 suggested to set width and height as the font selected might not 
 automatically size correctly.
+
+<br>**Properties**
+<br>The following properties apply when a Checkbox is instantiated with the Checkbox call as below
 
 | **Property**  | **Description**                                                                                        | **Type**                                    | **Optional** |
 |---------------|--------------------------------------------------------------------------------------------------------|---------------------------------------------|--------------|
@@ -668,41 +682,57 @@ A fully loaded checkbox declaration:
 
 ```
 Checkbox(
-                        tag="checkbox",
-                        text="Tick Me!",
-                        label="Check Box",
-                        callback=self.event_handler,
-                        label_align=qtg.Align_Text.CENTER,
-                        label_width=10,
-                        label_font=qtg.Font(style=qtg.Font_Style.OBLIQUE, size=14),
-                        width=6,
-                        height=1,
-                        txt_align=qtg.Align_Text.CENTER,
-                        txt_font=qtg.Font(style=qtg.Font_Style.NORMAL, size=20),
-                        txt_fontsize=12,
-                        bold=True,
-                        italic=True,
-                        underline=True,
-                        enabled=True,
-                        visible=True,
-                        tooltip="Check Box Press Me",
-                        tune_hsize=15,
-                        tune_vsize=15,
-                        user_data={"key": "value"},
-                        buddy_control=qtg.HBoxContainer().add_row(
-                            qtg.Spacer(width=1),
-                            qtg.Button(tag="button_push", text="Push Me!", callback=self.event_handler, width=12)
-                        ),
-
-                    )
+            tag="checkbox",
+            text="Tick Me!",
+            label="Check Box",
+            callback=self.event_handler,
+            label_align=qtg.Align_Text.CENTER,
+            label_width=10,
+            label_font=qtg.Font(style=qtg.Font_Style.OBLIQUE, size=14),
+            width=6,
+            height=1,
+            txt_align=qtg.Align_Text.CENTER,
+            txt_font=qtg.Font(style=qtg.Font_Style.NORMAL, size=20),
+            txt_fontsize=12,
+            bold=True,
+            italic=True,
+            underline=True,
+            enabled=True,
+            visible=True,
+            tooltip="Check Box Press Me",
+            tune_hsize=15,
+            tune_vsize=15,
+            user_data={"key": "value"},
+            buddy_control=qtg.HBoxContainer().add_row(
+                qtg.Spacer(width=1),
+                qtg.Button(tag="button_push", text="Push Me!", callback=self.event_handler, width=12)
+            ),
+    
+        )
 ```
+
+<br>**Methods**
+<br>A subset of the [_qtpyBase_Control](#_qtpybase_control) methods apply to Checkbox instances
+
+| **Method**     | **Arguments** | **Type** | **Description**                                                | **Optional** |
+|----------------|---------------|----------|----------------------------------------------------------------|--------------|
+| button_checked |               | bool     | <br><b>Returns:</b><br> The checked state of the checkbox.<br> |              |
+| button_toggle  |               | None     |                                                                |              |
+|                | value (True)  | bool     | True checkbox is checked, False checkbox is unchecked.         | ✓            |
+| label_get      |               | str      | <br><b>Returns:</b><br> The text of the label.<br>             |              |
+| value_get      |               | bool     | <br><b>Returns:</b><br> True checked, False not checked<br>    |              |
+| value_set      |               | None     |                                                                |              |
+|                | value         | bool     | True checkbox is checked, False checkbox is unchecked.         | ❌            |
+
 #### ComboBox
 
 Calling ComboBox in a layout will generate a dropdown combobox control on a form. The "tag"
-,"text" and "callback" arguments are generally the only arguments used. It is 
+,"text", "callback" and "items" arguments are generally the only arguments used. It is 
 suggested to set width and height as the font selected might not 
 automatically size correctly.
 
+<br>**Properties**
+<br>The following properties apply when a ComboBox is instantiated with the ComboBox call as below
 
 | **Property**      | **Description**                                                                                                      | **Type**                                    | **Optional** |
 |-------------------|----------------------------------------------------------------------------------------------------------------------|---------------------------------------------|--------------|
@@ -737,72 +767,218 @@ A fully loaded combobox declaration:
 - **Note: Only "tag", "text" ,"callback" and "items" are usually needed**
 ```
 ComboBox(
-                        tag="combo_box",
-                        label="Combo Box",
-                        display_na=True,
-                        dropdown_width=35,
-                        items=[
-                            qtg.Combo_Item(
-                                display="Item 1",
-                                data=None,
-                                icon=qtg.Sys_Icon.computericon.get(),
-                                user_data=None,
-                            ),
-                            qtg.Combo_Item(
-                                display="Item 2", data=None, icon=None, user_data=None
-                            ),
-                            qtg.Combo_Item(
-                                display="Item 3", data=None, icon=None, user_data=None
-                            ),
-                        ],
-                        callback=self.event_handler,
-                        label_align=qtg.Align_Text.CENTER,
-                        label_width=10,
-                        label_font=qtg.Font(style=qtg.Font_Style.OBLIQUE, size=14),
-                        width=8,
-                        height=1,
-                        txt_font=qtg.Font(style=qtg.Font_Style.ITALIC, size=12),
-                        txt_fontsize=12,
-                        bold=True,
-                        italic=True,
-                        underline=True,
-                        enabled=True,
-                        visible=True,
-                        tooltip="Check Box Press Me",
-                        tune_hsize=15,
-                        tune_vsize=1,
-                        user_data={"key": "value"},
-                        buddy_control=qtg.HBoxContainer().add_row(
-                            qtg.Spacer(width=1),
-                            qtg.Button(tag="button_push2", text="Push Me 2!", callback=self.event_handler, width=12)
-                        ),
-                    ),
+            tag="combo_box",
+            label="Combo Box",
+            display_na=True,
+            dropdown_width=35,
+            items=[
+                qtg.Combo_Item(
+                    display="Item 1",
+                    data=None,
+                    icon=qtg.Sys_Icon.computericon.get(),
+                    user_data=None,
+                ),
+                qtg.Combo_Item(
+                    display="Item 2", data=None, icon=None, user_data=None
+                ),
+                qtg.Combo_Item(
+                    display="Item 3", data=None, icon=None, user_data=None
+                ),
+            ],
+            callback=self.event_handler,
+            label_align=qtg.Align_Text.CENTER,
+            label_width=10,
+            label_font=qtg.Font(style=qtg.Font_Style.OBLIQUE, size=14),
+            width=8,
+            height=1,
+            txt_font=qtg.Font(style=qtg.Font_Style.ITALIC, size=12),
+            txt_fontsize=12,
+            bold=True,
+            italic=True,
+            underline=True,
+            enabled=True,
+            visible=True,
+            tooltip="Check Box Press Me",
+            tune_hsize=15,
+            tune_vsize=1,
+            user_data={"key": "value"},
+            buddy_control=qtg.HBoxContainer().add_row(
+                qtg.Spacer(width=1),
+                qtg.Button(tag="button_push2", text="Push Me 2!", callback=self.event_handler, width=12)
+            ),
+        ),
 ```
-#### Methods
 
-| **Method**        | **Description**                            | **Arguments** | **Type**                                | **Description**                                                                   | **Optional** |
-|-------------------|--------------------------------------------|---------------|-----------------------------------------|-----------------------------------------------------------------------------------|--------------|
-| count_items       | Returns the number of items in the list    |               | int                                     | \>= 0 <= number of items in list                                                  |              |  
-| display_width_set | Sets the combobox display width            |               |                                         |                                                                                   |              |
-|                   |                                            | display_width | int                                     |                                                                                   | ❌            |
-| get_items         | Returns all the items in the dropdown list |               | list [Combo_Data](#combo_data)          |                                                                                   |              |
-| icon_set          | Sets the icon at a given row               |               | int                                     | 1 if icon set, Otherwise -1                                                       |              |
-|                   |                                            | combo_index   | int                                     | \>=0 and <= count_items, Row index in the combobox where the icon is to be placed | ❌            |
- |                   |                                            | icon          | str [File Name], QIcon,QPixmap          | A QPixmap, QIcon or the icon file name                                            | ❌            |
-| load_csv_file     | Loads a CSV file into the combobox         |               | int                                     | Length of the maximum item if load ok, Otherwise -1                               |              |
-|                   |                                            | data_index    | int (1)                                 | The column in the file to load into user data                                     | ✓            |
-|                   |                                            | delimiter     | str (",")                               | CSV file field separator                                                          | ✓            |
-|                   |                                            | file_name     | str                                     | The path to the CSV file                                                          | ❌            |
-|                   |                                            | ignore_header | bool (true)                             | Set True if the CSV file has a header row                                         | ✓            |
-|                   |                                            | line_start    | int (1)                                 | The line in the file to start loading data from                                   | ✓            |
-|                   |                                            | select_text   | str (")                                 | The text to select after load                                                     | ✓            |
-|                   |                                            | text_index    | int (1)                                 | The column in the CSV file to load into display                                   | ✓            |
-| load_items        | Loads items into the combobox dropdown     |               | int                                     | Length of the maximum item                                                        |              |
-|                   |                                            | auto_na       | bool (True)                             | True puts na_string (Not Available) in combobox, Otherwise not                    | ✓            |
-|                   |                                            | clear_items   | bool (True)                             | Clears existing items from the combobox                                           | ✓            |
-|                   |                                            | items         | list or tuple [Combo_Item](#combo_item) | The items to be placed in the combobox                                            | ❌            |
-|                   |                                            | na_string     | str ("N/A")                             | The "Not Available" string                                                        | ✓            |
+<br>**Methods**
+<br>A subset of the [_qtpyBase_Control](#_qtpybase_control) methods apply to ComboBox instances
 
+| **Method**           | **Arguments**  | **Type**                             | **Description**                                                                                                                                                                                         | **Optional** |
+|----------------------|----------------|--------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
+| count_items          |                | int \>= 0 <= number of items in list | <br><b>Returns:</b><br> The number of items in the Combobox<br>                                                                                                                                         |              |
+| display_width_set    |                | None                                 |                                                                                                                                                                                                         |              |
+|                      | display_width  | int                                  | The number of characters to display in the Combobox                                                                                                                                                     | ❌            |
+| get_items            |                | list [Combo_Data](#combo_data)       | <br><b>Returns:</b><br> returns the List of items in the combo box<br>                                                                                                                                  |              |
+| icon_set             |                | int                                  | <br><b>Returns:</b><br> 1 if successful, -1 if not<br>                                                                                                                                                  |              |
+|                      | combo_index    | int                                  | Row index in the combobox where the icon is to be placed                                                                                                                                                | ❌            |
+|                      | icon           | str [File Name], QIcon,QPixmap       | A QPixmap, QIcon or the icon file name                                                                                                                                                                  | ❌            |
+| is_combo_child       |                | bool                                 | <br><b>Returns:</b><br> True if the Combobox is child of another combo box. False if not.<br>                                                                                                           |              |
+| load_csv_file        |                | int                                  | <br><b>Returns:</b><br> Length of maximum item if load OK, Otherwise -1<br>                                                                                                                             |              |
+|                      | data_index     | int (1)                              | The column in the file to load into user data                                                                                                                                                           | ✓            |
+|                      | delimiter      | str (",")                            | CSV file field separator                                                                                                                                                                                | ✓            |
+|                      | file_name      | str                                  | The path to the CSV file                                                                                                                                                                                | ❌            |
+|                      | ignore_header  | bool (true)                          | Set True if the CSV file has a header row                                                                                                                                                               | ✓            |
+|                      | line_start     | int (1)                              | The line in the file to start loading data from                                                                                                                                                         | ✓            |
+|                      | select_text    | str (")                              | The text to select after load                                                                                                                                                                           | ✓            |
+|                      | text_index     | int (1)                              | The column in the CSV file to load into display                                                                                                                                                         | ✓            |
+| load_items           |                | int                                  | <br><b>Returns:</b><br> int<br>                                                                                                                                                                         |              |
+|                      | auto_na        | bool (True)                          | True puts na_string (Not Available) in combobox, Otherwise not                                                                                                                                          | ✓            |
+|                      | clear_items    | bool (True)                          | Clears existing items from the combobox                                                                                                                                                                 | ✓            |
+|                      | na_string      | str ("N/A")                          | The "Not Available" string                                                                                                                                                                              | ✓            |
+| print_all_to_console |                | None                                 | Debug method - prints items to console                                                                                                                                                                  |              |
+| select_index         |                | None                                 | Scrolls to an index in the combobox and  sets the current index of the widget to the select_index argument                                                                                              |              |
+|                      | select_index   | int                                  | The index of the item to select                                                                                                                                                                         | ❌            |
+| select_text          |                | int                                  | Selects the text in the combobox <br><b>Returns:</b><br> The index of the selected text in the dropdown.                                                                                                |              |
+|                      | select_text    | int                                  | <br><b>Returns:</b><br> The index of the selected text in the dropdown.<br>                                                                                                                             | ❌            |
+|                      | case_sensitive | bool (False)                         | Whether to perform a case-sensitive match.                                                                                                                                                              | ✓            |
+|                      | partial_match  | bool (False)                         | Whether to perform a partial text match.                                                                                                                                                                | ✓            |
+|                      | select_text    | str                                  | The text to select.                                                                                                                                                                                     |              |
+| value_get            |                | [Combo_Data](#combo_data)            | <br><b>Returns:</b><br> Current row [Combo_Data](combo_data) if index = -1, Selected row [Combo_Data](combo_data) if row > 0<br>                                                                        |              |
+|                      | index          | int (-1)                             | The index of the item to get. Defaults to current row.                                                                                                                                                  | ✓            |
+| value_remove         |                | None                                 | Remove an item from the combobox a the given index.                                                                                                                                                     |              |
+|                      | index          | int                                  | The index of the item to remove.                                                                                                                                                                        | ❌            |
+| value_set            |                | None                                 | Sets a value in the dropdown and scrolls to that value. if COMBO_DATA index is -1 then data and display. <br> Values must match for scroll to happen                                                    |              |
+|                      | value          | str \| [Combo_Data](#combo_data)     | Inserts a value in the dropdown. <br>If [Combo_Data](#combo_data) index = -1 insert alphabetically when insert_alpha is True, Otherwise insert at bottom of list. if index > 1 insert at index position | ❌            |                                                                                                                                                  |
+|                      | insert_alpha   | bool (True)                          | Insert alphabetically                                                                                                                                                                                   | ✓            |
+
+#### Dateedit
+
+Calling Dateedit in a layout will generate a Dateedit control, with an erase button
+and a dropdown calendar, on a form. The "tag" ,"text" and "callback" arguments 
+are generally the only arguments used. It is suggested to set width and height 
+as the font selected might not automatically size correctly.
+
+**Constants**
+
+| **Constant** | **Description**                                            | **Type**         |
+|--------------|------------------------------------------------------------|------------------|
+| MINDATE      | The minimum date supported by Dateedit (1 Jan 100 AD)      | QDate(100, 1, 1) |
+| NODATE       | Used internally by Dateedit to signify a no date condition | QDate(1, 1, 1)   |
+
+<br>**Properties**
+<br>The following properties apply when a Datedit is instantiated with the Datedit call as below
+
+| **Property** | **Description**                                                                                                                    | **Type** | **Optional** |
+|--------------|------------------------------------------------------------------------------------------------------------------------------------|----------|--------------|
+| date         | Set to the current date if not set ("")                                                                                            | str ("") | ✓            |
+| format       | Date format. The `format` property is set to the current locale's date format if this is not set ("")<br>Follows QT date formating | str ("") | ✓            |
+| min_date     | Set to **MINDATE** if not set ("")                                                                                                 | str ("") | ✓            |
+| max_date     | Set to the to the current date if not set ("")                                                                                     | str ("") | ✓            |
+
+A fully loaded Dateedit declaration:
+- **Note: Only "tag", "text" ,and "callback" are usually needed **
+  - text behaves a little differently here as it serves to set the tooltip on the erase button
+  - max_date, min_date and format can be used to configure the date range and 
+  format of the Dateedit GUI Control if desired
+
+```
+Dateedit(
+            tag="dateedit2",
+            text="Tick Me!",
+            date="2022-01-01",
+            format="yyyy-MM-dd",
+            max_date="2032-01-01",
+            min_date="2000-01-01",
+            label="Date edit 2",
+            callback=self.event_handler,
+            label_align=qtg.Align_Text.CENTER,
+            label_width=10,
+            label_font=qtg.Font(style=qtg.Font_Style.OBLIQUE, size=14),
+            width=6,
+            height=1,
+            txt_align=qtg.Align_Text.CENTER,
+            txt_font=qtg.Font(style=qtg.Font_Style.NORMAL, size=20),
+            txt_fontsize=12,
+            bold=True,
+            italic=True,
+            underline=True,
+            enabled=True,
+            visible=True,
+            tooltip="Date Edit 2 ",
+            tune_hsize=15,
+            tune_vsize=15,
+            user_data={"key": "value"},
+            buddy_control=qtg.HBoxContainer().add_row(
+                qtg.Spacer(width=1),
+                qtg.Button(
+                    tag="dateedit_button_push",
+                    text="Date Edit 2 Push Me!",
+                    callback=self.event_handler,
+                    width=12,
+                ),
+        )
+```
+
+<br>**Methods**
+<br>A subset of the [_qtpyBase_Control](#_qtpybase_control) methods apply to Dateedit instances
+
+| **Method** | **Arguments**       | **Type**                  | **Description**                                                                                                                    | **Optional** |
+|------------|---------------------|---------------------------|------------------------------------------------------------------------------------------------------------------------------------|--------------|
+| clear      |                     | None                      | Clears the date displayed                                                                                                          |              |
+|            | default_text        | str ("-")                 | Date text to place in the edit control (must be a valid date string or - to clear the date)                                        | ✓            |
+| date_get   |                     | str                       | Gets the date. If date_tuple as a [Date_Tuple](#date_tuple), Otherwise a string formatted as per date_format<br>This is Overloaded |              |
+|            | date_format ("")    | str                       | Set the date format for a string return if date_tuple is False<br>Follows QT date formating                                        | ✓            |
+|            | date_tuple  (False) | bool                      | True, return date format as a [Date_Tuple](#date_tuple), Otherwise a string, formated as per date_format                           | ✓            |
+| date_get   |                     | [Date_Tuple](#date_tuple) | Gets the date. If date_tuple as a [Date_Tuple](#date_tuple), Otherwise a string formatted as per date_format<br>This is Overloaded |              |
+|            | date_format ("")    | str                       | Set the date format for a string return if date_tuple is False<br>Follows QT date formating                                        | ✓            |
+|            | date_tuple  (False) | bool                      | True, return date format as a [Date_Tuple](#date_tuple), Otherwise a string, formated as per date_format                           | ✓            |
+| date_set   |                     | None                      | Sets the date in the control                                                                                                       |              |
+|            | date                | str ("")                  | A string representing the date to set, formatted as 'y-m-d'.                                                                       | ✓            |
+|            | date_format         | str ("")                  | The format of the date string, defaults to an empty string.                                                                        | ✓            |
+|            | default_text        | str  ("-")                | if the date string is '-' then the date control is cleared                                                                         | ✓            |
+| date_valid |                     | bool                      | Checks if a date is valid<br><b>Returns:</b><br> True if date is valid, False otherwise<br>                                        |              |
+|            | date                | str                       | date in string format                                                                                                              | ❌            |
+|            | date_format         | str                       | The format of the date string.                                                                                                     | ❌            |
+| value_get  |                     | str                       | Gets the date. If date_tuple as a [Date_Tuple](#date_tuple), Otherwise a string formatted as per date_format<br>This is Overloaded |              |
+|            | date_format ("")    | str                       | Set the date format for a string return if date_tuple is False<br>Follows QT date formating                                        | ✓            |
+|            | date_tuple  (False) | bool                      | True, return date format as a [Date_Tuple](#date_tuple), Otherwise a string, formated as per date_format                           | ✓            |
+| value_get  |                     | [Date_Tuple](#date_tuple) | Gets the date. If date_tuple as a [Date_Tuple](#date_tuple), Otherwise a string formatted as per date_format<br>This is Overloaded |              |
+|            | date_format ("")    | str                       | Set the date format for a string return if date_tuple is False<br>Follows QT date formating                                        | ✓            |
+|            | date_tuple  (False) | bool                      | True, return date format as a [Date_Tuple](#date_tuple), Otherwise a string, formated as per date_format                           | ✓            |
+| value_set  |                     | None                      | Sets the date in the control                                                                                                       |              |
+|            | date                | str ("")                  | A string representing the date to set, formatted as 'y-m-d'.                                                                       | ✓            |
+|            | date_format         | str ("")                  | The format of the date string, defaults to an empty string.                                                                        | ✓            |
+
+### FolderView
+
+FolderView is a widget that displays a folder path in a tree format
+
+<br>**Properties**
+<br>The following properties apply when a Datedit is instantiated with the Datedit call as below
+
+| **Property**  | **Description**                                                                                                                                                                    | **Type**                                 | **Optional** |
+|---------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------|--------------|
+| width         | The width of the FolderView GUI control <br>Generally not set as header_widths determines the widths<br> Characters if [pixel_unit](#_qtpybase_control) is False, Otherwise pixels | int (40)                                 | ✓            |
+| height        | The height of the FolderView GUI control<br> Characters if [pixel_unit](#_qtpybase_control) is False, Otherwise pixels                                                             | int (15)  # In  lines                    | ✓            |
+| root_dir      | Sets root path of the FolderView                                                                                                                                                   | str ("\\") #Current directory            | ✓            |
+| dir_only      | True, displays directories only, Otherwise display all directories and files                                                                                                       | bool (False)                             | ✓            |
+| multiselect   | True, allows multiple files and/or folders to be selected, Otherwise only allow one file and/or folder to be selected at a time                                                    | bool (False)                             | ✓            |
+| header_widths | Sets the header widths - maximum of 4 allowed <br> Characters if [pixel_unit](#_qtpybase_control) is False, Otherwise pixels                                                       | list [int,...] \| tuple(int,...) = (40,) | ✓            | 
+| header_font   | Sets the font properties of the header row                                                                                                                                         | [Font](#font) \| None (None)             | ✓            |
+| click_expand  | True, expand folders when clicked on, Otherwise only expand folders if the handle is clicked                                                                                       | bool (False)                             | ✓            |
+
+
+<br>**Methods**
+<br>A subset of the [_qtpyBase_Control](#_qtpybase_control) methods apply to FolderView instances
+
+| **Method**      | **Arguments** | **Type** | **Description**                                                                                    | **Optional** |
+|-----------------|---------------|----------|----------------------------------------------------------------------------------------------------|--------------|
+| change_folder   |               | None     |                                                                                                    |              |
+| expand_on_click |               | bool     | <br><b>Returns:</b><br> The expand on click setting (true == dir node expands when clicked on)<br> |              |
+| headerData      |               | None     |                                                                                                    |              |
+|                 | section       | int      | The column number.                                                                                 |              |
+| value_get       |               | None     | <br><b>Returns:</b><br> The tuple containing the file values from the selected node<br>            |              |
+| value_set       |               | None     |                                                                                                    |              |
+|                 | value         | str      | The text to set the text to                                                                        |              |
 
 ### Slider
  
@@ -919,6 +1095,15 @@ Col_Def is a helper class used to set the column attributes of grid controls. Al
 | tag       | The application name for the column                                                           | str     |
 | width     | The width of the column in chars if GUI control argument pixel_unit is True, Otherwise pixels | int > 0 |
 
+### Date_Tuple
+Date_Tuple is a helper class used by [Dateedit](#dateedit) to store the date. 
+Basic date validation checks are done.
+
+| Property | Description | Type |
+|----------|-------------|------|
+| year     | The year    | int  |
+| month    | The month   | int  |
+| day      | The day     | int  |
 
 #### Font
 

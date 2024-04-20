@@ -864,12 +864,12 @@ class widget_def:
 
 @dataclasses.dataclass(slots=True)
 # Used by _Dateedit to store the data.
-class _Date_Tuple:
+class Date_Tuple:
     year: int
     month: int
     day: int
 
-    def _post_init(self):
+    def _post_init(self) -> None:
         # Checking the arguments passed to the constructor are of the correct type.
         assert (
             isinstance(self.year, int) and self.year > 0
@@ -882,6 +882,8 @@ class _Date_Tuple:
             if self.month == 2
             else 1 >= self.day <= 31
         ), f"{self.day=}. Must be an int between 1 and 28/31 depending on month"
+
+        return None
 
 
 @dataclasses.dataclass(slots=True)
@@ -7567,6 +7569,9 @@ class ComboBox(_qtpyBase_Control):
     def value_get(self, index: int = -1) -> Combo_Data:
         """Gets the value displayed in the dropdown
 
+        Args:
+            index (int, optional): The index of the item to get. Defaults to -1.
+
         Returns
             COMBO_DATA : Current row if index = -1, Selected row if row > 0
         """
@@ -7639,7 +7644,7 @@ class ComboBox(_qtpyBase_Control):
         """Sets a value in the dropdown and scrolls to that value. if COMBO_DATA index is -1 then data and display
         values must match for scroll to happen
 
-        value (Union[str,COMBO_DATA]): COMBO_DATA - selected text or int - selected index
+        value (Union[str,COMBO_DATA]): Inserts a value in the dropdown
         insert_alpha (bool): Insert alphabetically
         """
         if self._widget is None:
@@ -7980,10 +7985,9 @@ class _Custom_Dateedit(qtW.QWidget):
 @dataclasses.dataclass
 class Dateedit(_qtpyBase_Control):
     """A Dateedit widget that displays a date in a specified format."""
-
-    label: str = "&"
+    
     date: str = ""
-    format: str = ""  # "yyyy-MM-dd"
+    format: str = "" 
     min_date: str = ""
     max_date: str = ""
 
@@ -8181,69 +8185,31 @@ class Dateedit(_qtpyBase_Control):
         """
         date = self._widget.date()
         date_text = self.line_edit.text()
-
-        # print(f"A>>>>>>>>>>>>>>>>>>>>>@@@@@@@@@@@@@@ {date=}")
-
+        
         if date == self.MINDATE:
             default_date = qtC.QDate.fromString(date_text, self.format)
 
             if not default_date.isValid():
                 default_date = qtC.QDate.currentDate()
 
-            # self._widget.calendarWidget().setCurrentPage(default_date.year(),default_date.month())
-            # self._widget.setSpecialValueText("N/A")
-
-            # cal = _calendar_widget(self)
-            # cal.setSelectedDate(default_date)
-
-            # self._widget.calendarWidget().setSelectedDate(default_date)
-
-            # print(f"B>>>>>>>>>>>>>>>>>>>>>@@@@@@@@@@@@@@ {default_date=}")
-            # self._widget.calendarWidget().setFirstDayOfWeek(qtC.Qt.DayOfWeek.Wednesday)
-            # self._widget.calendarWidget().updateCell(default_date)
-            # self._widget.calendarWidget().setCurrentPage(default_date.year(), default_date.month())
-            # self._widget.calendarWidget().showToday()
-            # self._widget.setSelectedDay(default_date)
-
-            # self._widget.setSpecialValueText("N/A")
-
-            # self._widget.setCalendarWidget(cal)
-
-            # self.line_edit.setText("")
-            # self.clear()
         return 1
 
     def clear(self, default_text: str = "-") -> None:
-        """Clears the date displayed  - has to use a nasty hack to clear the date.
+        """Clears the date displayed
+
             If default_text = "-" then nothing is displayed in the date edit.
             otherwise the default text is displayed in the date edit
 
         Args:
 
-        default_text (str): Text to place in edit control (must be a valid date string 0r -) (default: {-})
+        default_text (str): Date text to place in the edit control (must be a valid date string 0r -). Defaults to -)
 
-        """
-
-        # Part of hack to clear displayed date as clear does not do the trick
+        """        
         assert isinstance(default_text, str), f"{default_text=}. Must be str "
 
         if self.allow_clear:
             self._widget.clear()
-
-        # if default_text == "":
-        #    default_text = self.trans_str("N/A")
-        # if default_text == "-":
-        #    default_text = " "
-        # else:
-        #    default_text = self.trans_str(default_text)
-
-        # self._widget.setDate(self._widget.minimumDate())
-
-        # self._widget.setSpecialValueText(default_text)
-
-        # Part of hack - means can not use 100,1,1 as a system date
-        # self._widget.setMinimumDate(self._min_date)
-
+        
     @overload
     def date_get(self, date_format: str = "", date_tuple: bool = False) -> str: ...
 
@@ -8252,33 +8218,33 @@ class Dateedit(_qtpyBase_Control):
 
     def date_get(
         self, date_format: str = "", date_tuple: bool = False
-    ) -> str | _Date_Tuple:
+    ) -> str | Date_Tuple:
         """Gets the date
                 If date_format = "" then date is returned as a string formated as control_def date_format
                 If date_format = "" and control_def date_format = "" then date is returned as string formatted
                 as a system shortformat
 
                 If date_tuple is True date is returned as a tuple(year,month,day)
-
-        date_format(str): Format to return date as (default: {""})
-        date_tuple (bool): Return date as tuple (default: {False})
+        Args:
+            date_format(str): Format to return date as (default: {""})
+            date_tuple (bool): Return date as tuple (default: {False})
 
         Returns:
-            Union[str,_Date_Tuple]: Date formatted as string or tuple
+            Union[str,Date_Tuple]: Date formatted as string or tuple
         """
 
         date: qtC.QDate = self._widget.date()
 
         if date == self.NODATE:
             if date_tuple:
-                return _Date_Tuple(
+                return Date_Tuple(
                     self.NODATE.year(), self.NODATE.month(), self.NODATE.day()
                 )
             else:
                 return ""
 
         if date_tuple:
-            return _Date_Tuple(date.year(), date.month(), date.day())
+            return Date_Tuple(date.year(), date.month(), date.day())
 
         if self.format.strip() == "" and date_format.strip == "":
             date_format = qtC.QLocale.system().dateFormat(
@@ -8295,7 +8261,7 @@ class Dateedit(_qtpyBase_Control):
         Args:
             date (str): A string representing the date to set, formatted as 'y-m-d'.
             date_format (str): The format of the date string, defaults to an empty string.
-            default_text (str): The default text to use if the date string is empty or equals '-'.
+            default_text (str): if the date string is '-' then the date control is cleared.
 
         Returns:
             None.
@@ -8313,25 +8279,16 @@ class Dateedit(_qtpyBase_Control):
         if date == "-":
             self.clear(default_text=default_text)
         else:
-            if date.strip() == "":
-                # date = str(datetime.date.today())
+            if date.strip() == "":                
                 date = qtC.QDate.currentDate().toString(self.format)
 
             if date_format.strip() == "":
                 date_format = qtC.QLocale.system().dateFormat(
                     qtC.QLocale.system().ShortFormat
                 )
-
-            # Follwing does not work in all envs
+            
             actual_date = qtC.QDate.fromString(date, date_format)
-
-            # so had to use hard coded date date_format y-m-d delimited by -
-            # date_ele = date.split("-")
-            # print(f"{date_ele=}")
-            # actual_date = qtC.QDate(
-            #    int(date_ele[0]), int(date_ele[1]), int(date_ele[2])
-            # )
-
+            
             assert actual_date.isValid(), (
                 f"Date <{date}> Or Format <{format}> is not valid! Converted Date Is"
                 f" <{actual_date}>"
@@ -8397,8 +8354,7 @@ class FolderView(_qtpyBase_Control):
     """FolderView is a widget that displays a folder path in a tree format"""
 
     width: int = 40  # In Chars
-    height: int = 15  # In  lines
-    widget_align: Align = Align.LEFT
+    height: int = 15  # In  lines    
     root_dir: str = "\\"
     dir_only: bool = False
     multiselect: bool = False
@@ -8410,11 +8366,8 @@ class FolderView(_qtpyBase_Control):
         """Constructor event that validates arguments and sets instance variables"""
         super().__post_init__()
 
-        assert isinstance(self.width, int), f"{self.width=}. Must beint"
-        assert isinstance(self.height, int), f"{self.height=}. Must be int"
-        assert isinstance(
-            self.widget_align, Align
-        ), f"{self.widget_align=}. Must be ALIGN"
+        assert isinstance(self.width, int), f"{self.width=}. Must be int"
+        assert isinstance(self.height, int), f"{self.height=}. Must be int"       
         assert (
             isinstance(self.root_dir, str) and self.root_dir.strip() != ""
         ), f"{self.root_dir=}. Must be a non-empty str"
@@ -15292,7 +15245,11 @@ class Slider(_qtpyBase_Control):
 
     @scale_factor.setter
     def scale_factor(self, value: float) -> None:
-        """Sets the scale factor as a percentage."""
+        """Sets the scale factor as a percentage.
+
+        Args:
+            value (float): The scale factor as a percentage.
+        """
         assert (
             isinstance(self.scale_factor_percent, float)
             and 0 <= self.scale_factor_percent <= 100
@@ -15349,6 +15306,7 @@ class Slider(_qtpyBase_Control):
 
         Args:
             value (int): The value to set the slider to.
+            block_signals (bool, optional): Whether to stop the slider from emiting signals. Defaults to False.
         """
 
         # Scale the value back to the internal range
