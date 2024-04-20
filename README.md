@@ -451,8 +451,8 @@ used to set the behavior of the GUI control when instantiated.
 | allow_clear       | bool (True)                                    | True, allow GUI controls that can be cleared to be cleared, Otherwise not                                                                         |
 | bold              | bool (False)                                   | True, sets GUI controls that have text bold, Otherwise not                                                                                        |
 | buddy_control     | _qtpyBase_Control \| None (None)               | Set the buddy GUI control or Container                                                                                                            | 
-| buddy_callback    | Callable \| None (None)                        | Sets the callback for the buddy GUI control                                                                                                       |
-| callback          | Callable \| None (None)                        | Sets the callback for the GUI control                                                                                                             |
+| buddy_callback    | Callable \| None (None)                        | Sets the callback method for the buddy GUI control (Functon, Method or Lambda)                                                                    |
+| callback          | Callable \| None (None)                        | Sets the callback method for the GUI control (Functon, Method or Lambda)                                                                          |
 | container_tag     | str ("")                                       | Sets the container_tag for the GUI control. If "" then system generated                                                                           |
 | editable          | bool (True)                                    | True, sets GUI controls that support editing into edit mode, Otherwise not                                                                        |
 | enabled           | bool (True)                                    | True, enables the GUI control, Otherwise disable the GUI control                                                                                  |
@@ -485,77 +485,79 @@ used to set the behavior of the GUI control when instantiated.
 - Not all methods will be used by descendant GUI controls
 - Some methods will be overridden
 
-| **Method**          | **Arguments**   | **Type**                                | **Description**                                                                                                           | **Optional** |
-|---------------------|-----------------|-----------------------------------------|---------------------------------------------------------------------------------------------------------------------------|--------------|
-| block_signals       |                 | None                                    |                                                                                                                           |              |
-|                     | block_signals   | bool                                    | True, stop this widget from generating signals (events), Otherwise do  not do not stop signals (events)  being generaed . |              |
-| guiwidget_get       |                 | _qtpyBase_Control                       | <br><b>Returns:</b><br> The QT GUI widget.<br>                                                                            |              |
-| guiwidget_set       |                 | None                                    | Sets the GUI Control                                                                                                      |              |
-| buddy_text_set      |                 | None                                    | Sets the text on the buddy control, where supported                                                                       |              |
-|                     | value           | str                                     | The text to set on the buddy widget.                                                                                      |              |
-| ediitable_set       |                 | None                                    | Controls the edit setting of a GUI control, where supported.                                                              |              |
-|                     | editable        | bool                                    | True, set the GUI control editable, where supported, Otherwise not.                                                       |              |
-| clear               |                 | None                                    | Clears the contents of the GUI control, if supported                                                                      |              |
-| enable_get          |                 | bool                                    | <br><b>Returns:</b><br> The enable value of the widget.<br>                                                               |              |
-| enable_set          |                 | int                                     | Enables/Disables the GUI control <br><b>Returns:</b><br> 1 - set ok, -1 - set failed<br>                                  |              |
-|                     | enable          | bool                                    | True enable control, Otherwise disable the control.                                                                       |              |
-| pixel_str_size      |                 | Char_Pixel_Size                         | <br><b>Returns:</b><br> The pixel size of the string in  CHAR_PIXEL_SIZE instance   .<br>                                 |              |
-|                     | text            | str                                     | The text to be measured                                                                                                   |              |
-| pixel_char_size     |                 | Char_Pixel_Size                         | The size of a char in pixels<br><b>Returns:</b><br> CHAR_PIXEL_SIZE <br>                                                  |              |
-|                     | char_height     | int                                     | Character height in chars                                                                                                 |              |
-|                     | char_width      | int                                     | Character width in chars                                                                                                  |              |
-|                     | height_fudge    | float                                   | Fudge factor multiplier to provide height adjustment                                                                      |              |
-|                     | width_fudge     | float                                   | Fudge factor multiplier to provide width adjustment                                                                       |              |
-| text_pixel_size     |                 | None                                    | <br><b>Returns:</b><br> The height and width of the text in pixels.<br>                                                   |              |
-|                     | text            | str                                     | The text to be measured.                                                                                                  |              |
-| fonts_available_get |                 | None                                    | <br><b>Returns:</b><br> A tuple of font name strings.<br>                                                                 |              |
-| font_set            |                 | None                                    | Sets the font on the GUI control                                                                                          |              |
-|                     | app_font        | Font                                    | Application font                                                                                                          |              |
-|                     | widget_font     | Font                                    | Control font                                                                                                              |              |
-| font_system_get     |                 | None                                    | Gets the sstem font <br><b>Returns:</b><br> A QFont object.<br>                                                           |              |
-|                     | fixed           | bool                                    | bool = True. Defaults to True                                                                                             |              |
-| frame_style_set     |                 | None                                    | Sets the frame style of the GUI control, where supported                                                                  |              |
-|                     | frame           | [Widget_Frame](#widget_frame)           | Frame definition object.                                                                                                  |              |
-| icon_set            |                 | None                                    |                                                                                                                           |              |
-|                     | icon            | None \| qtG.QIcon \| qtG.QPixmap \| str | Sets the icon on a GUI control were supported. If a str then this is the filename  of the icon                            |
-| tooltip_get         |                 | str                                     | <br><b>Returns:</b><br> The tooltip text.<br>                                                                             |              |
-| tooltip_set         |                 | None                                    |                                                                                                                           |              |
-|                     | tooltip         | str                                     | The text to display in the tooltip.                                                                                       |              |
-|                     | width           | int                                     | The width of the tooltip in pixels. Defaults to 200 - currently 400 for testing.                                          |              |
-|                     | txt_color       | str                                     | The color of the tooltip text. Defaults to black.                                                                         |              |
-|                     | bg_color        | str                                     | The background color of the tooltip. Defaults to white.                                                                   |              |
-|                     | border          | str                                     | The border style of the tooltip. Defaults to "1px solid #000000".                                                         |              |
-| tooltipsvisible_get |                 | bool                                    | <br><b>Returns:</b><br> True - visible, False - not visible.<br>                                                          |              |
-| tooltipsvisible_set |                 | None                                    |                                                                                                                           |              |
-|                     | visible         | bool                                    | True - Visible, False - not visible.                                                                                      |              |
-| trans_get           |                 | bool                                    | <br><b>Returns:</b><br> True - translate, False - do not translate<br>                                                    |              |
-| trans_set           |                 | None                                    |                                                                                                                           |              |
-|                     | no_trans        | bool                                    | True - no translation, False - translate                                                                                  |              |
-| trans_str           |                 | str                                     | <br><b>Returns:</b><br> The translated text.<br>                                                                          |              |
-|                     | text            | str                                     | The text to be translated.                                                                                                |              |
-|                     | force_translate | bool                                    | Translate text if True,Otherwise do not translate text. Defaults to False                                                 |              |
-| validate            |                 | bool                                    | <br><b>Returns:</b><br> True if validation ok, otherwise False<br>                                                        |              |
-| value_get           |                 | any                                     | <br><b>Returns:</b><br> The value of the widget.<br>                                                                      |              |
-| userdata_get        |                 | any                                     | <br><b>Returns:</b><br> The user data stored on the widget                                                                |              |
-| userdata_set        |                 | None                                    | Sets the user data on the widget.                                                                                         |              |
-|                     | user_data       | any                                     | The user data can be of any type                                                                                          |              |
-| value_set           |                 | None                                    | Sets the widget value - These are overloaded types                                                                        |              |
-|                     | value           | bool                                    | Sets the bool value set of the widget.                                                                                    |              |
-| value_set           |                 | None                                    | Sets the widget value - These are overloaded types                                                                        |              |
-|                     | value           | int                                     | Sets the int value set of the widget.                                                                                     |              |
-| value_set           |                 | None                                    | Sets the widget value - These are overloaded types                                                                        |              |
-|                     | value           | float                                   | Sets the float value set of the widget.                                                                                   |              |
-| value_set           |                 | None                                    | Sets the widget value - These are overloaded types                                                                        |              |
-|                     | value           | Combo_Data                              | Sets the [Combo_Data](#combo_data) value set of the widget.                                                               |              |
-| value_set           |                 | None                                    | Sets the widget value - These are overloaded types                                                                        |              |
-|                     | value           | str                                     | Sets the str value set of the widget.                                                                                     |              |
-| value_set           |                 | None                                    | Sets the widget value - These are overloaded types                                                                        |              |
-|                     | value           | datetime.date                           | Sets the date value set of the widget                                                                                     |
-| value_set           |                 | None                                    | Sets the widget value - These are overloaded types                                                                        |              |
-|                     | value           | datetime.datetime                       | Sets the datetime value set of the widget                                                                                 |
-| visible_get         |                 | bool                                    | <br><b>Returns:</b><br> True - widget visible, False - widget hidden.<br>                                                 |              |
-| visible_set         |                 | None                                    |                                                                                                                           |              |
-|                     | visible         | bool                                    | True - widget visible, False - widget hidden.                                                                             |              |
+| **Method**          | **Arguments**   | **Type**                                | **Description**                                                                                                                      | **Optional** |
+|---------------------|-----------------|-----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|--------------|
+| block_signals       |                 | None                                    | Blocks or unblocks signals for the widget (Used rarely where signals might be generated very frequently e.g. [Slider](#slider))      |              |
+|                     | block_signals   | bool (True)                             | True, stop this widget from generating signals (events), Otherwise do  not do not stop signals (events)  being generated .           | ✓            |
+| guiwidget_get       |                 | qtW.QWidget                             | Returns the underlying QT widget so that specialised operations can be performed<br><b>Returns:</b><br> The QT GUI widget.<br>       |              |
+| guiwidget_set       |                 | None                                    | Sets the GUI Control (Almost never used by QTPYGUI programmers)                                                                      |              |
+|                     | widget          | qtW.QWidget \| qtG.QAction              | The widget being set                                                                                                                 | ❌            | 
+| buddy_text_set      |                 | None                                    | Sets the text on the buddy control, where supported                                                                                  |              |
+|                     | value           | str                                     | The label text set to the left of the buddy widget.                                                                                  | ❌            |
+| ediitable_set       |                 | None                                    | Controls the edit setting of a GUI control, where supported.                                                                         |              |
+|                     | editable        | bool (False)                            | True, set the GUI control editable, where supported, Otherwise not.                                                                  | ✓            |
+| clear               |                 | None                                    | Clears the contents of the GUI control, if supported                                                                                 |              |
+| enable_get          |                 | bool                                    | <br><b>Returns:</b><br> The enable value of the widget.<br>                                                                          |              |
+| enable_set          |                 | int                                     | Enables/Disables the GUI control where supported <br><b>Returns:</b><br> 1 - set ok, -1 - set failed<br>                             |              |
+|                     | enable          | bool                                    | True enable control, Otherwise disable the control.                                                                                  | ❌            |
+| pixel_str_size      |                 | [Char_Pixel_Size](#char_pixel_size)     | <br><b>Returns:</b><br> The pixel size of the string in a [Char_Pixel_Size](#char_pixel_size) instance   .<br>                       |              |
+|                     | text            | str                                     | The text to be measured                                                                                                              | ❌            |
+| pixel_char_size     |                 | [Char_Pixel_Size](#char_pixel_size)     | The size of a char in pixels<br><b>Returns:</b><br> [Char_Pixel_Size](#char_pixel_size) <br>                                         |              |
+|                     | char_height     | int                                     | Character height in chars                                                                                                            | ❌            |
+|                     | char_width      | int                                     | Character width in chars                                                                                                             | ❌            |
+|                     | height_fudge    | float (1.1)                             | Fudge factor multiplier to provide height adjustment                                                                                 | ✓            |
+|                     | width_fudge     | float (1.1)                             | Fudge factor multiplier to provide width adjustment                                                                                  | ✓            |
+| text_pixel_size     |                 | tuple[int,int]                          | Returns the height and width of a string of text in pixels <br><b>Returns:</b><br> The [height,width] of the text in pixels.<br>     |              |
+|                     | text            | str                                     | The text to be measured.                                                                                                             | ❌            |
+| fonts_available_get |                 | tuple[str]                              | <br><b>Returns:</b><br> A tuple of font name strings.<br>                                                                            |              |
+| font_set            |                 | None                                    | Sets the font on the GUI control (Usually used internally as the [Font](#font) property is set when the GUI control is instantiated) |              |
+|                     | app_font        | Font                                    | Application font                                                                                                                     | ❌            |
+|                     | widget_font     | Font                                    | Control font                                                                                                                         | ❌            |
+|                     | widget          | qtW.QWidget (None)                      | The QT widget having the font set (defaults to current GUI control)                                                                  | ✓            |
+| font_system_get     |                 | None                                    | Gets the sstem font <br><b>Returns:</b><br> A QFont object.<br>                                                                      |              |
+|                     | fixed           | bool (True)                             | True, return the fixed size system font, Otherwise not                                                                               |              |
+| frame_style_set     |                 | None                                    | Sets the frame style of the GUI control, where supported                                                                             |              |
+|                     | frame           | [Widget_Frame](#widget_frame)           | Frame definition object.                                                                                                             | ✓            |
+| icon_set            |                 | None                                    |                                                                                                                                      |              |
+|                     | icon            | None \| qtG.QIcon \| qtG.QPixmap \| str | Sets the icon on a GUI control were supported. If a str then this is the filename  of the icon                                       | ❌            |
+| tooltip_get         |                 | str                                     | <br><b>Returns:</b><br> The tooltip text.<br>                                                                                        |              |
+| tooltip_set         |                 | None                                    |                                                                                                                                      |              |
+|                     | tooltip         | str                                     | The text to display in the tooltip.                                                                                                  | ❌            |
+|                     | width           | int (200) _Currently 400 for testing_   | The width of the tooltip in pixels. ( Width setting is still being ignored TODO Find Fix)                                            | ✓            |
+|                     | txt_color       | str                                     | The color of the tooltip text. Defaults to black.                                                                                    | ✓            |
+|                     | bg_color        | str                                     | The background color of the tooltip. Defaults to white.                                                                              | ✓            |
+|                     | border          | str                                     | The border style of the tooltip. Defaults to "1px solid #000000".                                                                    | ✓            |
+| tooltipsvisible_get |                 | bool                                    | <br><b>Returns:</b><br> True - visible, False - not visible.<br>                                                                     |              |
+| tooltipsvisible_set |                 | None                                    |                                                                                                                                      |              |
+|                     | visible         | bool                                    | True, tooltip visible, Otherwise not.                                                                                                | ❌            |
+| trans_get           |                 | bool                                    | <br><b>Returns:</b><br> True - text translated, False - text not translate<br>                                                       |              |
+| trans_set           |                 | None                                    |                                                                                                                                      |              |
+|                     | no_trans        | bool                                    | True, text not translated, Otherwise text is translated                                                                              | ❌            |
+| trans_str           |                 | str                                     | <br><b>Returns:</b><br> The translated text.<br>                                                                                     |              |
+|                     | text            | str                                     | The text to be translated.                                                                                                           | ❌            |
+|                     | force_translate | bool (False)                            | Translate text if True,Otherwise do not translate text. Defaults to False                                                            | ✓            |
+| validate            |                 | bool                                    | <br><b>Returns:</b><br> True if validation ok, otherwise False<br>                                                                   |              |
+| value_get           |                 | any                                     | <br><b>Returns:</b><br> The value of the widget.<br>                                                                                 |              |
+| userdata_get        |                 | any                                     | <br><b>Returns:</b><br> The user data stored on the widget                                                                           |              |
+| userdata_set        |                 | None                                    | Sets the user data on the widget.                                                                                                    |              |
+|                     | user_data       | any                                     | The user data can be of any type                                                                                                     | ❌            |
+| value_set           |                 | None                                    | Sets the widget value - These are overloaded types                                                                                   |              |
+|                     | value           | bool                                    | Sets the bool value set of the widget.                                                                                               | ❌            |
+| value_set           |                 | None                                    | Sets the widget value - These are overloaded types                                                                                   |              |
+|                     | value           | int                                     | Sets the int value set of the widget.                                                                                                | ❌            |
+| value_set           |                 | None                                    | Sets the widget value - These are overloaded types                                                                                   |              |
+|                     | value           | float                                   | Sets the float value set of the widget.                                                                                              | ❌            |
+| value_set           |                 | None                                    | Sets the widget value - These are overloaded types                                                                                   |              |
+|                     | value           | Combo_Data                              | Sets the [Combo_Data](#combo_data) value set of the widget.                                                                          | ❌            |
+| value_set           |                 | None                                    | Sets the widget value - These are overloaded types                                                                                   |              |
+|                     | value           | str                                     | Sets the str value set of the widget.                                                                                                | ❌            |
+| value_set           |                 | None                                    | Sets the widget value - These are overloaded types                                                                                   |              |
+|                     | value           | datetime.date                           | Sets the date value set of the widget                                                                                                | ❌            |
+| value_set           |                 | None                                    | Sets the widget value - These are overloaded types                                                                                   |              |
+|                     | value           | datetime.datetime                       | Sets the datetime value set of the widget                                                                                            | ❌            |
+| visible_get         |                 | bool                                    | <br><b>Returns:</b><br> True - widget visible, False - widget hidden.<br>                                                            |              |
+| visible_set         |                 | None                                    |                                                                                                                                      |              |
+|                     | visible         | bool                                    | True, sets widget visible, Otherwise widget hidden.                                                                                  | ❌            |
 
 
 #### Button
@@ -832,15 +834,6 @@ Instantiates a Slider widget and associated properties
 |               | value         | int          | The value to set the slider to.                                     | ❌            |
 |               | block_signals | bool (False) | True, stop the slider from emitting signals, Otherwise emit signals | ✓            |
 
-#### Widget_Frame
- Widget_Frame` is a class that defines the style of the frame around a widget
-
-| Property      | Description | Type                        |
-|---------------|-------------|-----------------------------|
-| frame         |             | [Frame](#frame)             |
-| frame_style   |             | [Frame_Style](#frame_style) |
-| line_width    |             | int =3                      |
-| midline_width |             | int = 0                     |
 
 ### QTPYGUI Enumerated Types/Class Reference
 
@@ -849,7 +842,7 @@ behaviour of QTPYGUI
 
 #### Align
 
-Used in defining the alignment of containers and GUI controls
+Align is an enumerated type used in defining the alignment of containers and GUI controls
 
 | Property     | Description | Type                             |
 |--------------|-------------|----------------------------------|
@@ -871,8 +864,8 @@ Used in defining the alignment of containers and GUI controls
 
 #### Align_Text
 
-Aligns text using style sheet type declaration (Some controls will remap to 
-[Align](#align) types)
+Align_Text is an enumerated type that aligns text using style sheet type 
+declaration (Some controls will remap to [Align](#align) types)
 
 | Property | Description | Type              |
 |----------|-------------|-------------------|
@@ -882,9 +875,19 @@ Aligns text using style sheet type declaration (Some controls will remap to
 | TOP      |             | text-align:top    |
 | BOTTOM   |             | text-align:bottom |
 
+### Char_Pixel_Size
+
+Char_Pixel_Size is a helper class that stores the width and height values in 
+pixels 
+
+| Property | Description      | Type |
+|----------|------------------|------|
+| height   | Height in pixels | int  |
+| } width  | Width in pixels  | int  |
+
 #### Combo_Data
 
-Combo_Data is a class used to store data sourced from combo box items
+Combo_Data is a helper class used to store data sourced from combo box items
 
 | Property  | Description                          | Type                                                               |
 |-----------|--------------------------------------|--------------------------------------------------------------------|
@@ -895,7 +898,7 @@ Combo_Data is a class used to store data sourced from combo box items
 
 #### Combo_Item
 
-Combo_Item is a class used to set combo box items.  All attributes are mandatory.
+Combo_Item is a helper class used to set combo box items.  All attributes are mandatory.
 
 | Property  | Description                            | Type                                                               |
 |-----------|----------------------------------------|--------------------------------------------------------------------|
@@ -906,7 +909,7 @@ Combo_Item is a class used to set combo box items.  All attributes are mandatory
 
 #### Col_Def
 
-Col_Def is a class used to set the column attributes of grid controls. All attributes are mandatory.
+Col_Def is a helper class used to set the column attributes of grid controls. All attributes are mandatory.
 
 | Property  | Description                                                                                   | Type    |
 |-----------|-----------------------------------------------------------------------------------------------|---------|
@@ -919,8 +922,8 @@ Col_Def is a class used to set the column attributes of grid controls. All attri
 
 #### Font
 
-Defines the [font](#font) properties, utilised in font related arguments in GUI control 
-definitions.
+Font is a helper class that defines the [font](#font) properties, utilised in 
+font related arguments in GUI control definitions.
 
 Colours are checked to ensure they are valid and will raise an assertion error 
 if they are not. 
@@ -937,7 +940,7 @@ if they are not.
 | weight     | The font weight             | [Font_Weight](#font_weight) (NORMAL) |
 
 #### Font_Style
-Defines the style of the [font](#font)
+Font_Style is an enumerated type that defines the style of the [font](#font)
 
 | Property | Description                   | Type               |
 |----------|-------------------------------|--------------------|
@@ -946,7 +949,7 @@ Defines the style of the [font](#font)
 | OBLIQUE  | Defines font as oblique style | QFont.StyleOblique |
 
 #### Font_Weight
-Defines the weight of the [font](#font)
+Font_Weight is an enumerated that defines the weight of the [font](#font)
 
 | Property   | Description                                         | Type       |
 |------------|-----------------------------------------------------|------------|
@@ -961,7 +964,7 @@ Defines the weight of the [font](#font)
 | THIN       | Defines the font as thin                            | Enumerated |
 
 #### Frame
-Defines the frame of a GUI control where supported
+Frane is an enumerated type that defines the frame of a GUI control where supported
 
 | Property | Description    | Type              |
 |----------|----------------|-------------------|
@@ -970,7 +973,7 @@ Defines the frame of a GUI control where supported
 | SUNKEN   | A sunken frame | qtW.QFrame.Sunken |
 
 #### Frame_Style
-Defines the frame of a GUI control where supported
+Frame_Style is an enumerated type that defines the frame of a GUI control where supported
 
 | Property | Description             | Type                   |
 |----------|-------------------------|------------------------|
@@ -983,6 +986,15 @@ Defines the frame of a GUI control where supported
 | STYLED   | A Styled panel frame    | qtW.QFrame.StyledPanel |
 
 
+#### Widget_Frame
+ Widget_Frame` is a helper class that defines the style of the frame around a widget
+
+| Property      | Description | Type                        |
+|---------------|-------------|-----------------------------|
+| frame         |             | [Frame](#frame)             |
+| frame_style   |             | [Frame_Style](#frame_style) |
+| line_width    |             | int =3                      |
+| midline_width |             | int = 0                     |
 
 
 
