@@ -313,6 +313,7 @@ def Get_Window_ID(
 @dataclasses.dataclass(slots=True)
 class Grid_Item:
     row_index: int
+    col_index: int
     tag: str
     current_value: any
     user_data: any
@@ -435,8 +436,7 @@ class Size:
 
 
 @dataclasses.dataclass(slots=True)
-# `Col_Def` is a class used by grid controls that has four attributes: `label`,
-# `tag`, `width`, and `editable`
+# `Col_Def` is a helper class used by grid controls
 class Col_Def:
     label: str
     tag: str
@@ -448,7 +448,9 @@ class Col_Def:
         # Checking the arguments passed to the constructor are of the correct type.
         assert isinstance(self.label, str), f"{self.label=}. Must be a str"
         assert isinstance(self.tag, str), f"{self.tag=}. Must be a str"
-        assert isinstance(self.width, int) and self.width > 0, f"{self.width=}. Must be a int"
+        assert (
+            isinstance(self.width, int) and self.width > 0
+        ), f"{self.width=}. Must be a int"
         assert isinstance(self.editable, bool), f"{self.editable=}. Must be bool"
         assert isinstance(self.checkable, bool), f"{self.checkable=}. Must be bool"
 
@@ -2513,11 +2515,9 @@ class _qtpyBase_Control(_qtpyBase):
                         " QComboBox { combobox-popup: 0; } "
                     )
                 case Dateedit():
-                    self._widget = _Custom_Dateedit(
-                        parent
-                    )  # self._widget = qtW.QDateEdit(parent)
+                    self._widget = _Custom_Dateedit(parent)
                 case Grid():
-                    self._widget = _Grid_TableWidget(parent)  # qtW.QTableWidget(parent)
+                    self._widget = _Grid_TableWidget(parent)
                     self._widget.grid = self
                 case FolderView():
                     self._widget = qtW.QTreeView(parent)
@@ -2739,10 +2739,17 @@ class _qtpyBase_Control(_qtpyBase):
 
         if buddy_widget is not None:
             if isinstance(buddy_widget, _Image):
-                if buddy_widget.height > self._widget.height():
-                    self.height = buddy_widget.height
+                if buddy_widget.height() > self._widget.height():
+                    if self.pixel_unit:
+                        self.height = buddy_widget.height()
+                    else:
+                        self.height = buddy_widget.height() // char_pixel_size.height
             else:
-                self.height = buddy_widget.height() // char_pixel_size.height
+                if buddy_widget.height() > self._widget.height():
+                    if self.pixel_unit:
+                        self.height = buddy_widget.height()
+                    else:
+                        self.height = buddy_widget.height() // char_pixel_size.height
 
         if edit_frame is not None:
             # edit_frame.setFrameShape(qtW.QFrame.Shape.Box)  # Debug
@@ -3452,6 +3459,7 @@ class _qtpyBase_Control(_qtpyBase):
 
     @overload
     def value_set(self, value: bool) -> None: ...
+
     """Sets  a value
 
     Args:
@@ -3460,6 +3468,7 @@ class _qtpyBase_Control(_qtpyBase):
 
     @overload
     def value_set(self, value: int) -> None: ...
+
     """Sets a value
 
     Args:
@@ -3468,6 +3477,7 @@ class _qtpyBase_Control(_qtpyBase):
 
     @overload
     def value_set(self, value: float) -> None: ...
+
     """Sets a value
 
     Args:
@@ -3476,6 +3486,7 @@ class _qtpyBase_Control(_qtpyBase):
 
     @overload
     def value_set(self, value: Combo_Data): ...
+
     """Sets the widget value
 
     Args:
@@ -3484,6 +3495,7 @@ class _qtpyBase_Control(_qtpyBase):
 
     @overload
     def value_set(self, value: str): ...
+
     """Sets the widget value
 
     Args:
@@ -3491,6 +3503,7 @@ class _qtpyBase_Control(_qtpyBase):
     """
 
     def value_set(self, value: datetime.date) -> None: ...
+
     """Sets the widget value
 
     Args:
@@ -3499,13 +3512,12 @@ class _qtpyBase_Control(_qtpyBase):
 
     @overload
     def value_set(self, value: datetime.datetime) -> None: ...
+
     """Sets the widget value
 
     Args:
         value (datetime.datetime): The value setting.
     """
-
-    
 
     # @overload
     # def value_set(self, hour: int = 0, min: int = 0, sec: int = 0, msec: int = 0):
@@ -7093,8 +7105,7 @@ class ComboBox(_qtpyBase_Control):
     class _USER_DATA:
         data: any
         user_data: any
-    
-          
+
     @property
     def is_combo_child(self) -> bool:
         """Returns True if this combobox is a child of another combo box.
@@ -7109,7 +7120,7 @@ class ComboBox(_qtpyBase_Control):
             return True
 
     def __post_init__(self) -> None:
-        """Constructor event that checks arguments and sets internal variables."""        
+        """Constructor event that checks arguments and sets internal variables."""
         super().__post_init__()
 
         assert self.validate_callback is None or callable(
@@ -7213,9 +7224,9 @@ class ComboBox(_qtpyBase_Control):
                     self.pixel_char_size(char_height=1, char_width=max_len).width
                 )
 
-        self.enable_set(enabled)        
+        self.enable_set(enabled)
         self._widget.setMaxVisibleItems(self.num_visible_items)
-        
+
         return widget
 
     def display_width_set(self, display_width: int) -> None:
@@ -7245,7 +7256,7 @@ class ComboBox(_qtpyBase_Control):
 
     def icon_set(
         self, combo_index: int, icon: Union[str, qtG.QIcon, qtG.QPixmap]
-    ) -> int:  
+    ) -> int:
         """Sets an icon at a given row in the combo box
 
         Args:
@@ -7328,11 +7339,9 @@ class ComboBox(_qtpyBase_Control):
         if select_text == "":
             select_text = self.text
 
-        if not os.path.isfile(file_name) or not os.access(
-            file_name, os.R_OK
-        ):
+        if not os.path.isfile(file_name) or not os.access(file_name, os.R_OK):
             return -1
-        
+
         line_list = []
 
         try:
@@ -7364,7 +7373,7 @@ class ComboBox(_qtpyBase_Control):
                 self.select_text(select_text)
 
             return max_len
-        except Exception as e:            
+        except Exception as e:
             return -1
 
     @property
@@ -7705,6 +7714,7 @@ class ComboBox(_qtpyBase_Control):
 
         return None
 
+
 class SimpleDateValidator(qtG.QValidator):
     """A validator that ensures that the text in the line edit is a valid date, and that the date is greater than
     1/1/100 (the minimum date).
@@ -7985,9 +7995,9 @@ class _Custom_Dateedit(qtW.QWidget):
 @dataclasses.dataclass
 class Dateedit(_qtpyBase_Control):
     """A Dateedit widget that displays a date in a specified format."""
-    
+
     date: str = ""
-    format: str = "" 
+    format: str = ""
     min_date: str = ""
     max_date: str = ""
 
@@ -8185,7 +8195,7 @@ class Dateedit(_qtpyBase_Control):
         """
         date = self._widget.date()
         date_text = self.line_edit.text()
-        
+
         if date == self.MINDATE:
             default_date = qtC.QDate.fromString(date_text, self.format)
 
@@ -8204,12 +8214,12 @@ class Dateedit(_qtpyBase_Control):
 
         default_text (str): Date text to place in the edit control (must be a valid date string 0r -). Defaults to -)
 
-        """        
+        """
         assert isinstance(default_text, str), f"{default_text=}. Must be str "
 
         if self.allow_clear:
             self._widget.clear()
-        
+
     @overload
     def date_get(self, date_format: str = "", date_tuple: bool = False) -> str: ...
 
@@ -8279,16 +8289,16 @@ class Dateedit(_qtpyBase_Control):
         if date == "-":
             self.clear(default_text=default_text)
         else:
-            if date.strip() == "":                
+            if date.strip() == "":
                 date = qtC.QDate.currentDate().toString(self.format)
 
             if date_format.strip() == "":
                 date_format = qtC.QLocale.system().dateFormat(
                     qtC.QLocale.system().ShortFormat
                 )
-            
+
             actual_date = qtC.QDate.fromString(date, date_format)
-            
+
             assert actual_date.isValid(), (
                 f"Date <{date}> Or Format <{format}> is not valid! Converted Date Is"
                 f" <{actual_date}>"
@@ -8354,7 +8364,7 @@ class FolderView(_qtpyBase_Control):
     """FolderView is a widget that displays a folder path in a tree format"""
 
     width: int = 40  # In Chars
-    height: int = 15  # In  lines    
+    height: int = 15  # In  lines
     root_dir: str = "\\"
     dir_only: bool = False
     multiselect: bool = False
@@ -8367,7 +8377,7 @@ class FolderView(_qtpyBase_Control):
         super().__post_init__()
 
         assert isinstance(self.width, int), f"{self.width=}. Must be int"
-        assert isinstance(self.height, int), f"{self.height=}. Must be int"       
+        assert isinstance(self.height, int), f"{self.height=}. Must be int"
         assert (
             isinstance(self.root_dir, str) and self.root_dir.strip() != ""
         ), f"{self.root_dir=}. Must be a non-empty str"
@@ -8482,6 +8492,7 @@ class FolderView(_qtpyBase_Control):
         Returns:
             qtW.QWidget : The configured file treeview widget.
         """
+
         if self.height == -1:
             self.height = WIDGET_SIZE.height
 
@@ -8515,7 +8526,7 @@ class FolderView(_qtpyBase_Control):
 
         self._widget.setModel(self.file_model)
 
-        # tran_str is here in case any no trans delimiters have been placed around root dir
+        # trans_str is here in case any no trans delimiters have been placed around root dir
         self._widget.setRootIndex(self.file_model.index(self.trans_str(self.root_dir)))
         self._widget.setAnimated(False)
         self._widget.setIndentation(20)
@@ -8556,7 +8567,9 @@ class FolderView(_qtpyBase_Control):
         # self.guiwidget_get.setStyleSheet(style)
 
         self._widget.setMinimumWidth(width + self.tune_hsize + (2 * pixel_size.width))
-        self._widget.setMinimumHeight(self.height * pixel_size.height + self.tune_vsize)
+        self._widget.setMinimumHeight(
+            (self.height * pixel_size.height) + self.tune_vsize
+        )
 
         self._widget.setExpandsOnDoubleClick(False)
 
@@ -8670,7 +8683,7 @@ class FolderView(_qtpyBase_Control):
         else:
             return 1
 
-    def change_folder(self, folder) -> None:
+    def change_folder(self, folder: str) -> None:
         """Changes the root folder for the directory view, clearing the view in the process.
 
         Args:
@@ -8687,6 +8700,8 @@ class FolderView(_qtpyBase_Control):
         self._widget: qtW.QTreeView  # Type hinting
         self._widget.reset()
         self._widget.setRootIndex(self.file_model.index(folder))
+
+        return None
 
     @property
     def expand_on_click(self) -> bool:
@@ -8721,6 +8736,8 @@ class FolderView(_qtpyBase_Control):
         # TODO Fix this for a dir view - QTreeWidgetItem.settext
         self._widget: qtW.QTreeWidgetItem
         self._widget.setText(self.trans_str(value))
+
+        return None
 
 
 class _ClearTypingBufferEvent(qtC.QEvent):
@@ -8972,15 +8989,17 @@ class _Grid_TableWidget_Item(qtW.QTableWidgetItem):
 class Grid(_qtpyBase_Control):
     """Grid widget definition and creation"""
 
-    width: int = 1  # BUTTON_SIZE.width
+    width: int = -1  # -1 defaults to grid width being used to calculate width
     height: int = BUTTON_SIZE.height
 
     col_def: list[Col_Def] | tuple[Col_Def, ...] = ()
+    grid_items: list[Grid_Item] = field(default_factory=list)
+    header_sort: bool = True
     multiselect: bool = False
     noselection: bool = False
-    header_sort: bool = True
 
     _changed: bool = False
+    _temp_width = -1  # self.width is being overridden when -1
 
     @dataclasses.dataclass(slots=True)
     class _Item_Data:
@@ -9076,6 +9095,12 @@ class Grid(_qtpyBase_Control):
             isinstance(definition, Col_Def) for definition in self.col_def
         ), f"{self.col_def=}. All items must be instances of Col_Def"
 
+        assert all(
+            isinstance(definition, Grid_Item) for definition in self.grid_items
+        ), f"{self.grid_items=}. All items must be instances of Grid_Item"
+
+        self._temp_width = self.width  # self.width is being overridden when -1
+
     def _create_widget(
         self, parent_app: QtPyApp, parent: qtW.QWidget, container_tag: str = ""
     ) -> qtW.QWidget:
@@ -9098,6 +9123,27 @@ class Grid(_qtpyBase_Control):
         ), f"{parent=}. Must be an instance of qtW.QWidget"
         assert isinstance(container_tag, str), f"{container_tag=}. Must be a string"
 
+        self.width = self._temp_width  # self.width is being overridden when -1
+
+        labels = []
+
+        self._col_widths = {}
+        grid_width = 0
+
+        for col_index, definition in enumerate(self.col_def):
+            labels.append(self.trans_str(definition.label))
+
+            if len(self.trans_str(definition.label)) > definition.width:
+                self._col_widths[col_index] = len(self.trans_str(definition.label))
+            else:
+                self._col_widths[col_index] = definition.width
+            grid_width += self._col_widths[col_index]
+
+        if self.width == -1:
+            self.width = grid_width
+
+        self.width += 3  # Scrol Bar space
+
         widget: _Grid_TableWidget = super()._create_widget(
             parent_app=parent_app, parent=parent, container_tag=container_tag
         )
@@ -9107,22 +9153,9 @@ class Grid(_qtpyBase_Control):
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
-        labels = []
-
-        self._col_widths = {}
-
-        for col_index, definition in enumerate(self.col_def):
-            labels.append(self.trans_str(definition.label))
-
-            if len(self.trans_str(definition.label)) > definition.width:
-                self._col_widths[col_index] = len(self.trans_str(definition.label))
-            else:
-                self._col_widths[col_index] = definition.width
-
         self._widget.setColumnCount(len(labels))
 
         char_pixel_size = self.pixel_char_size(char_height=1, char_width=1)
-        grid_width = sum(self._col_widths.values())
 
         for col_index, definition in enumerate(self.col_def):
             item_data = self._Item_Data(
@@ -9177,9 +9210,6 @@ class Grid(_qtpyBase_Control):
             "QTableView::item:selected { background-color: #E8F0FE;color: black; }"
         )
 
-        if self.width <= 1:  # Override auto-calculated grid width
-            self.width = grid_width + 3  # Scroll bar space
-
         self._widget.setMinimumWidth(
             (self.width * char_pixel_size.width) + self.tune_hsize
         )  # Allow for scroll-bard
@@ -9195,6 +9225,15 @@ class Grid(_qtpyBase_Control):
             )
         # And I seem to need this to complete the above fix
         self._widget.horizontalHeader().setStretchLastSection(True)
+
+        # Load grid items if provided
+        for grid_item in self.grid_items:
+            self.value_set(
+                value=grid_item.current_value,
+                row=grid_item.row_index,
+                col=grid_item.col_index,
+                user_data=grid_item.user_data,                
+            )
 
         return widget
 
@@ -9323,7 +9362,7 @@ class Grid(_qtpyBase_Control):
         return self._changed
 
     @changed.setter
-    def changed(self, value: bool):
+    def changed(self, value: bool) -> None:
         """Sets the changed property.
 
         Args:
@@ -9333,8 +9372,10 @@ class Grid(_qtpyBase_Control):
 
         self._changed = value
 
+        return None
+
     def checkitemrow_get(self, row: int, col: int) -> Grid_Item | tuple:
-        """Returns ans named tuple of (row_index, tag, current_value, and user_data) from the row and column specified
+        """Returns a named tuple of (row_index, tag, current_value, and user_data) from the row and column specified
         if the item is checked or an empty tuple if not checked.
 
         Args:
@@ -9342,8 +9383,8 @@ class Grid(_qtpyBase_Control):
             col (int): The index of the column to retrieve the item from.
 
         Returns:
-            Grid_Item_Tuple: A Grid_Item_Tuple tuple containing the row_index, tag, current_value, and user_data of the checked item.
-            An empty tuple if the item is not checked.
+            Grid_Item:  Tuple of checked item Grid_Item definitions containing the row_index,col_index, tag,
+            current_value, and user_data of a checked item and an empty tuple if bi item  checked.
         """
         assert isinstance(row, int), "row argument must be of type int"
         assert isinstance(col, int), "col argument must be of type int"
@@ -9356,6 +9397,7 @@ class Grid(_qtpyBase_Control):
         if item.checkState() == qtC.Qt.Checked:
             return Grid_Item(
                 row_index=row_index,
+                col_index=col_index,
                 tag=item_data.tag,
                 current_value=item_data.current_value,
                 user_data=item_data.user_data,
@@ -9422,7 +9464,7 @@ class Grid(_qtpyBase_Control):
         """Get the checked items.
 
         Returns:
-            tuple: A tuple of Grid_items
+            tuple: A tuple of all Grid_items checked in the grid
         """
         assert self._widget is not None, f"{self._widget=} not set"
 
@@ -9477,6 +9519,9 @@ class Grid(_qtpyBase_Control):
 
         Returns:
             int: The column index for a column tag name.
+
+        Raises:
+            AssertionError: If the column tag is invalid.
 
         """
         assert (
@@ -9578,7 +9623,6 @@ class Grid(_qtpyBase_Control):
         self,
         file_name: str,
         display_col: Union[int, str],
-        select_text: str = "",
         text_index: int = 1,
         line_start: int = 1,
         data_index: int = 1,
@@ -9590,7 +9634,6 @@ class Grid(_qtpyBase_Control):
         Args:
             file_name (str): The name of the CSV file.
             display_col (Union[int, str]): The column in the grid that will display the loaded data.
-            select_text (str, optional): The text to select in the combo-box after the data is loaded. Defaults to "".
             text_index (int, optional): The column index in the CSV file containing the text to display in the grid. Defaults to 1.
             line_start (int, optional): The line number in the CSV file to start loading data from. Defaults to 1.
             data_index (int, optional): The column index in the CSV file containing the user data to associate with the loaded data. Defaults to 1.
@@ -9607,9 +9650,6 @@ class Grid(_qtpyBase_Control):
         assert isinstance(
             display_col, (str, int)
         ), f"{display_col=}. Must be a non-empty string or int"
-        assert isinstance(
-            select_text, str
-        ), f"{select_text=}. Must be a non-empty string"
         assert (
             isinstance(text_index, int) and text_index > 0
         ), f"{text_index=}. Must be an int > 0"
@@ -9626,37 +9666,38 @@ class Grid(_qtpyBase_Control):
 
         rowcol = self._rowcol_validate(row=self.row_count, col=display_col)
 
-        if not select_text:
-            select_text = self.text
-
         if not os.path.isfile(file_name) and not os.access(file_name, os.R_OK):
             return -1
 
-        max_len = 0
+        try:
+            max_len = 0
 
-        with open(file_name, "r") as csv_file:
-            for i, line in enumerate(csv_file.readlines()):
-                if i == 0 and ignore_header:
-                    continue
-                elif i + 1 < line_start:
-                    continue
+            with open(file_name, "r") as csv_file:
+                for i, line in enumerate(csv_file.readlines()):
+                    if i == 0 and ignore_header:
+                        continue
+                    elif i + 1 < line_start:
+                        continue
 
-                line_split = line.strip().split(delimiter)
+                    line_split = line.strip().split(delimiter)
 
-                if len(line_split) < max(text_index, data_index):
-                    continue
+                    if len(line_split) < max(text_index, data_index):
+                        continue
 
-                if len(line_split[text_index - 1]) > max_len:
-                    max_len = len(line_split[text_index - 1])
+                    if len(line_split[text_index - 1]) > max_len:
+                        max_len = len(line_split[text_index - 1])
 
-                self.value_set(
-                    value=line_split[text_index - 1],
-                    row=self.row_count,
-                    col=rowcol[1],
-                    user_data=line_split[data_index - 1],
-                )
+                    self.value_set(
+                        value=line_split[text_index - 1],
+                        row=self.row_count,
+                        col=rowcol[1],
+                        user_data=line_split[data_index - 1],
+                    )
+            return max_len
 
-        return max_len
+        except Exception as e:
+            print(f"File Read Failed With Exception: {e}")
+            return -1
 
     def move_checked_block_up(self) -> None:
         """Move the currently selected block up one position in the table.
@@ -9669,8 +9710,8 @@ class Grid(_qtpyBase_Control):
         for item in self.checkitems_get:
             self.move_row_up(item.row_index)
 
-    def move_checked_block_down(self):
-        """Move the currently selected block down one position in the table.
+    def move_checked_block_down(self) -> None:
+        """Move the currently selected checked block down one position in the table.
 
         If the currently selected block is already at the bottom of the table, nothing happens.
 
@@ -9680,10 +9721,15 @@ class Grid(_qtpyBase_Control):
         for item in reversed(self.checkitems_get):
             self.move_row_down(item.row_index)
 
+        return None
+
     def move_row_up(self, move_row: int) -> int:
         """Move the currently selected row up one position in the table.
 
         If the currently selected row is already at the top of the table, nothing happens.
+
+        Args:
+            move_row (int): The index of the row to move.
 
         Returns:
             int: The new row or -1 if the row is at the top of the table
@@ -9721,8 +9767,11 @@ class Grid(_qtpyBase_Control):
 
         If the currently selected row is already at the bottom of the table, nothing happens.
 
+        Args:
+            move_row (int): The index of the row to move.
+
         Returns:
-            int: The new row or -1 if the row is not at the bottom of the table
+            int: The new row or -1 if the row is at the bottom of the table
         """
         self._widget: qtW.QTableWidget
         column = self._widget.currentColumn()
@@ -9755,7 +9804,7 @@ class Grid(_qtpyBase_Control):
         """Returns the grid row count
 
         Returns:
-            int: Row Count (number of rows in grid)
+            int: Row Count (number of rows in the grid)
 
         """
         self._widget: qtW.QTableWidget
@@ -9767,7 +9816,7 @@ class Grid(_qtpyBase_Control):
 
     @property
     def row_append(self) -> int:
-        """Appends a row to the grid.
+        """Appends a blank row to the grid.
 
         Returns:
             int: Row number inserted.
@@ -9831,7 +9880,7 @@ class Grid(_qtpyBase_Control):
         """Deletes a row.
 
         Args:
-            row (int): Row index in the grid.
+            row (int): Row index of the row in the grid that is to be deleted.
         """
         assert (
             isinstance(row, int) and 0 <= row <= self.row_count
@@ -9866,7 +9915,7 @@ class Grid(_qtpyBase_Control):
         self._widget.removeRow(row)
 
     def row_widget_tag_delete(
-        self, widget_row: int, tag: str = "", container_tag: str = ""
+        self, widget_row: int, tag: str, container_tag: str = ""
     ) -> int:
         """Deletes a row if the row contains a dev added row widget with a tag that matches the row and tag passed to the
         method
@@ -9906,7 +9955,7 @@ class Grid(_qtpyBase_Control):
 
         Args:
             row (int): The row index in the grid.
-            scroll_to (bool): Whether to scroll to the inserted row.
+            scroll_to (bool): True scroll to the inserted row, Otherwise not.
 
         """
         self._widget: qtW.QTableWidget
@@ -9927,6 +9976,12 @@ class Grid(_qtpyBase_Control):
             self.select_row(row=row)
 
     def select_col(self, row: int, col: int) -> None:
+        """Sets the current column
+
+        Args:
+            row (int): The row index in the grid.
+            col (int): The column index in the grid.
+        """
         self._widget: qtW.QTableWidget
 
         if self._widget is None:
@@ -9944,6 +9999,8 @@ class Grid(_qtpyBase_Control):
 
         self._widget.setCurrentCell(row, col)
 
+        return None
+
     def row_scroll_to(self, row: int, col: int = -1) -> None:
         """
         Scrolls to the row.
@@ -9953,7 +10010,7 @@ class Grid(_qtpyBase_Control):
         self.select_row(row, col)
 
     def select_row(self, row: int, col: int = -1) -> None:
-        """Scrolls to the row.
+        """Scrolls to the given row.
 
         Args:
             row (int): The row index in the grid.
@@ -10009,9 +10066,9 @@ class Grid(_qtpyBase_Control):
 
 
         Args:
-            row (int): Row index reference (default {-1})
-            col (int): Column index reference (default {-1})
-            user_data (any): User data to be stored (default: None)
+            row (int): Row index reference. Defaults -1
+            col (int): Column index reference. Default to -1
+            user_data (any): User data to be stored. Defaults to None
         """
 
         # ====== Helper
@@ -10074,15 +10131,17 @@ class Grid(_qtpyBase_Control):
             item = self._widget.item(row_index, col_index)
             _set_user_data(user_data, item)
 
+        return None
+
     def userdata_get(self, row: int = -1, col: int = -1) -> any:
         """
         Returns the user data stored on the given column referred to by row and col.
-        If row or col is not specified, it returns user data stored in the current row or column.
+        If row or col is -1, it returns user data stored in the current row or column.
         If no user data is stored, returns None.
 
         Args:
-            row (int): Row index reference (default {-1})
-            col (int): Column index reference (default {-1})
+            row (int): Row index reference. Defaults to -1
+            col (int): Column index reference. Defaults to -1
 
         Returns:
             any: User data stored in column referred to by row and col
@@ -10121,15 +10180,16 @@ class Grid(_qtpyBase_Control):
         | None
     ):
         """
-        Returns the current value stored in the given column referred to by row and col.
-        If row or col is not specified, the current row or current column is used as default.
+        The value stored in the column referenced by row and column
+        If row or col is -1, the current row or current column is used as default.
 
         Args:
-            row (int): The row index reference (default: -1).
-            col (int): The column index reference (default: -1).
+            row (int): The row index reference. Defaults to -1
+            col (int): The column index reference. Defaults to -1
 
         Returns:
-            bool| datetime.date| datetime.datetime| datetime.time| float| int| str: The value stored in the column referred to by row and col.
+            bool| datetime.date| datetime.datetime| datetime.time| float| int| str:
+            The value stored in the column referenced to by row and col.
                 Returns None if the item or item data is None.
         """
         assert isinstance(row, int) and row >= -1, f"{row=} must be an int >= -1"
@@ -10181,8 +10241,8 @@ class Grid(_qtpyBase_Control):
         | str
         | None
     ):
-        """Returns the original value stored in the given column referred to by row and col.
-        Default returns current row and current column
+        """Returns the original value stored in the given column referenced by row and col.
+        If row or col are -1 then returns the original value at the current row and current column
 
         Args:
             row (int): Row index reference (default {-1})
@@ -10226,15 +10286,16 @@ class Grid(_qtpyBase_Control):
         | str
         | None
     ):
-        """Returns the previous value stored in the given column referred to by row and col. Default returns current row
-        and current column
+        """Returns the previous value stored in the given column referred to by row and col.
+        Default returns current row and current column
 
         Args:
-            row (int): Row index reference (default {-1})
-            col (int): Col index reference (default {-1})
+            row (int): Row index reference. Default -1 the current row
+            col (int): Col index reference. Default -1 the current column
 
         Returns:
-            bool| datetime.date| datetime.datetime| datetime.time| float| int| str | None: The previous value stored in column referred to by row and col
+            bool| datetime.date| datetime.datetime| datetime.time| float| int| str | None:
+            The previous value stored in the given column referred to by row and col
         """
         self._widget: qtW.QTableWidget
 
@@ -10528,7 +10589,7 @@ class Grid(_qtpyBase_Control):
             row (int): The table widget row
 
         Returns:
-            list[int]: List of item_ids
+            list[int]:  List of  item_ids of the items found in a specified row
         """
         assert (
             isinstance(row, int) and 0 <= row < self._widget.rowCount()
@@ -10578,7 +10639,8 @@ class Grid(_qtpyBase_Control):
             row (int): The row index of the cell you want to set the widget for.
             col (int): The column index of the cell to set the widget for.
             widget (_qtpyBase_Control): The widget to be inserted into the grid
-            group_text (str): The text that will be displayed in the group box
+            group_text (str): If group_text is provided the widget will be displayed
+              in a group box with the group_text as a title
         """
         self._widget: qtW.QTableWidget
 
@@ -10642,7 +10704,7 @@ class Grid(_qtpyBase_Control):
         self._widget.setColumnWidth(col_index, size_hint.width())
         self._widget.setCellWidget(row_index, col_index, rowcol_widget)
 
-        return
+        return None
 
     # ----------------------------------------------------------------------------#
     #      Class Private Methods                                                  #

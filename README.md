@@ -45,7 +45,7 @@ the application source code using a formal specification. There is no need for
 GUI designers, and the application programmer writes the UI as just another 
 part of the code. This is an old idea, going back at least to the early 1980's
 and applications like dBase II and Clipper but just because it is old does not 
-mean it is bad ot not relevant.
+mean it is bad or not relevant.
 
 ### Notes
 1. Development of QTPYGUI started privately in 2020, moving to a public release in 2024.
@@ -421,7 +421,7 @@ PyInstaller produces even larger executables!
 | [ComboBox](#combobox)     | Creates a drop down selection box, icon in list is <br/>optional                                                             |
 | [Dateedit](#dateedit)     | Creates a date edit control with a dropdown calendar and <br/>an erase button                                                |
 | [FolderView](#folderview) | Creates a control that displays the contents of a folder in a Grid                                                           |
-| Grid                      | Creates a control that displays data in a table (grid) format                                                                |
+| [Grid](#grid)             | Creates a control that displays data in a table (grid) format                                                                |
 | Image                     | Creates a control that displays an image                                                                                     |
 | Label                     | Creates a text string                                                                                                        |
 | LineEdit                  | Creates a control that allows text to be edited and displayed<br/> in a single line                                          |
@@ -438,7 +438,7 @@ PyInstaller produces even larger executables!
 
 ### _qtpyBase_Control
  
-This is the ancestor of all QTPYGUI GUI controls, and the properties here are 
+This is the ancestor of all QTPYGUI [GUI controls](#qtpygui-control-api-reference), and the properties here are 
 used to set the behavior of the GUI control when instantiated.
   
 **Properties** 
@@ -485,79 +485,67 @@ used to set the behavior of the GUI control when instantiated.
 - Not all methods will be used by descendant GUI controls
 - Some methods will be overridden
 
-| **Method**          | **Arguments**   | **Type**                                | **Description**                                                                                                                      | **Optional** |
-|---------------------|-----------------|-----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|--------------|
-| block_signals       |                 | None                                    | Blocks or unblocks signals for the widget (Used rarely where signals might be generated very frequently e.g. [Slider](#slider))      |              |
-|                     | block_signals   | bool (True)                             | True, stop this widget from generating signals (events), Otherwise do  not do not stop signals (events)  being generated .           | ✓            |
-| clear               |                 | None                                    | Clears the contents of the GUI control, if supported                                                                                 |              | 
-| buddy_text_set      |                 | None                                    | Sets the text on the buddy control, where supported                                                                                  |              |
-|                     | value           | str                                     | The label text set to the left of the buddy widget.                                                                                  | ❌            |
-| ediitable_set       |                 | None                                    | Controls the edit setting of a GUI control, where supported.                                                                         |              |
-|                     | editable        | bool (False)                            | True, set the GUI control editable, where supported, Otherwise not.                                                                  | ✓            |
-| enable_get          |                 | bool                                    | <br><b>Returns:</b><br> The enable value of the widget.<br>                                                                          |              |
-| enable_set          |                 | int                                     | Enables/Disables the GUI control where supported <br><b>Returns:</b><br> 1 - set ok, -1 - set failed<br>                             |              |
-|                     | enable          | bool                                    | True enable control, Otherwise disable the control.                                                                                  | ❌            |
-| fonts_available_get |                 | tuple[str]                              | <br><b>Returns:</b><br> A tuple of font name strings.<br>                                                                            |              |
-| font_set            |                 | None                                    | Sets the font on the GUI control (Usually used internally as the [Font](#font) property is set when the GUI control is instantiated) |              |
-|                     | app_font        | Font                                    | Application font                                                                                                                     | ❌            |
-|                     | widget_font     | Font                                    | Control font                                                                                                                         | ❌            |
-|                     | widget          | qtW.QWidget (None)                      | The QT widget having the font set (defaults to current GUI control)                                                                  | ✓            |
-| font_system_get     |                 | None                                    | Gets the sstem font <br><b>Returns:</b><br> A QFont object.<br>                                                                      |              |
-|                     | fixed           | bool (True)                             | True, return the fixed size system font, Otherwise not                                                                               |              |
-| frame_style_set     |                 | None                                    | Sets the frame style of the GUI control, where supported                                                                             |              |
-|                     | frame           | [Widget_Frame](#widget_frame)           | Frame definition object.                                                                                                             | ✓            |
-| icon_set            |                 | None                                    |                                                                                                                                      |              |
-|                     | icon            | None \| qtG.QIcon \| qtG.QPixmap \| str | Sets the icon on a GUI control were supported. If a str then this is the filename  of the icon                                       | ❌            |
-| guiwidget_get       |                 | qtW.QWidget                             | Returns the underlying QT widget so that specialised operations can be performed<br><b>Returns:</b><br> The QT GUI widget.<br>       |              |
-| guiwidget_set       |                 | None                                    | Sets the GUI Control (Almost never used by QTPYGUI programmers)                                                                      |              |
-|                     | widget          | qtW.QWidget \| qtG.QAction              | The widget being set                                                                                                                 | ❌            |
-| pixel_str_size      |                 | [Char_Pixel_Size](#char_pixel_size)     | <br><b>Returns:</b><br> The pixel size of the string in a [Char_Pixel_Size](#char_pixel_size) instance   .<br>                       |              |
-|                     | text            | str                                     | The text to be measured                                                                                                              | ❌            |
-| pixel_char_size     |                 | [Char_Pixel_Size](#char_pixel_size)     | The size of a char in pixels<br><b>Returns:</b><br> [Char_Pixel_Size](#char_pixel_size) <br>                                         |              |
-|                     | char_height     | int                                     | Character height in chars                                                                                                            | ❌            |
-|                     | char_width      | int                                     | Character width in chars                                                                                                             | ❌            |
-|                     | height_fudge    | float (1.1)                             | Fudge factor multiplier to provide height adjustment                                                                                 | ✓            |
-|                     | width_fudge     | float (1.1)                             | Fudge factor multiplier to provide width adjustment                                                                                  | ✓            |
-| text_pixel_size     |                 | tuple[int,int]                          | Returns the height and width of a string of text in pixels <br><b>Returns:</b><br> The [height,width] of the text in pixels.<br>     |              |
-|                     | text            | str                                     | The text to be measured.                                                                                                             | ❌            |
-| tooltip_get         |                 | str                                     | <br><b>Returns:</b><br> The tooltip text.<br>                                                                                        |              |
-| tooltip_set         |                 | None                                    |                                                                                                                                      |              |
-|                     | tooltip         | str                                     | The text to display in the tooltip.                                                                                                  | ❌            |
-|                     | width           | int (200) _Currently 400 for testing_   | The width of the tooltip in pixels. ( Width setting is still being ignored TODO Find Fix)                                            | ✓            |
-|                     | txt_color       | str                                     | The color of the tooltip text. Defaults to black.                                                                                    | ✓            |
-|                     | bg_color        | str                                     | The background color of the tooltip. Defaults to white.                                                                              | ✓            |
-|                     | border          | str                                     | The border style of the tooltip. Defaults to "1px solid #000000".                                                                    | ✓            |
-| tooltipsvisible_get |                 | bool                                    | <br><b>Returns:</b><br> True - visible, False - not visible.<br>                                                                     |              |
-| tooltipsvisible_set |                 | None                                    |                                                                                                                                      |              |
-|                     | visible         | bool                                    | True, tooltip visible, Otherwise not.                                                                                                | ❌            |
-| trans_get           |                 | bool                                    | <br><b>Returns:</b><br> True - text translated, False - text not translate<br>                                                       |              |
-| trans_set           |                 | None                                    |                                                                                                                                      |              |
-|                     | no_trans        | bool                                    | True, text not translated, Otherwise text is translated                                                                              | ❌            |
-| trans_str           |                 | str                                     | <br><b>Returns:</b><br> The translated text.<br>                                                                                     |              |
-|                     | text            | str                                     | The text to be translated.                                                                                                           | ❌            |
-|                     | force_translate | bool (False)                            | Translate text if True,Otherwise do not translate text. Defaults to False                                                            | ✓            |
-| validate            |                 | bool                                    | <br><b>Returns:</b><br> True if validation ok, otherwise False<br>                                                                   |              |
-| value_get           |                 | any                                     | <br><b>Returns:</b><br> The value of the widget.<br>                                                                                 |              |
-| userdata_get        |                 | any                                     | <br><b>Returns:</b><br> The user data stored on the widget                                                                           |              |
-| userdata_set        |                 | None                                    | Sets the user data on the widget.                                                                                                    |              |
-|                     | user_data       | any                                     | The user data can be of any type                                                                                                     | ❌            |
-| value_set           |                 | None                                    | Sets the widget value - These are overloaded types                                                                                   |              |
-|                     | value           | bool                                    | Sets the bool value set of the widget.                                                                                               | ❌            |
-| value_set           |                 | None                                    | Sets the widget value - These are overloaded types                                                                                   |              |
-|                     | value           | int                                     | Sets the int value set of the widget.                                                                                                | ❌            |
-| value_set           |                 | None                                    | Sets the widget value - These are overloaded types                                                                                   |              |
-|                     | value           | float                                   | Sets the float value set of the widget.                                                                                              | ❌            |
-| value_set           |                 | None                                    | Sets the widget value - These are overloaded types                                                                                   |              |
-|                     | value           | Combo_Data                              | Sets the [Combo_Data](#combo_data) value set of the widget.                                                                          | ❌            |
-| value_set           |                 | None                                    | Sets the widget value - These are overloaded types                                                                                   |              |
-|                     | value           | str                                     | Sets the str value set of the widget.                                                                                                | ❌            |
-| value_set           |                 | None                                    | Sets the widget value - These are overloaded types                                                                                   |              |
-|                     | value           | datetime.date                           | Sets the date value set of the widget                                                                                                | ❌            |
-| value_set           |                 | None                                    | Sets the widget value - These are overloaded types                                                                                   |              |
-|                     | value           | datetime.datetime                       | Sets the datetime value set of the widget                                                                                            | ❌            |
-| visible_get         |                 | bool                                    | <br><b>Returns:</b><br> True - widget visible, False - widget hidden.<br>                                                            |              |
-| visible_set         |                 | None                                    |                                                                                                                                      |              |
-|                     | visible         | bool                                    | True, sets widget visible, Otherwise widget hidden.                                                                                  | ❌            |
+| **Method**          | **Arguments**   | **Type**                                                                                       | **Description**                                                                                                                      | **Optional** |
+|---------------------|-----------------|------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|--------------|
+| block_signals       |                 | None                                                                                           | Blocks or unblocks signals for the widget (Used rarely where signals might be generated very frequently e.g. [Slider](#slider))      |              |
+|                     | block_signals   | bool (True)                                                                                    | True, stop this widget from generating signals (events), Otherwise do  not do not stop signals (events)  being generated .           | ✓            |
+| clear               |                 | None                                                                                           | Clears the contents of the GUI control, if supported                                                                                 |              | 
+| buddy_text_set      |                 | None                                                                                           | Sets the text on the buddy control, where supported                                                                                  |              |
+|                     | value           | str                                                                                            | The label text set to the left of the buddy widget.                                                                                  | ❌            |
+| ediitable_set       |                 | None                                                                                           | Controls the edit setting of a GUI control, where supported.                                                                         |              |
+|                     | editable        | bool (False)                                                                                   | True, set the GUI control editable, where supported, Otherwise not.                                                                  | ✓            |
+| enable_get          |                 | bool                                                                                           | <br><b>Returns:</b><br> The enable value of the widget.<br>                                                                          |              |
+| enable_set          |                 | int                                                                                            | Enables/Disables the GUI control where supported <br><b>Returns:</b><br> 1 - set ok, -1 - set failed<br>                             |              |
+|                     | enable          | bool                                                                                           | True enable control, Otherwise disable the control.                                                                                  | ❌            |
+| fonts_available_get |                 | tuple[str]                                                                                     | <br><b>Returns:</b><br> A tuple of font name strings.<br>                                                                            |              |
+| font_set            |                 | None                                                                                           | Sets the font on the GUI control (Usually used internally as the [Font](#font) property is set when the GUI control is instantiated) |              |
+|                     | app_font        | Font                                                                                           | Application font                                                                                                                     | ❌            |
+|                     | widget_font     | Font                                                                                           | Control font                                                                                                                         | ❌            |
+|                     | widget          | qtW.QWidget (None)                                                                             | The QT widget having the font set (defaults to current GUI control)                                                                  | ✓            |
+| font_system_get     |                 | None                                                                                           | Gets the sstem font <br><b>Returns:</b><br> A QFont object.<br>                                                                      |              |
+|                     | fixed           | bool (True)                                                                                    | True, return the fixed size system font, Otherwise not                                                                               |              |
+| frame_style_set     |                 | None                                                                                           | Sets the frame style of the GUI control, where supported                                                                             |              |
+|                     | frame           | [Widget_Frame](#widget_frame)                                                                  | Frame definition object.                                                                                                             | ✓            |
+| icon_set            |                 | None                                                                                           |                                                                                                                                      |              |
+|                     | icon            | None \| qtG.QIcon \| qtG.QPixmap \| str                                                        | Sets the icon on a GUI control were supported. If a str then this is the filename  of the icon                                       | ❌            |
+| guiwidget_get       |                 | qtW.QWidget                                                                                    | Returns the underlying QT widget so that specialised operations can be performed<br><b>Returns:</b><br> The QT GUI widget.<br>       |              |
+| guiwidget_set       |                 | None                                                                                           | Sets the GUI Control (Almost never used by QTPYGUI programmers)                                                                      |              |
+|                     | widget          | qtW.QWidget \| qtG.QAction                                                                     | The widget being set                                                                                                                 | ❌            |
+| pixel_str_size      |                 | [Char_Pixel_Size](#char_pixel_size)                                                            | <br><b>Returns:</b><br> The pixel size of the string in a [Char_Pixel_Size](#char_pixel_size) instance   .<br>                       |              |
+|                     | text            | str                                                                                            | The text to be measured                                                                                                              | ❌            |
+| pixel_char_size     |                 | [Char_Pixel_Size](#char_pixel_size)                                                            | The size of a char in pixels<br><b>Returns:</b><br> [Char_Pixel_Size](#char_pixel_size) <br>                                         |              |
+|                     | char_height     | int                                                                                            | Character height in chars                                                                                                            | ❌            |
+|                     | char_width      | int                                                                                            | Character width in chars                                                                                                             | ❌            |
+|                     | height_fudge    | float (1.1)                                                                                    | Fudge factor multiplier to provide height adjustment                                                                                 | ✓            |
+|                     | width_fudge     | float (1.1)                                                                                    | Fudge factor multiplier to provide width adjustment                                                                                  | ✓            |
+| text_pixel_size     |                 | tuple[int,int]                                                                                 | Returns the height and width of a string of text in pixels <br><b>Returns:</b><br> The [height,width] of the text in pixels.<br>     |              |
+|                     | text            | str                                                                                            | The text to be measured.                                                                                                             | ❌            |
+| tooltip_get         |                 | str                                                                                            | <br><b>Returns:</b><br> The tooltip text.<br>                                                                                        |              |
+| tooltip_set         |                 | None                                                                                           |                                                                                                                                      |              |
+|                     | tooltip         | str                                                                                            | The text to display in the tooltip.                                                                                                  | ❌            |
+|                     | width           | int (200) _Currently 400 for testing_                                                          | The width of the tooltip in pixels. ( Width setting is still being ignored TODO Find Fix)                                            | ✓            |
+|                     | txt_color       | str                                                                                            | The color of the tooltip text. Defaults to black.                                                                                    | ✓            |
+|                     | bg_color        | str                                                                                            | The background color of the tooltip. Defaults to white.                                                                              | ✓            |
+|                     | border          | str                                                                                            | The border style of the tooltip. Defaults to "1px solid #000000".                                                                    | ✓            |
+| tooltipsvisible_get |                 | bool                                                                                           | <br><b>Returns:</b><br> True - visible, False - not visible.<br>                                                                     |              |
+| tooltipsvisible_set |                 | None                                                                                           |                                                                                                                                      |              |
+|                     | visible         | bool                                                                                           | True, tooltip visible, Otherwise not.                                                                                                | ❌            |
+| trans_get           |                 | bool                                                                                           | <br><b>Returns:</b><br> True - text translated, False - text not translate<br>                                                       |              |
+| trans_set           |                 | None                                                                                           |                                                                                                                                      |              |
+|                     | no_trans        | bool                                                                                           | True, text not translated, Otherwise text is translated                                                                              | ❌            |
+| trans_str           |                 | str                                                                                            | <br><b>Returns:</b><br> The translated text.<br>                                                                                     |              |
+|                     | text            | str                                                                                            | The text to be translated.                                                                                                           | ❌            |
+|                     | force_translate | bool (False)                                                                                   | Translate text if True,Otherwise do not translate text. Defaults to False                                                            | ✓            |
+| validate            |                 | bool                                                                                           | <br><b>Returns:</b><br> True if validation ok, otherwise False<br>                                                                   |              |
+| value_get           |                 | any                                                                                            | <br><b>Returns:</b><br> The value of the widget.<br>                                                                                 |              |
+| userdata_get        |                 | any                                                                                            | <br><b>Returns:</b><br> The user data stored on the widget                                                                           |              |
+| userdata_set        |                 | None                                                                                           | Sets the user data on the widget.                                                                                                    |              |
+|                     | user_data       | any                                                                                            | The user data can be of any type                                                                                                     | ❌            ||
+| value_set           |                 | None                                                                                           | Sets the widget value                                                                                                                |              |
+|                     | value           | bool \| int \| float \| [Combo_Data](#combo_data) \| str \| datetime.date \| datetime.datetime | Sets the value of the widget                                                                                                         | ❌            |
+| visible_get         |                 | bool                                                                                           | <br><b>Returns:</b><br> True - widget visible, False - widget hidden.<br>                                                            |              |
+| visible_set         |                 | None                                                                                           |                                                                                                                                      |              |
+|                     | visible         | bool                                                                                           | True, sets widget visible, Otherwise widget hidden.                                                                                  | ❌            |
 
 
 #### Button
@@ -568,7 +556,8 @@ suggested to set width and height as the font selected might not
 automatically size correctly.  
 
 <br>**Properties**
-<br>The following properties apply when a button is instantiated with the Button call as below 
+<br>The following properties apply when a button is instantiated with the Button 
+call, as in the "fully loaded" declaration below 
 
 | **Property**         | **Description**                                                                                      | **Type**                                    | **Optional** |
 |----------------------|------------------------------------------------------------------------------------------------------|---------------------------------------------|--------------|
@@ -648,7 +637,8 @@ suggested to set width and height as the font selected might not
 automatically size correctly.
 
 <br>**Properties**
-<br>The following properties apply when a Checkbox is instantiated with the Checkbox call as below
+<br>The following properties apply when a Checkbox is instantiated with the Checkbox 
+call, as in the "fully loaded" declaration below
 
 | **Property**  | **Description**                                                                                        | **Type**                                    | **Optional** |
 |---------------|--------------------------------------------------------------------------------------------------------|---------------------------------------------|--------------|
@@ -732,7 +722,8 @@ suggested to set width and height as the font selected might not
 automatically size correctly.
 
 <br>**Properties**
-<br>The following properties apply when a ComboBox is instantiated with the ComboBox call as below
+<br>The following properties apply when a ComboBox is instantiated with the ComboBox 
+call, as in the "fully loaded" declaration below
 
 | **Property**      | **Description**                                                                                                      | **Type**                                    | **Optional** |
 |-------------------|----------------------------------------------------------------------------------------------------------------------|---------------------------------------------|--------------|
@@ -865,7 +856,8 @@ as the font selected might not automatically size correctly.
 | NODATE       | Used internally by Dateedit to signify a no date condition | QDate(1, 1, 1)   |
 
 <br>**Properties**
-<br>The following properties apply when a Datedit is instantiated with the Datedit call as below
+<br>The following properties apply when a Datedit is instantiated with the 
+Datedit call, as in the "fully loaded" declaration below
 
 | **Property** | **Description**                                                                                                                    | **Type** | **Optional** |
 |--------------|------------------------------------------------------------------------------------------------------------------------------------|----------|--------------|
@@ -921,39 +913,36 @@ Dateedit(
 <br>**Methods**
 <br>A subset of the [_qtpyBase_Control](#_qtpybase_control) methods apply to Dateedit instances
 
-| **Method** | **Arguments**       | **Type**                  | **Description**                                                                                                                    | **Optional** |
-|------------|---------------------|---------------------------|------------------------------------------------------------------------------------------------------------------------------------|--------------|
-| clear      |                     | None                      | Clears the date displayed                                                                                                          |              |
-|            | default_text        | str ("-")                 | Date text to place in the edit control (must be a valid date string or - to clear the date)                                        | ✓            |
-| date_get   |                     | str                       | Gets the date. If date_tuple as a [Date_Tuple](#date_tuple), Otherwise a string formatted as per date_format<br>This is Overloaded |              |
-|            | date_format ("")    | str                       | Set the date format for a string return if date_tuple is False<br>Follows QT date formating                                        | ✓            |
-|            | date_tuple  (False) | bool                      | True, return date format as a [Date_Tuple](#date_tuple), Otherwise a string, formated as per date_format                           | ✓            |
-| date_get   |                     | [Date_Tuple](#date_tuple) | Gets the date. If date_tuple as a [Date_Tuple](#date_tuple), Otherwise a string formatted as per date_format<br>This is Overloaded |              |
-|            | date_format ("")    | str                       | Set the date format for a string return if date_tuple is False<br>Follows QT date formating                                        | ✓            |
-|            | date_tuple  (False) | bool                      | True, return date format as a [Date_Tuple](#date_tuple), Otherwise a string, formated as per date_format                           | ✓            |
-| date_set   |                     | None                      | Sets the date in the control                                                                                                       |              |
-|            | date                | str ("")                  | A string representing the date to set, formatted as 'y-m-d'.                                                                       | ✓            |
-|            | date_format         | str ("")                  | The format of the date string, defaults to an empty string.                                                                        | ✓            |
-|            | default_text        | str  ("-")                | if the date string is '-' then the date control is cleared                                                                         | ✓            |
-| date_valid |                     | bool                      | Checks if a date is valid<br><b>Returns:</b><br> True if date is valid, False otherwise<br>                                        |              |
-|            | date                | str                       | date in string format                                                                                                              | ❌            |
-|            | date_format         | str                       | The format of the date string.                                                                                                     | ❌            |
-| value_get  |                     | str                       | Gets the date. If date_tuple as a [Date_Tuple](#date_tuple), Otherwise a string formatted as per date_format<br>This is Overloaded |              |
-|            | date_format ("")    | str                       | Set the date format for a string return if date_tuple is False<br>Follows QT date formating                                        | ✓            |
-|            | date_tuple  (False) | bool                      | True, return date format as a [Date_Tuple](#date_tuple), Otherwise a string, formated as per date_format                           | ✓            |
-| value_get  |                     | [Date_Tuple](#date_tuple) | Gets the date. If date_tuple as a [Date_Tuple](#date_tuple), Otherwise a string formatted as per date_format<br>This is Overloaded |              |
-|            | date_format ("")    | str                       | Set the date format for a string return if date_tuple is False<br>Follows QT date formating                                        | ✓            |
-|            | date_tuple  (False) | bool                      | True, return date format as a [Date_Tuple](#date_tuple), Otherwise a string, formated as per date_format                           | ✓            |
-| value_set  |                     | None                      | Sets the date in the control                                                                                                       |              |
-|            | date                | str ("")                  | A string representing the date to set, formatted as 'y-m-d'.                                                                       | ✓            |
-|            | date_format         | str ("")                  | The format of the date string, defaults to an empty string.                                                                        | ✓            |
+| **Method** | **Arguments**       | **Type**                          | **Description**                                                                                                  | **Optional** |
+|------------|---------------------|-----------------------------------|------------------------------------------------------------------------------------------------------------------|--------------|
+| clear      |                     | None                              | Clears the date displayed                                                                                        |              |
+|            | default_text        | str ("-")                         | Date text to place in the edit control (must be a valid date string or - to clear the date)                      | ✓            |
+| date_get   |                     | str  \| [Date_Tuple](#date_tuple) | Gets the date. If date_tuple as a [Date_Tuple](#date_tuple), Otherwise a string formatted as per date_format<br> |              |
+|            | date_format ("")    | str                               | Set the date format for a string return if date_tuple is False<br>Follows QT date formating                      | ✓            |
+|            | date_tuple  (False) | bool                              | True, return date format as a [Date_Tuple](#date_tuple), Otherwise a string, formated as per date_format         | ✓            |
+| date_set   |                     | None                              | Sets the date in the control                                                                                     |              |
+|            | date                | str ("")                          | A string representing the date to set, formatted as 'y-m-d'.                                                     | ✓            |
+|            | date_format         | str ("")                          | The format of the date string, defaults to an empty string.                                                      | ✓            |
+|            | default_text        | str  ("-")                        | if the date string is '-' then the date control is cleared                                                       | ✓            |
+| date_valid |                     | bool                              | Checks if a date is valid<br><b>Returns:</b><br> True if date is valid, False otherwise<br>                      |              |
+|            | date                | str                               | date in string format                                                                                            | ❌            |
+|            | date_format         | str                               | The format of the date string.                                                                                   | ❌            |
+| value_get  |                     | str \| [Date_Tuple](#date_tuple)  | Gets the date. If date_tuple as a [Date_Tuple](#date_tuple), Otherwise a string formatted as per date_format<br> |              |
+|            | date_format ("")    | str                               | Set the date format for a string return if date_tuple is False<br>Follows QT date formating                      | ✓            |
+|            | date_tuple  (False) | bool                              | True, return date format as a [Date_Tuple](#date_tuple), Otherwise a string, formated as per date_format         | ✓            |
+| value_set  |                     | None                              | Sets the date in the control                                                                                     |              |
+|            | date                | str ("")                          | A string representing the date to set, formatted as 'y-m-d'.                                                     | ✓            |
+|            | date_format         | str ("")                          | The format of the date string, defaults to an empty string.                                                      | ✓            |
 
 ### FolderView
-
-FolderView is a widget that displays a folder path in a tree format
+Calling FolderView in a layout will generate a FolderView control, on a form. 
+The "tag", "text", "callback", "header_widths" and "height" arguments 
+are generally the only arguments used. It is suggested to set width and height 
+as the font selected might not automatically size correctly.
 
 <br>**Properties**
-<br>The following properties apply when a Datedit is instantiated with the Datedit call as below
+<br>The following properties apply when a FolderView is instantiated with the 
+FolderView call, as in the "fully loaded" declaration below
 
 | **Property**  | **Description**                                                                                                                                                                    | **Type**                                 | **Optional** |
 |---------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------|--------------|
@@ -966,20 +955,234 @@ FolderView is a widget that displays a folder path in a tree format
 | header_font   | Sets the font properties of the header row                                                                                                                                         | [Font](#font) \| None (None)             | ✓            |
 | click_expand  | True, expand folders when clicked on, Otherwise only expand folders if the handle is clicked                                                                                       | bool (False)                             | ✓            |
 
+A fully loaded FolderView declaration:
+- **Note: Only "tag", "text", "callback", "header_widths" and "height" are usually needed **
+
+```
+FolderView(
+            tag="folderview",
+            label="Folder View",
+            callback=self.event_handler,
+            height=5,
+            header_widths=[10, 10, 10, 10],
+            multiselect=False,
+            click_expand=False,
+            label_align=qtg.Align_Text.CENTER,
+            label_width=10,
+            label_font=qtg.Font(style=qtg.Font_Style.OBLIQUE, size=20),
+            txt_align=qtg.Align_Text.CENTER,
+            txt_font=qtg.Font(style=qtg.Font_Style.NORMAL, size=14),
+            header_font=qtg.Font(
+                style=qtg.Font_Style.OBLIQUE,
+                backcolor="cyan",
+                forecolor="orange",
+                size=20,
+            ),
+            txt_fontsize=12,
+            bold=True,
+            italic=True,
+            underline=True,
+            enabled=True,
+            visible=True,
+            tooltip="FolderView Press Me",
+            tune_hsize=15,
+            tune_vsize=15,
+            user_data={"key": "value"},
+            buddy_control=qtg.HBoxContainer().add_row(
+                qtg.Spacer(width=1),
+                qtg.Button(
+                    tag="folderview_button_push",
+                    text="Push Me!",
+                    callback=self.event_handler,
+                    width=12,
+                ),
+            ),
+        )
+```
 
 <br>**Methods**
 <br>A subset of the [_qtpyBase_Control](#_qtpybase_control) methods apply to FolderView instances
 
-| **Method**      | **Arguments** | **Type** | **Description**                                                                                    | **Optional** |
-|-----------------|---------------|----------|----------------------------------------------------------------------------------------------------|--------------|
-| change_folder   |               | None     |                                                                                                    |              |
-| expand_on_click |               | bool     | <br><b>Returns:</b><br> The expand on click setting (true == dir node expands when clicked on)<br> |              |
-| headerData      |               | None     |                                                                                                    |              |
-|                 | section       | int      | The column number.                                                                                 |              |
-| value_get       |               | None     | <br><b>Returns:</b><br> The tuple containing the file values from the selected node<br>            |              |
-| value_set       |               | None     |                                                                                                    |              |
-|                 | value         | str      | The text to set the text to                                                                        |              |
+| **Method**      | **Arguments** | **Type**                | **Description**                                                                                                                                                                                                                                                         | **Optional** |
+|-----------------|---------------|-------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
+| change_folder   |               | None                    | Changes the root folder for the directory view, clearing the view in the process.                                                                                                                                                                                       |              |
+|                 | folder        | str                     | THe new root folder. This is not checked for validity.                                                                                                                                                                                                                  | ❌            |
+| expand_on_click |               | bool                    | <br><b>Returns:</b><br> The expand on click setting. If True then the dir node expands when dir name clicked on, Otherwise not<br>                                                                                                                                      |              |
+| value_get       |               | tuple[selected_node(s)] | This will return named tuple(s) of selected_nodes (selected_node, name, path, size, modified, date_modified type, isdir). <br><b>Returns:</b><br> One tuple if multiselect is False, Otherwise one or more tuples containing the file values from the selected node<br> |              |
+| value_set       |               | None                    | Sets the text value of the selected node. Note: may not work in dir view only mode                                                                                                                                                                                      |              |
+|                 | value         | str                     | The text to set as the current node text                                                                                                                                                                                                                                | ❌            |
 
+### Grid
+ Calling Grid in a layout will generate a Grid control, on a form. 
+The "tag", "text", "callback", "col_def" and "height" arguments 
+are generally the only arguments used. 
+
+<br>**Properties**
+<br>The following properties apply when a Grid is instantiated with the 
+Grid call, as in the "fully loaded" declaration below
+
+| **Property** | **Description**                                                                                                                                             | **Type**                          | **Optional** |
+|--------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------|--------------|
+| width        | The width of the Grid <br>-1 defaults to the grid column widths being used to calculate the width                                                           | int (-1)                          | ✓            |
+| height       | The height of the grid                                                                                                                                      | int (BUTTON_SIZE.height)          | ✓            |
+| col_def      | This is the column definitions  of the grid                                                                                                                 | list \| tuple [Col_Def](#col_del) | ❌            |
+| grid_items   | If an initial grid load is required then set this to a list of [Grid_Items](#grid_item).<br> The tag field of the [Grid_Item](#grid_item) must be set to "" | list [Grid_Item](#grid_item) ([]) | ✓            |
+| multiselect  | True, allow multiple selections in the grid, Otherwise do not                                                                                               | bool (False)                      | ✓            |
+| noselection  | True, do not allow any selections in the grid, Otherwise allow selections                                                                                   | bool (False)                      | ✓            |
+| header_sort  | True, Allow header sorting, Otherwise do not                                                                                                                | bool (True)                       | ✓            |
+
+A fully loaded Grid declaration:
+- **Note: Only "tag", "text", "callback", "col_def" and "height" are usually needed **
+  - Initial Grid loading is usually done by loading grid_items as below
+
+```
+Grid(
+    tag="grid",
+    label="Grid",
+    callback=self.event_handler,
+    col_def=[
+        qtg.Col_Def(
+            label="Col 1", checkable=True, editable=False, tag="col_1", width=10
+        ),
+        qtg.Col_Def(
+            label="Col 2", checkable=False, editable=True, tag="col_2", width=10
+        ),
+    ],
+    grid_items=[
+                qtg.Grid_Item(row_index=0, col_index=0,current_value="value 1" , user_data=None,tag=""),
+                qtg.Grid_Item(row_index=0, col_index=1,current_value="value 2" , user_data=None,tag=""),
+                qtg.Grid_Item(row_index=1, col_index=0, current_value="value 3", user_data=None, tag=""),
+                qtg.Grid_Item(row_index=1, col_index=1, current_value="value 4", user_data=None, tag=""),
+            ],
+    height=3,
+    label_align=qtg.Align_Text.CENTER,
+    label_width=10,
+    label_font=qtg.Font(style=qtg.Font_Style.OBLIQUE,backcolor="red", size=14),
+    txt_align=qtg.Align_Text.CENTER,
+    txt_font=qtg.Font(style=qtg.Font_Style.NORMAL, size=15), #Does not set colours
+    txt_fontsize=12,
+    bold=True,
+    italic=True,
+    underline=True,
+    enabled=True,
+    visible=True,
+    tooltip="Grid Me",
+    tune_hsize=15,
+    tune_vsize=15,
+    user_data={"key": "value"},
+    buddy_control=qtg.HBoxContainer().add_row(
+        qtg.Spacer(width=1),
+        qtg.Button(
+            tag="grid_push",
+            text="Grid Push Me!",
+            callback=self.event_handler,
+            width=12,
+        ),
+    )
+``` 
+
+<br>**Methods**
+<br>A subset of the [_qtpyBase_Control](#_qtpybase_control) methods apply to Grid instances
+
+| **Method**              | **Arguments** | **Type**                                                                                   | **Description**                                                                                                                                                                                                           | **Optional** |
+|-------------------------|---------------|--------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
+| changed                 |               | bool                                                                                       | <br><b>Returns:</b><br> True if the grid has been changed, False otherwise.<br>                                                                                                                                           |              |
+| changed                 |               | None                                                                                       | Sets the changed property.                                                                                                                                                                                                |              |
+|                         | value         | bool                                                                                       | Set True if the grid has been changed, False otherwise.                                                                                                                                                                   | ❌            |
+| checkitemrow_get        |               | [Grid_Item](#grid_item) \| empty tuple ()                                                  | <br><b>Returns:</b><br> A Grid_Item definition containing the row_index,col_index, tag, current_value, and user_data of a item at the given row/col position.<br>                                                         |              |
+|                         | col           | int                                                                                        | The index of the column to retrieve the item from.                                                                                                                                                                        | ❌            |
+|                         | row           | int                                                                                        | The index of the row to retrieve the item from.                                                                                                                                                                           | ❌            |
+| checkitemrow_set        |               | None                                                                                       | Sets the check state of the item at the row and column specified.                                                                                                                                                         |              |
+|                         | checked       | bool                                                                                       | True, check the item, Otherwise do not                                                                                                                                                                                    | ❌            |
+|                         | col           | int                                                                                        | The index of the column to set the check state for.                                                                                                                                                                       | ❌            |
+|                         | row           | int                                                                                        | The index of the row to set the check state for.                                                                                                                                                                          | ❌            |
+| checkitems_all          |               | None                                                                                       | Checks all items in the grid that are checkable.                                                                                                                                                                          |              |
+|                         | checked       | bool (True)                                                                                | True, check an item, Otherwise uncheck.                                                                                                                                                                                   |              |
+|                         | col_tag       | str  ("")                                                                                  | The column tag name. Only items in this column will be checked/unchecked. If col_tag is "" then all columns will be examined to see if they can be checked/uncheked.                                                      | ✓            |
+| checkitems_get          |               | [Grid_Item](#grid_item) \| empty tuple ()                                                  | <br><b>Returns:</b><br> A tuple of all checked Grid_items in the grid or an empty tuple if no items checked<br>                                                                                                           | ✓            |
+| clear                   |               | None                                                                                       | Clears the grid of all data                                                                                                                                                                                               |              |
+| col_count               |               | int                                                                                        | <br><b>Returns:</b><br> The number of columns in the grid<br>                                                                                                                                                             |              |
+| colindex_get            |               | int                                                                                        | <br><b>Returns:</b><br> The column index for a column tag name.<br> If the column tag is invalid an assertion error is raised                                                                                             |              |
+|                         | column_tag    | str                                                                                        | The column tag name.                                                                                                                                                                                                      | ❌            |
+| coltag_get              |               | str                                                                                        | <br><b>Returns:</b><br> The column tag name.<br>If the column index is invalid an assertion error is raised.<br>                                                                                                          |              |
+|                         | column_index  | int                                                                                        | The column index reference.                                                                                                                                                                                               | ❌            |
+| get_previous_value      |               | bool\| datetime.date \| datetime.datetime \| datetime.time \| float \| int \| str \| None  | <br><b>Returns:</b><br> The previous value stored in the column referred to by row and col<br>                                                                                                                            |              | 
+|                         | col           | int (-1)                                                                                   | Col index reference. Defaults to current column                                                                                                                                                                           | ✓            |
+|                         | row           | int (-1)                                                                                   | Row index reference. Defaults to current row                                                                                                                                                                              | ✓            |
+| grid_item_get           |               | [Grid_Item](#grid_item) \|None                                                             | <br><b>Returns:</b><br> The Grid item referred to by row and col<br>                                                                                                                                                      |              |
+|                         | col           | int (-1)                                                                                   | Column index reference. Defaults to current column                                                                                                                                                                        | ✓            |
+|                         | row           | int (-1)                                                                                   | Row index reference. Defaults to current column                                                                                                                                                                           | ✓            |
+| item_ids_from_row       |               | list[int]                                                                                  | <br><b>Returns:</b><br> List of  item_ids of the items found in a specified row<br>                                                                                                                                       |              |
+|                         | row           | int                                                                                        | The table widget row                                                                                                                                                                                                      | ❌            |
+| load_csv_file           |               | int                                                                                        | <br><b>Returns:</b><br> The length of the maximum item loaded or -1 if there is a problem with the file.<br>                                                                                                              |              |
+|                         | data_index    | int (1)                                                                                    | The column index in the CSV file containing the user data to associate with the loaded data.                                                                                                                              |              |
+|                         | delimiter     | str ","                                                                                    | The field separator used in the CSV file. Defaults to ",".                                                                                                                                                                |              |
+|                         | file_name     | str                                                                                        | The name of the CSV file.                                                                                                                                                                                                 | ❌            |
+|                         | ignore_header | bool (True)                                                                                | Set to True if the CSV file has a header row that should be ignored                                                                                                                                                       | ✓            |
+|                         | line_start    | int  (1)                                                                                   | The line number in the CSV file to start loading data from                                                                                                                                                                | ✓            |
+|                         | text_index    | int  (1)                                                                                   | The column index in the CSV file containing the text to display in the grid                                                                                                                                               |              |
+| move_checked_block_down |               | None                                                                                       | Move the checked block down one position in the Grid                                                                                                                                                                      |              |
+| move_checked_block_up   |               | None                                                                                       | Move the checked block up one position in the Grid                                                                                                                                                                        |              |
+| move_row_down           |               | int                                                                                        | Move the currently selected row down one position in the Grid <br><b>Returns:</b><br> The new row or -1 if the row is at the bottom of the table<br>                                                                      |              |
+|                         | move_row      | int                                                                                        | The index of the row to move                                                                                                                                                                                              | ❌            |
+| move_row_up             |               | int                                                                                        | Move the currently selected row up one position in the table<br><b>Returns:</b><br> The new row or -1 if the row is at the top of the table<br>                                                                           |              |
+|                         | move_row      | int                                                                                        | The index of the row to move.                                                                                                                                                                                             | ❌            |
+| row_append              |               | int                                                                                        | Appends a blank row to the grid<br><b>Returns:</b><br> Row number inserted.<br>                                                                                                                                           |              |
+| row_count               |               | int                                                                                        | <br><b>Returns:</b><br> Row Count (number of rows in the grid)<br>                                                                                                                                                        |              |
+| row_delete              |               | None                                                                                       | Deletes a row                                                                                                                                                                                                             |              |
+|                         | row           | int                                                                                        | Row index of the row in the grid that is to be deleted                                                                                                                                                                    | ❌            |
+| row_from_item_id        |               | int                                                                                        | Returns the row index of the item with the specified item_id<br><b>Returns:</b><br> The row index of the item with the specified item_id. -1 if item_id not found<br>                                                     |              |
+|                         | item_id       | int                                                                                        | The item_id of the item you want to find the row index for                                                                                                                                                                | ❌            |
+| row_insert              |               | None                                                                                       | Inserts a row at the given row index. If row is > number of rows then a new row is inserted.                                                                                                                              |              |
+|                         | row           | int                                                                                        | The row index in the grid.                                                                                                                                                                                                | ❌            |
+|                         | scroll_to     | bool (True)                                                                                | True scroll to the inserted row, Otherwise not                                                                                                                                                                            | ✓            |
+| row_scroll_to           |               | None                                                                                       | Scrolls to a row (Deprecated will be removed in a later release. Use select_row)                                                                                                                                          |              |
+|                         | col           | int (-1)                                                                                   | -1 no column selected, Otherwise select the column indicated by col index                                                                                                                                                 | ✓            |
+|                         | row           | int                                                                                        | Row to scroll to                                                                                                                                                                                                          | ❌            |
+| row_widget_get          |               | [_qtpyBase_Control](#_qtpybase_control)  \| [Container](#containers)                       | <br><b>Returns:</b><br> If found, the widget or the widget container stored in the specified row and column, Otherwise None<br>                                                                                           |              |
+|                         | col           | int                                                                                        | Grid column index. If -1, the current column is used, Otherwise the specified column.                                                                                                                                     | ❌            |
+|                         | container_tag | str ("")                                                                                   | Container tag is needed if the desired widget is in a container                                                                                                                                                           | ✓            |
+|                         | row           | int                                                                                        | Grid row index. If -1, the current row is used, Otherwise the specified row.                                                                                                                                              | ❌            |
+|                         | tag           | str ("-")                                                                                  | control tag name. If "-" is supplied, the container is returned.                                                                                                                                                          |              |
+| row_widget_set          |               | None                                                                                       | Sets a widget at the specified row and column                                                                                                                                                                             | ✓            |
+|                         | col           | int                                                                                        | The column index of the cell to set the widget for.                                                                                                                                                                       | ❌            |
+|                         | group_text    | str ("")                                                                                   | If group_text is provided the widget will be displayed in a group box with the group_text as a title                                                                                                                      | ✓            |
+|                         | row           | int                                                                                        | The row index of the cell you want to set the widget for.                                                                                                                                                                 | ❌            |
+|                         | widget        | [_qtpyBase_Control](#_qtpybase_control)                                                    | The widget to be inserted into the grid                                                                                                                                                                                   | ❌            |
+| row_widget_tag_delete   |               | int                                                                                        | Deletes a row if the row contains a row widget with a tag that matches the row and tag passed to the method<br><b>Returns:</b><br> 1 row found and deleted, -1 no row found that matches the tag passed to the method<br> |              |
+|                         | container_tag | str ("")                                                                                   | This is the container tag of the  widget (used only where the widget container tag has been set. Defaults to self.container).                                                                                             | ✓            |
+|                         | tag           | str                                                                                        | The tag of the widget to be deleted.                                                                                                                                                                                      | ❌            |
+|                         | widget_row    | int                                                                                        | The row housing the widget                                                                                                                                                                                                | ❌            |
+| select_col              |               | None                                                                                       | Sets the current column                                                                                                                                                                                                   |              |
+|                         | col           | int                                                                                        | The column index in the grid.                                                                                                                                                                                             | ❌            |
+|                         | row           | int                                                                                        | The row index in the grid.                                                                                                                                                                                                | ❌            |
+| select_row              |               | None                                                                                       | Scrolls to the given row                                                                                                                                                                                                  |              |
+|                         | col           | int (-1)                                                                                   | The column index in the grid (defaults to -1 scroll to row only).                                                                                                                                                         | ✓            |
+|                         | row           | int                                                                                        | The row index in the grid.                                                                                                                                                                                                | ❌            |
+| selected_col            |               | int                                                                                        | <br><b>Returns:</b><br> The currently selected col<br>                                                                                                                                                                    |              |
+| selected_row            |               | int                                                                                        | <br><b>Returns:</b><br> The currently selected row<br>                                                                                                                                                                    |              |
+| userdata_get            |               | any                                                                                        | <br><b>Returns:</b><br> User data stored in column referred to by row and col<br>                                                                                                                                         |              |
+|                         | col           | int (-1)                                                                                   | If -1, the current column, Otherwise column specified by column                                                                                                                                                           | ✓            |
+|                         | row           | int (-1)                                                                                   | if -1, the current row, Otherwise row specified by row                                                                                                                                                                    | ✓            |
+| userdata_set            |               | None                                                                                       | Sets the user data stored on the given column referred to by row and col                                                                                                                                                  |              |
+|                         | col           | int (-1)                                                                                   | If -1, the current column, Otherwise column specified by column                                                                                                                                                           | ✓            |
+|                         | row           | int (-1)                                                                                   | if -1, the current row, Otherwise row specified by row                                                                                                                                                                    | ✓            |
+|                         | user_data     | any (None)                                                                                 | User data to be stored                                                                                                                                                                                                    |              |
+| value_get               |               | bool \| datetime.date \| datetime.datetime \| datetime.time \| float \| int \| str \| None | <br><b>Returns:</b><br> The value stored in the column referenced by row and column<br>                                                                                                                                   |              |
+|                         | col           | int (-1)                                                                                   | If -1, the current column, Otherwise column specified by column                                                                                                                                                           | ✓            |
+|                         | row           | int (-1)                                                                                   | if -1, the current row, Otherwise row specified by row                                                                                                                                                                    | ✓            |
+| value_set               |               | None                                                                                       | Sets a display value (and user data if supplied) at a given row and column                                                                                                                                                |              |
+|                         | bold          | bool (False)                                                                               | If True **bolds** the display font, Otherwise not                                                                                                                                                                         | ✓            |
+|                         | col           | int                                                                                        | Column index reference.                                                                                                                                                                                                   | ❌            |
+|                         | italic        | bool (False)                                                                               | If True _italicises_ the display font, Otherwise not                                                                                                                                                                      | ✓            |
+|                         | row           | int                                                                                        | Row index reference.                                                                                                                                                                                                      | ❌            |
+|                         | tooltip       | str ("")                                                                                   | Tooltip to be displayed.                                                                                                                                                                                                  | ✓            |
+|                         | underline     | bool (False)                                                                               | If True underlines the display font, Otherwise not                                                                                                                                                                        | ✓            |
+|                         | user_data     | any                                                                                        | User data to be stored.                                                                                                                                                                                                   | ❌            |
+|                         | value         | bool \| datetime.date \| datetime.datetime \|datetime.time \| float \| int \|str \| None   | The value to be displayed.                                                                                                                                                                                                | ❌            |
+| valueorig_get           |               | bool \| datetime.date \| datetime.datetime \|datetime.time \| float \| int \|str \| None   | <br><b>Returns:</b><br> The original value stored in the column referenced to by row and col<br>                                                                                                                          |              |
+|                         | col           | int (-1)                                                                                   | If -1, the current column, Otherwise column specified by column                                                                                                                                                           | ✓            |
+|                         | row           | int (-1)                                                                                   | if -1, the current row, Otherwise row specified by row                                                                                                                                                                    | ✓            |
 ### Slider
  
 Instantiates a Slider widget and associated properties
@@ -1011,99 +1214,100 @@ Instantiates a Slider widget and associated properties
 |               | block_signals | bool (False) | True, stop the slider from emitting signals, Otherwise emit signals | ✓            |
 
 
-### QTPYGUI Enumerated Types/Class Reference
+### QTPYGUI Enumerated Types/Helper Class Reference
 
-The following enumerated types and classes are used to define the features and 
+The following enumerated types and helper classes are used to define the features and 
 behaviour of QTPYGUI 
 
 #### Align
 
 Align is an enumerated type used in defining the alignment of containers and GUI controls
 
-| Property     | Description | Type                             |
-|--------------|-------------|----------------------------------|
- | LEFT         |             | Qt.AlignLeft                     |
-| CENTER       |             | Qt.AlignCenter                   |
-| CENTERLEFT   |             | Qt.AlignCenter \| Qt.AlignLeft   |
-| CENTERRIGHT  |             | Qt.AlignCenter \| Qt.AlignRight  |
-| RIGHT        |             | Qt.AlignRight                    |
-| TOP          |             | Qt.AlignTop                      |
-| TOPCENTER    |             | Qt.AlignTop                      |
-| TOPLEFT      |             | Qt.AlignTop \| Qt.AlignLeft      |
- | TOPRIGHT     |             | Qt.AlignTop \| Qt.AlignRight     |
-| BOTTOM       |             | Qt.AlignBottom                   |
-| VCENTER      |             | Qt.AlignVCenter                  |
-| HCENTER      |             | Qt.AlignHCenter                  |
-| BOTTOMCENTER |             | Qt.AlignBottom \| Qt.AlignCenter |
-| BOTTOMLEFT   |             | Qt.AlignBottom \| Qt.AlignLeft   |
-| BOTTOMRIGHT  |             | Qt.AlignBottom \| Qt.AlignRight  |
+| **Property** | **Description** | **Type**                         |
+|--------------|-----------------|----------------------------------|
+ | LEFT         |                 | Qt.AlignLeft                     |
+| CENTER       |                 | Qt.AlignCenter                   |
+| CENTERLEFT   |                 | Qt.AlignCenter \| Qt.AlignLeft   |
+| CENTERRIGHT  |                 | Qt.AlignCenter \| Qt.AlignRight  |
+| RIGHT        |                 | Qt.AlignRight                    |
+| TOP          |                 | Qt.AlignTop                      |
+| TOPCENTER    |                 | Qt.AlignTop                      |
+| TOPLEFT      |                 | Qt.AlignTop \| Qt.AlignLeft      |
+ | TOPRIGHT     |                 | Qt.AlignTop \| Qt.AlignRight     |
+| BOTTOM       |                 | Qt.AlignBottom                   |
+| VCENTER      |                 | Qt.AlignVCenter                  |
+| HCENTER      |                 | Qt.AlignHCenter                  |
+| BOTTOMCENTER |                 | Qt.AlignBottom \| Qt.AlignCenter |
+| BOTTOMLEFT   |                 | Qt.AlignBottom \| Qt.AlignLeft   |
+| BOTTOMRIGHT  |                 | Qt.AlignBottom \| Qt.AlignRight  |
 
 #### Align_Text
 
 Align_Text is an enumerated type that aligns text using style sheet type 
 declaration (Some controls will remap to [Align](#align) types)
 
-| Property | Description | Type              |
-|----------|-------------|-------------------|
- | LEFT     |             | text-align:left   |
-| CENTER   |             | text-align:center |
-| RIGHT    |             | text-align:right  |
-| TOP      |             | text-align:top    |
-| BOTTOM   |             | text-align:bottom |
+| **Property** | **Description** | **Type**          |
+|--------------|-----------------|-------------------|
+ | LEFT         |                 | text-align:left   |
+| CENTER       |                 | text-align:center |
+| RIGHT        |                 | text-align:right  |
+| TOP          |                 | text-align:top    |
+| BOTTOM       |                 | text-align:bottom |
 
 ### Char_Pixel_Size
 
 Char_Pixel_Size is a helper class that stores the width and height values in 
 pixels 
 
-| Property | Description      | Type |
-|----------|------------------|------|
-| height   | Height in pixels | int  |
-| } width  | Width in pixels  | int  |
+| **Property** | **Description**  | **Type** |
+|--------------|------------------|----------|
+| height       | Height in pixels | int      |
+| } width      | Width in pixels  | int      |
 
 #### Combo_Data
 
 Combo_Data is a helper class used to store data sourced from combo box items
 
-| Property  | Description                          | Type                                                               |
-|-----------|--------------------------------------|--------------------------------------------------------------------|
-| display   | Text displayed in dropdown row       | str                                                                |
-| data      | user data held in dropdown row       | str, int, float, bytes, bool, None                                 |
-| index     | Row index of data item               | int >= 0                                                           |
-| user_data | Data stored by user  in dropdown row | None , str, int , float , bytes , bool , tuple , list , dict, None |
-
-#### Combo_Item
-
-Combo_Item is a helper class used to set combo box items.  All attributes are mandatory.
-
-| Property  | Description                            | Type                                                               |
-|-----------|----------------------------------------|--------------------------------------------------------------------|
-| display   | Text displayed in dropdown row         | str                                                                |
-| data      | user data held in dropdown row         | str, int, float, bytes, bool, None                                 |
-| icon      | The icon image displayed on the button | str [File Name]<br/>,QIcon,QPixmap, None                           |
-| user_data | Data stored by user  in dropdown row   | None , str, int , float , bytes , bool , tuple , list , dict, None |
+| **Property** | **Description**                      | **Type**                                                           |
+|--------------|--------------------------------------|--------------------------------------------------------------------|
+| display      | Text displayed in dropdown row       | str                                                                |
+| data         | user data held in dropdown row       | str, int, float, bytes, bool, None                                 |
+| index        | Row index of data item               | int >= 0                                                           |
+| user_data    | Data stored by user  in dropdown row | None , str, int , float , bytes , bool , tuple , list , dict, None |
 
 #### Col_Def
 
 Col_Def is a helper class used to set the column attributes of grid controls. All attributes are mandatory.
 
-| Property  | Description                                                                                   | Type    |
-|-----------|-----------------------------------------------------------------------------------------------|---------|
-| checkable | The column rows have a check-box if True, Otherwise no checkbox is displayed                  | bool    |
-| editable  | The column rows can be edited if True, Otherwise the column rows can not be edited            | bool    |
-| label     | the label displayed in the columns first  row denoting the column name                        | str     |
-| tag       | The application name for the column                                                           | str     |
-| width     | The width of the column in chars if GUI control argument pixel_unit is True, Otherwise pixels | int > 0 |
+| **Property** | **Description**                                                                               | **Type** |
+|--------------|-----------------------------------------------------------------------------------------------|----------|
+| checkable    | The column rows have a check-box if True, Otherwise no checkbox is displayed                  | bool     |
+| editable     | The column rows can be edited if True, Otherwise the column rows can not be edited            | bool     |
+| label        | the label displayed in the columns first  row denoting the column name                        | str      |
+| tag          | The application name for the column                                                           | str      |
+| width        | The width of the column in chars if GUI control argument pixel_unit is True, Otherwise pixels | int > 0  |
+
+#### Combo_Item
+
+Combo_Item is a helper class used to set combo box items.  All attributes are mandatory.
+
+| **Property** | **Description**                        | **Type**                                                           |
+|--------------|----------------------------------------|--------------------------------------------------------------------|
+| display      | Text displayed in dropdown row         | str                                                                |
+| data         | user data held in dropdown row         | str, int, float, bytes, bool, None                                 |
+| icon         | The icon image displayed on the button | str [File Name]<br/>,QIcon,QPixmap, None                           |
+| user_data    | Data stored by user  in dropdown row   | None , str, int , float , bytes , bool , tuple , list , dict, None |
+
 
 ### Date_Tuple
 Date_Tuple is a helper class used by [Dateedit](#dateedit) to store the date. 
 Basic date validation checks are done.
 
-| Property | Description | Type |
-|----------|-------------|------|
-| year     | The year    | int  |
-| month    | The month   | int  |
-| day      | The day     | int  |
+| **Property** | **Description** | **Type** |
+|--------------|-----------------|----------|
+| year         | The year        | int      |
+| month        | The month       | int      |
+| day          | The day         | int      |
 
 #### Font
 
@@ -1113,73 +1317,83 @@ font related arguments in GUI control definitions.
 Colours are checked to ensure they are valid and will raise an assertion error 
 if they are not. 
 
-| Property   | Description                 | Type                                 |
-|------------|-----------------------------|--------------------------------------|
-| backcolor  | Background colour           | str ("")                             |
-| forecolor  | Foreground colour           | str ("")                             |
-| font_name  | The font name               | str ("")                             |
-| selectback | Selection background colour | str ("")                             |
-| selectfore | Selection foreground colour | str ("")                             |
-| size       | The font point size         | int (10)                             |
-| style      | The font style              | [Font_Style](#font_style) (NORMAL)   |
-| weight     | The font weight             | [Font_Weight](#font_weight) (NORMAL) |
+| **Property** | **Description**             | **Type**                             |
+|--------------|-----------------------------|--------------------------------------|
+| backcolor    | Background colour           | str ("")                             |
+| forecolor    | Foreground colour           | str ("")                             |
+| font_name    | The font name               | str ("")                             |
+| selectback   | Selection background colour | str ("")                             |
+| selectfore   | Selection foreground colour | str ("")                             |
+| size         | The font point size         | int (10)                             |
+| style        | The font style              | [Font_Style](#font_style) (NORMAL)   |
+| weight       | The font weight             | [Font_Weight](#font_weight) (NORMAL) |
 
 #### Font_Style
 Font_Style is an enumerated type that defines the style of the [font](#font)
 
-| Property | Description                   | Type               |
-|----------|-------------------------------|--------------------|
-| NORMAL   | Font has no special features  | QFont.StyleNormal  |
-| ITALIC   | Defines font as italic style  | QFont.StyleItalic  |
-| OBLIQUE  | Defines font as oblique style | QFont.StyleOblique |
+| **Property** | **Description**               | **Type**           |
+|--------------|-------------------------------|--------------------|
+| NORMAL       | Font has no special features  | QFont.StyleNormal  |
+| ITALIC       | Defines font as italic style  | QFont.StyleItalic  |
+| OBLIQUE      | Defines font as oblique style | QFont.StyleOblique |
 
 #### Font_Weight
 Font_Weight is an enumerated that defines the weight of the [font](#font)
 
-| Property   | Description                                         | Type       |
-|------------|-----------------------------------------------------|------------|
-| BLACK      | Defines the font as black                           | Enumerated |
-| BOLD       | Defines the font as bold                            | Enumerated |
-| DEMIBOLD   | Defines the font as demibold                        | Enumerated |
-| EXTRABOLD  | Defines the font as extra bold                      | Enumerated |
-| EXTRALIGHT | Defines the font as extra light                     | Enumerated |
-| LIGHT      | Defines the font as light                           | Enumerated |
-| MEDIUM     | Defines the font as medium                          | Enumerated |
-| NORMAL     | Defines the font as normal with no special features | Enumerated |
-| THIN       | Defines the font as thin                            | Enumerated |
+| **Property** | **Description**                                     | **Type**   |
+|--------------|-----------------------------------------------------|------------|
+| BLACK        | Defines the font as black                           | Enumerated |
+| BOLD         | Defines the font as bold                            | Enumerated |
+| DEMIBOLD     | Defines the font as demibold                        | Enumerated |
+| EXTRABOLD    | Defines the font as extra bold                      | Enumerated |
+| EXTRALIGHT   | Defines the font as extra light                     | Enumerated |
+| LIGHT        | Defines the font as light                           | Enumerated |
+| MEDIUM       | Defines the font as medium                          | Enumerated |
+| NORMAL       | Defines the font as normal with no special features | Enumerated |
+| THIN         | Defines the font as thin                            | Enumerated |
 
 #### Frame
 Frane is an enumerated type that defines the frame of a GUI control where supported
 
-| Property | Description    | Type              |
-|----------|----------------|-------------------|
-| PLAIN    | A flat frame   | qtW.QFrame.Plain  |
-| RAISED   | A raised frame | qtW.QFrame.Raised |
-| SUNKEN   | A sunken frame | qtW.QFrame.Sunken |
+| **Property** | **Description** | **Type**          |
+|--------------|-----------------|-------------------|
+| PLAIN        | A flat frame    | qtW.QFrame.Plain  |
+| RAISED       | A raised frame  | qtW.QFrame.Raised |
+| SUNKEN       | A sunken frame  | qtW.QFrame.Sunken |
 
 #### Frame_Style
 Frame_Style is an enumerated type that defines the frame of a GUI control where supported
 
-| Property | Description             | Type                   |
-|----------|-------------------------|------------------------|
-| BOX      | A box frame             | qtW.QFrame.Box         |
-| PANEL    | A panel frame           | qtW.QFrame.Panel       |
-| HLINE    | A horizontal line frame | qtW.QFrame.HLine       |
-| NONE     | No frame                | qtW.QFrame.NoFrame     |
-| VLINE    | A vertical line frame   | qtW.QFrame.VLine       |
-| WPANEL   | A window panel frame    | qtW.QFrame.WinPanel    |
-| STYLED   | A Styled panel frame    | qtW.QFrame.StyledPanel |
+| **Property** | **Description**         | **Type**               |
+|--------------|-------------------------|------------------------|
+| BOX          | A box frame             | qtW.QFrame.Box         |
+| PANEL        | A panel frame           | qtW.QFrame.Panel       |
+| HLINE        | A horizontal line frame | qtW.QFrame.HLine       |
+| NONE         | No frame                | qtW.QFrame.NoFrame     |
+| VLINE        | A vertical line frame   | qtW.QFrame.VLine       |
+| WPANEL       | A window panel frame    | qtW.QFrame.WinPanel    |
+| STYLED       | A Styled panel frame    | qtW.QFrame.StyledPanel |
 
+### Grid_Item
+Grid_Item is a helper class used by [Grid](#grid) to store row information
+
+| **Property**  | **Description**                     | **Type** |
+|---------------|-------------------------------------|----------|
+| row_index     | The row index                       | int      |
+| col_index     | The column index                    | int      |
+| tag           | The tag of the row/col              | str      |
+| current_value | The existing value in the row/col   | any      |
+| user_data     | The user data stored in the row/col | any      |
 
 #### Widget_Frame
  Widget_Frame` is a helper class that defines the style of the frame around a widget
 
-| Property      | Description | Type                        |
-|---------------|-------------|-----------------------------|
-| frame         |             | [Frame](#frame)             |
-| frame_style   |             | [Frame_Style](#frame_style) |
-| line_width    |             | int =3                      |
-| midline_width |             | int = 0                     |
+| **Property**  | **Description** | **Type**                    |
+|---------------|-----------------|-----------------------------|
+| frame         |                 | [Frame](#frame)             |
+| frame_style   |                 | [Frame_Style](#frame_style) |
+| line_width    |                 | int =3                      |
+| midline_width |                 | int = 0                     |
 
 
 
