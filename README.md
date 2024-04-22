@@ -422,7 +422,7 @@ PyInstaller produces even larger executables!
 | [Dateedit](#dateedit)     | Creates a date edit control with a dropdown calendar and <br/>an erase button                                                |
 | [FolderView](#folderview) | Creates a control that displays the contents of a folder in a Grid                                                           |
 | [Grid](#grid)             | Creates a control that displays data in a table (grid) format                                                                |
-| Image                     | Creates a control that displays an image                                                                                     |
+| [Image](#image)           | Creates a control that displays an image                                                                                     |
 | Label                     | Creates a text string                                                                                                        |
 | LineEdit                  | Creates a control that allows text to be edited and displayed<br/> in a single line                                          |
 | Menu                      | Creates a menu just below the title bar                                                                                      |
@@ -438,8 +438,8 @@ PyInstaller produces even larger executables!
 
 ### _qtpyBase_Control
  
-This is the ancestor of all QTPYGUI [GUI controls](#qtpygui-control-api-reference), and the properties here are 
-used to set the behavior of the GUI control when instantiated.
+This is the ancestor of all QTPYGUI [GUI controls](#qtpygui-control-api-reference),
+and the properties here are used to set the behavior of the GUI control when instantiated.
   
 **Properties** 
 - Not all properties will be supported or used by descendant GUI controls and will be ignored
@@ -550,10 +550,11 @@ used to set the behavior of the GUI control when instantiated.
 
 #### Button
 
-Calling Button in a layout will generate a button control on a form. The "tag"
-,"text" and "callback" arguments are generally the only arguments used. It is 
-suggested to set width and height as the font selected might not 
-automatically size correctly.  
+Calling Button in a layout will generate a button control on a form. 
+
+The "tag", "text" and "callback" arguments are generally the only arguments used. 
+It is suggested to set width and height as the font selected might not automatically
+size correctly.  
 
 <br>**Properties**
 <br>The following properties apply when a button is instantiated with the Button 
@@ -631,10 +632,11 @@ Button(
 
 #### Checkbox
 
-Calling Checkbox in a layout will generate a checkbox control on a form. The "tag"
-,"text" and "callback" arguments are generally the only arguments used. It is 
-suggested to set width and height as the font selected might not 
-automatically size correctly.
+Calling Checkbox in a layout will generate a checkbox control on a form. 
+
+The "tag", "text" and "callback" arguments are generally the only arguments used.
+It is suggested to set width and height as the font selected might not automatically
+size correctly.
 
 <br>**Properties**
 <br>The following properties apply when a Checkbox is instantiated with the Checkbox 
@@ -716,10 +718,11 @@ Checkbox(
 
 #### ComboBox
 
-Calling ComboBox in a layout will generate a dropdown combobox control on a form. The "tag"
-,"text", "callback" and "items" arguments are generally the only arguments used. It is 
-suggested to set width and height as the font selected might not 
-automatically size correctly.
+Calling ComboBox in a layout will generate a dropdown combobox control on a form. 
+
+The "tag" ,"text", "callback" and "items" arguments are generally the only 
+arguments used. It is suggested to set width and height as the font selected 
+might not automatically size correctly.
 
 <br>**Properties**
 <br>The following properties apply when a ComboBox is instantiated with the ComboBox 
@@ -844,9 +847,11 @@ ComboBox(
 #### Dateedit
 
 Calling Dateedit in a layout will generate a Dateedit control, with an erase button
-and a dropdown calendar, on a form. The "tag" ,"text" and "callback" arguments 
-are generally the only arguments used. It is suggested to set width and height 
-as the font selected might not automatically size correctly.
+and a dropdown calendar, on a form. 
+
+The "tag" ,"text" and "callback" arguments are generally the only arguments used. 
+It is suggested to set width and height as the font selected might not automatically 
+size correctly.
 
 **Constants**
 
@@ -935,10 +940,12 @@ Dateedit(
 |            | date_format         | str ("")                          | The format of the date string, defaults to an empty string.                                                      | ✓            |
 
 ### FolderView
-Calling FolderView in a layout will generate a FolderView control, on a form. 
-The "tag", "text", "callback", "header_widths" and "height" arguments 
-are generally the only arguments used. It is suggested to set width and height 
-as the font selected might not automatically size correctly.
+
+Calling FolderView in a layout will generate a FolderView control on a form.
+
+The "tag", "text", "callback", "header_widths" and "height" arguments are generally
+the only arguments used. It is suggested to set width and height as the font 
+selected might not automatically size correctly.
 
 <br>**Properties**
 <br>The following properties apply when a FolderView is instantiated with the 
@@ -1013,9 +1020,11 @@ FolderView(
 |                 | value         | str                     | The text to set as the current node text                                                                                                                                                                                                                                | ❌            |
 
 ### Grid
- Calling Grid in a layout will generate a Grid control, on a form. 
-The "tag", "text", "callback", "col_def" and "height" arguments 
-are generally the only arguments used. 
+
+Calling Grid in a layout will generate a Grid control on a form. 
+
+The "tag", "text", "callback", "col_def" and "height" arguments are generally 
+the only arguments used. 
 
 <br>**Properties**
 <br>The following properties apply when a Grid is instantiated with the 
@@ -1183,6 +1192,122 @@ Grid(
 | valueorig_get           |               | bool \| datetime.date \| datetime.datetime \|datetime.time \| float \| int \|str \| None   | <br><b>Returns:</b><br> The original value stored in the column referenced to by row and col<br>                                                                                                                          |              |
 |                         | col           | int (-1)                                                                                   | If -1, the current column, Otherwise column specified by column                                                                                                                                                           | ✓            |
 |                         | row           | int (-1)                                                                                   | if -1, the current row, Otherwise row specified by row                                                                                                                                                                    | ✓            |
+
+### Image
+
+Calling Image in a layout will generate an Image control on a form. 
+
+The "tag", "text", "callback", "height" and width arguments are generally the 
+only arguments used.
+
+<br>**Properties**
+<br>The following properties apply when an Image is instantiated with the 
+Image call, as in the "fully loaded" declaration below
+
+| **Property**   | **Description**                               | **Type**                                                                                                                                 | **Optional** |
+|----------------|-----------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------|--------------|
+| width          | The width of the image                        | int (1)                                                                                                                                  | ✓            |
+| height         | The height of the Image                       | int (1)                                                                                                                                  | ✓            |
+| image          | str [File name]  \| QPixmap]] \| bytes (None) | If str the image is at the file path specified, If bytes must be image file contents, Otherwise the image must be a QPixmap or None      | ✓            |                                                                     
+| cached_height  | int (-1)                                      | If -1, no cached images is stored, Otherwise the cached image will be stored at the specific height<br>Aspect ratio is always maintained | ✓            |
+| cached_width   | int (-1)                                      | If -1, no cached image is stored , Otherwise the cached image will be stored at the specified width<br>Aspect ratio is always maintained | ✓            |
+| rotate_degrees | int (0)                                       | Rotates the image by the specified number of degrees<br>Must be int between +- 0 and 360                                                 | ✓            |
+
+
+
+A fully loaded Image declaration:
+<br><br>**Note: Only "tag", "text", "callback", "height", "width" and "image" are usually needed**
+    <br>- For implementation reasons, txt_fontsize affects image size and I would 
+    suggest setting to 10 or 12. 
+    <br>-txt_font overrides the other text font settings
+
+```
+qtg.Image(
+            tag="image",
+            label="Image",
+            #width=13,
+            height=10,
+            callback=self.event_handler,
+            image="example.jpg",
+            label_align=qtg.Align_Text.CENTER,
+            label_width=10,
+            label_font=qtg.Font(style=qtg.Font_Style.OBLIQUE, size=14),
+            txt_align=qtg.Align_Text.CENTER,
+            txt_font=qtg.Font(style=qtg.Font_Style.NORMAL, size=12),
+            txt_fontsize=12,
+            bold=True,
+            italic=True,
+            underline=True,
+            enabled=True,
+            visible=True,
+            tooltip="Image Press Me",
+            tune_hsize=1,
+            tune_vsize=1,
+            user_data={"key": "value"},
+            buddy_control=qtg.HBoxContainer().add_row(
+                qtg.Spacer(width=1),
+                qtg.Button(
+                    tag="image_button_push",
+                    text="Push Me!",
+                    callback=self.event_handler,
+                    width=12,
+                    height=2,
+                ),
+            )
+```
+
+<br>**Methods**
+<br>A subset of the [_qtpyBase_Control](#_qtpybase_control) methods apply to Image instances
+
+ 
+| **Method**           | **Arguments**       | **Type**                                  | **Description**                                                                                                                                                                                                                                                                                                                  | **Optional** |
+|----------------------|---------------------|-------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
+| clear                |                     | None                                      | Clears the visible items from the image                                                                                                                                                                                                                                                                                          |              |
+| clip_get             |                     | QPixmap \| None                           | Gets a QPixmap clip of the image at the given coordinates of the given size<br><b>Returns:</b><br> A QPixmap clipped image or None if something went wrong.<br>                                                                                                                                                                  |              |
+|                      | height              | int                                       | The height of the image portion to be clipped.                                                                                                                                                                                                                                                                                   | ❌            |
+|                      | width               | int                                       | The width of the image portion to be clipped.                                                                                                                                                                                                                                                                                    | ❌            |
+|                      | x                   | int                                       | The x coordinate of the left corner of the rectangle to be clipped.                                                                                                                                                                                                                                                              | ❌            |
+|                      | y                   | int                                       | The y coordinate of top of the rectangle to be clipped.                                                                                                                                                                                                                                                                          | ❌            |
+| get_height_width     |                     | tuple[int, int]                           | Gets the height and width of the image as a tuple of pixels. <br><b>Returns:</b><br> (Height,Width) in pixels<br>                                                                                                                                                                                                                |              |
+| image_cache_get      |                     | QPixmap \| None                           | Returns the cached image<br><b>Returns:</b><br> The cached image if it has been set or None<br>                                                                                                                                                                                                                                  |              |
+| image_cache_set      |                     | None                                      | Sets a cached image - used to speed things up if we do not want to load the image again                                                                                                                                                                                                                                          |              |
+|                      | image               | QPixmap                                   | The image to be cached.                                                                                                                                                                                                                                                                                                          | ❌            |
+| image_file_get       |                     | str                                       | Gets the file path of the source file<br><b>Returns:</b><br> The file path of the source file or "" if the image is not sourced from a file<br>                                                                                                                                                                                  |              |
+| image_set            |                     | int                                       | Sets an image to be displayed<br><b>Returns:</b><br> 1 Ok, -1 If not                                                                                                                                                                                                                                                             |              |
+|                      | cached_height       | int (-1)                                  | If -1 no cached image is stored, Otherwise create a cached image of a specific height<br>Aspect ratio always maintained                                                                                                                                                                                                          | ✓            |
+|                      | cached_width        | int (-1)                                  | If -1 no cached image is stored, Otherwise create a cached image of a specific width<br>Aspect ratio always maintained                                                                                                                                                                                                           | ✓            |
+|                      | height              | int (-1)                                  | Height of image, If -1 scaled to the width                                                                                                                                                                                                                                                                                       | ✓            |
+|                      | high_quality        | bool (False)                              | Display image in high quality                                                                                                                                                                                                                                                                                                    | ✓            |
+|                      | image               | str \| qtG.QPixmap \| bytes               | Image to be displayed                                                                                                                                                                                                                                                                                                            | ❌            |
+|                      | rotate_degrees      | int (0)                                   | Rotate the image in degrees                                                                                                                                                                                                                                                                                                      | ✓            |
+|                      | scaled              | bool (True)                               | Scale the image to fit height and width                                                                                                                                                                                                                                                                                          | ✓            |
+|                      | width               | int  (-1)                                 | Width of image. If -1 scaled to the height                                                                                                                                                                                                                                                                                       | ✓            |
+| numpy_array_get      |                     | tuple[int, int, ndarray]                  | Generates an RGB numpy array suited for dlib (and other libs the author imagines) type operations <br><b>Returns:</b><br> The tuple  (image height (pixels),image width (pixels), np.ndarray)<br>The last element is the RGB numpy array that represents the pixmap that is displayed.  Assumes only one image is displayed!<br> |              |
+|                      | dlib                | bool (False)                              | If True, the array will be converted to 32bit RGB, Otherwise left as is                                                                                                                                                                                                                                                          |              |
+| rectangle_coords_get |                     | [Rect_Coords](#rect_cords)                | Returns an instance of [Rect_Coords](#rect_cords)  containing the coordinates of a rectangle, given its id<br><b>Returns:</b><br> The coordinates of the rectangle.These will be set to -1 if rect_id not found<br>str<br>int<br>int<br>int<br>int<br>                                                                           |              |
+|                      | rect_id             | str                                       | The ID of the rectangle.                                                                                                                                                                                                                                                                                                         | ❌            |
+| rectangle_delete     |                     | bool                                      | Deletes a specific rectangle if the rect_id is provided else deletes all the rectangles in the image <br><b>Returns:</b><br> True if rectangle deleted or False if rectangle not found<br>                                                                                                                                       |              |
+|                      | rect_id             | str                                       | The rect_id of the rectangle to be deleted or "" if all rectangles are to be deleted.                                                                                                                                                                                                                                            | ✓            |
+| rectangle_draw       |                     | None                                      | Draws a rectangle on the currently loaded image                                                                                                                                                                                                                                                                                  |              |
+|                      | colour              | str ("red")                               | Colour of rectangle line (mostly legal HTML colours)                                                                                                                                                                                                                                                                             | ✓            |
+|                      | height              | int (-1)                                  | If -1, top + 50, Otherwise Height of rectangle in pixels                                                                                                                                                                                                                                                                         | ✓            |
+|                      | item_id             | str                                       | Rectangle identifier. Must be a non-empty str                                                                                                                                                                                                                                                                                    | ❌            |
+|                      | left                | int                                       | Left position in pixels                                                                                                                                                                                                                                                                                                          | ❌            |
+|                      | top                 | int                                       | Top position in pixels                                                                                                                                                                                                                                                                                                           | ❌            |
+|                      | visible             | bool (True)                               | If True, rectangle is visible, Otherwise not                                                                                                                                                                                                                                                                                     | ✓            |
+|                      | width               | int (-1)                                  | If -1, left + 20 , Otherwise width of rectangle in pixels                                                                                                                                                                                                                                                                        | ✓            |
+| rectangle_id_change  |                     | None                                      | Updates the rectangle id                                                                                                                                                                                                                                                                                                         |              |
+|                      | new_id              | str                                       | The new rectangle_id                                                                                                                                                                                                                                                                                                             | ❌            |
+|                      | old_id              | str                                       | The old rectangle_id                                                                                                                                                                                                                                                                                                             | ❌            |
+| rectangle_overlaps   |                     | tuple [Overlap_Rect](#overlap_rect)       | Returns a tuple of overlapping rectangles<br><b>Returns:</b><br> A tuple containing the ids and coords of overlapping rectangles.<br>                                                                                                                                                                                            |              |
+|                      | overlap_ratio       | float (0.3)                               | The ratio to determine overlapping. 0 - No overlap to 1 - Complete overlap                                                                                                                                                                                                                                                       | ✓            |
+| rectangle_show       |                     | None                                      |                                                                                                                                                                                                                                                                                                                                  |              |
+|                      | rect_id             | str                                       | The id of the rectangle that will be shown/hidden depending on visible                                                                                                                                                                                                                                                           | ❌            |
+|                      | suppress_rect_check | bool (False)                              | Used for debugging, suppresses the assert for checking if a rect_id is in the image                                                                                                                                                                                                                                              | ✓            |
+|                      | visible             | bool                                      | True shows the rectangle, False hides the rectangle                                                                                                                                                                                                                                                                              | ❌            |
+| rectangles_changed   |                     | dict [str, [Rect_Changed](#rect_changed)] | Returns a dict of changed rectangles <br><b>Returns:</b><br> Dict of changed rectangles.<br>                                                                                                                                                                                                                                     |              |
+
+
 ### Slider
  
 Instantiates a Slider widget and associated properties
@@ -1298,6 +1423,30 @@ Combo_Item is a helper class used to set combo box items.  All attributes are ma
 | icon         | The icon image displayed on the button | str [File Name]<br/>,QIcon,QPixmap, None                           |
 | user_data    | Data stored by user  in dropdown row   | None , str, int , float , bytes , bool , tuple , list , dict, None |
 
+#### Coords
+Coords is a helper class used by [Image](#image) helper classes to represent co-ordinates
+
+**Properties**
+| **Property** | **Description**                               | **Type** |
+|--------------|-----------------------------------------------|----------|
+ | top          | Top position in pixels                        | NUMBER   |
+| left         | Left position in pixels                       | NUMBER   |
+| height       | Height in pixels                              | NUMBER   |
+| width        | Width in pixels                               | NUMBER   |
+| area         | Calculates the area of the Coords             | NUMBER   |
+| perimeter    | Calculates the perimeter length of the Coords | NUMBER   |
+| diagonal     | Calculates the diagonal length of the Coords  | NUMBER   |
+
+
+ **Methods**
+| **Method** | **Arguments** | **Type**    | **Description**                                                            | **Optional** |
+|------------|---------------|-------------|----------------------------------------------------------------------------|--------------|
+| overlaps   |               | bool        | True if another set of Coords overlaps this set of Coords, Otherwise False |              |
+|            | other_cords   | Coords      | The other set of coordinates to check for overlap                          | ❌    |
+|            | overlap_ratio | float (0.3) | The ratio to determine overlapping. 0 - No overlap to 1 - Complete overlap | ✓|
+
+
+
 
 ### Date_Tuple
 Date_Tuple is a helper class used by [Dateedit](#dateedit) to store the date. 
@@ -1384,6 +1533,39 @@ Grid_Item is a helper class used by [Grid](#grid) to store row information
 | tag           | The tag of the row/col              | str      |
 | current_value | The existing value in the row/col   | any      |
 | user_data     | The user data stored in the row/col | any      |
+
+### Overlap_Rect
+Overlap_Rect is a helper class used by [Image](#image) to represent the overlapping
+of two rectangles
+
+| **Property** | **Description**          | **Type**          |
+|--------------|--------------------------|-------------------|
+| a_rect_id    | Rectangle A Id           | str               |
+| a_coords     | Rectangle A Co-ordinates | [Coords](#coords) |
+| b_rect_id    | Rectangle B Id           | str               |
+| b_coords     | Rectangle B Co-Ordinates | [Coords](#coords)            |
+
+### Rect_Changed
+Rect_Changed is a helper class used by [Image](#image) to represent a changed rectangle
+
+| **Property** | **Description**        | **Type** |
+|--------------|------------------------|----------|
+| rect_id      | Rectangle Id           | str      |
+| coords       | Rectangle Co-ordinates | [Coords](#coords)   |
+
+### Rect_Cords
+ 
+ Rect_Cords is a helper class used by [Image](#image) to represent a rectangle
+
+
+| **Property** | **Description**         | **Type**          |
+|--------------|-------------------------|-------------------|
+| rect_id      | Rectangle Id            | str               |
+| coords       | Rectangle co-ordinates  | [Coords](#coords) | 
+| left         | Left position in pixels | int               |
+| top          | Top position in pixels  | int               |
+| width        | Width in pixels         | int               |
+| height       | Height in pixels        | int               |
 
 #### Widget_Frame
  Widget_Frame` is a helper class that defines the style of the frame around a widget

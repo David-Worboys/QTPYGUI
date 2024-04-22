@@ -22,10 +22,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Tell Black to leave this block alone (realm of isort)
 # fmt: off
+from calendar import c
 import copy
 import dataclasses
 import datetime
 import functools
+import io
 import math
 import os
 import pathlib
@@ -44,11 +46,11 @@ from enum import Enum, IntEnum
 from typing import (Callable, ClassVar, Literal, NoReturn, Optional, Union,
                     cast, overload)
 
-import numpy as np
 import PySide6.QtCore as qtC
 import PySide6.QtGui as qtG
 import PySide6.QtMultimedia as qtM
 import PySide6.QtWidgets as qtW
+import numpy as np
 import shiboken6  # type: ignore
 from attrs import define
 
@@ -312,11 +314,25 @@ def Get_Window_ID(
 
 @dataclasses.dataclass(slots=True)
 class Grid_Item:
+    """Grid class to store information about a grid item."""
+
     row_index: int
     col_index: int
     tag: str
     current_value: any
     user_data: any
+
+    def _post_init(self):
+        """Checks that the Grid_Item attributes are valid."""
+        assert isinstance(self.row_index, int), f"{self.row_index=}. Must be int"
+        assert isinstance(self.col_index, int), f"{self.col_index=}. Must be int"
+        assert isinstance(self.tag, str), f"{self.tag=}. Must be str"
+        assert isinstance(
+            self.current_value, (bool, int, float, str, dict, list, type(None))
+        )
+        assert isinstance(
+            self.user_data, (bool, int, float, str, dict, list, type(None))
+        )
 
 
 # An enumeration of all the application events that can be handled by the GUI.
@@ -395,8 +411,13 @@ TEXT_COLORS = \
 # fmt: on
 
 
-# `Layout` is an enumeration of the possible layout types for a `Form` or `Grid` object
 class Layout(IntEnum):
+    """Layout is an enumeration of the possible layout types for a `Form` or `Grid` object
+
+    Args:
+        IntEnum: The enumeration type
+    """
+
     FORM = 0
     GRID = 1
     HORZ = 2
@@ -404,8 +425,11 @@ class Layout(IntEnum):
 
 
 @dataclasses.dataclass(slots=True)
-# A Char_Pixel_Size is a class that used by widgets to determine char size, it has two attributes: height and width
 class Char_Pixel_Size:
+    """A Char_Pixel_Size is a class that used by widgets to determine char size;
+    it has two attributes: height and width
+    """
+
     height: int
     width: int
 
@@ -420,8 +444,9 @@ class Char_Pixel_Size:
 
 
 @dataclasses.dataclass(slots=True)
-# `Size` is a class used by widget controls that has two attributes, `height` and `width`
 class Size:
+    """Size` is a class used by widget controls that has two attributes, `height` and `width`"""
+
     height: int
     width: int
 
@@ -436,8 +461,9 @@ class Size:
 
 
 @dataclasses.dataclass(slots=True)
-# `Col_Def` is a helper class used by grid controls
 class Col_Def:
+    """`Col_Def` is a helper class used by grid controls"""
+
     label: str
     tag: str
     width: int
@@ -508,8 +534,106 @@ class Combo_Item:
 
 
 @dataclasses.dataclass(slots=True)
-# `Rect_Changed` is a class used byy rectangles to that has two attributes, `rect_id` and `coords`
+class Rect_Cords:
+    """Class that contains the properties of a rectangle"""
+
+    rect_id: str
+    coords: Coords
+
+    def _post_init(self):
+        # Checking the arguments passed to the constructor are of the correct type.
+        assert (
+            isinstance(self.rect_id, str) and self.rect_id.strip() != ""
+        ), f"{self.rect_id=}. Must be a non-empty string"
+        assert isinstance(
+            self.coords, Coords
+        ), f"{self.coords=}. Must be a Coords instance"
+
+    @property
+    def top(self) -> utils.NUMBER:
+        """Get the top coordinate of the rectangle
+
+        Returns:
+            utils.NUMBER: int or float
+        """
+        return self.coords.top
+
+    @top.setter
+    def top(self, value: utils.NUMBER):
+        """Set the top coordinate of the rectangle
+
+        Args:
+            value (utils.NUMBER): int or float
+        """
+        assert isinstance(value, utils.NUMBER), f"{value=}. Must NUMBER"
+
+        self.coords.top = value
+
+    @property
+    def left(self) -> utils.NUMBER:
+        """Get the left coordinate of the rectangle
+
+        Returns:
+            utils.NUMBER: int or float
+        """
+        return self.coords.left
+
+    @left.setter
+    def left(self, value: utils.NUMBER):
+        """Set the left coordinate of the rectangle
+
+        Args:
+            value (utils.NUMBER): int or float
+        """
+        assert isinstance(value, utils.NUMBER), f"{value=}. Must NUMBER"
+
+        self.coords.left = value
+
+    @property
+    def width(self) -> utils.NUMBER:
+        """Get the width of the rectangle
+
+        Returns:
+            utils.NUMBER: int or float
+        """
+        return self.coords.width
+
+    @width.setter
+    def width(self, value: utils.NUMBER):
+        """Set the width of the rectangle
+
+        Args:
+            value (utils.NUMBER): int or float
+        """
+        assert isinstance(value, utils.NUMBER), f"{value=}. Must NUMBER"
+
+        self.coords.width = value
+
+    @property
+    def height(self) -> utils.NUMBER:
+        """Get the height of the rectangle
+
+        Returns:
+            utils.NUMBER: int or float
+        """
+        return self.coords.height
+
+    @height.setter
+    def height(self, value: utils.NUMBER):
+        """Set the height of the rectangle
+
+        Args:
+            value (utils.NUMBER): int or float
+        """
+        assert isinstance(value, utils.NUMBER), f"{value=}. Must NUMBER"
+
+        self.coords.height = value
+
+
+@dataclasses.dataclass(slots=True)
 class Rect_Changed:
+    """Used by rectangles to check if q rectangle has changed"""
+
     rect_id: str
     coords: Coords
 
@@ -524,8 +648,9 @@ class Rect_Changed:
 
 
 @dataclasses.dataclass(slots=True)
-# `Overlap_Rect` is a class that represents the overlap between two rectangles
 class Overlap_Rect:
+    """`Overlap_Rect` is a class that represents the overlap between two rectangles"""
+
     a_rect_id: str
     a_coords: Coords
     b_rect_id: str
@@ -628,8 +753,13 @@ class Font_Weight_Text(Enum):
     BLACK = "black"
 
 
-# The `FONTSTYLE` class is an enumeration of the possible font styles
 class Font_Style(Enum):
+    """Defines the font style
+
+    Args:
+        Enum (Enum):Super class
+    """
+
     NORMAL = qtG.QFont.StyleNormal
     ITALIC = qtG.QFont.StyleItalic
     OBLIQUE = qtG.QFont.StyleOblique
@@ -637,13 +767,24 @@ class Font_Style(Enum):
 
 # Widget frame appearance
 class Frame(Enum):
+    """Defines the widget frame appearance
+
+    Args:
+        Enum (Enum):Super class
+    """
+
     PLAIN = qtW.QFrame.Plain
     RAISED = qtW.QFrame.Raised
     SUNKEN = qtW.QFrame.Sunken
 
 
-# Widget frame style
 class Frame_Style(Enum):
+    """Defines the widget frame style
+
+    Args:
+        Enum (Enum):Super class
+    """
+
     BOX = qtW.QFrame.Box
     PANEL = qtW.QFrame.Panel
     HLINE = qtW.QFrame.HLine
@@ -653,8 +794,13 @@ class Frame_Style(Enum):
     STYLED = qtW.QFrame.StyledPanel
 
 
-# The `CURSOR` class is an enumeration of the different types of cursors that can be used in a `Qt` application
 class Cursor(Enum):
+    """Defines the cursor appearance
+
+    Args:
+        Enum (Enum):Super class
+    """
+
     arrow = qtC.Qt.ArrowCursor
     arrowup = qtC.Qt.UpArrowCursor
     bitmap = qtC.Qt.BitmapCursor
@@ -679,8 +825,13 @@ class Cursor(Enum):
     splitv = qtC.Qt.SplitVCursor
 
 
-# `SYSICON` is a class that contains all the system icons that can be used in a `a `Qt` application
 class Sys_Icon(Enum):
+    """Defines the system icons
+
+    Args:
+        Enum (Enum):Super class
+    """
+
     arrowback = qtW.QStyle.SP_ArrowBack
     arrowdown = qtW.QStyle.SP_ArrowDown
     arrowforward = qtW.QStyle.SP_ArrowForward
@@ -830,15 +981,16 @@ def cursor_off():
 
 
 @dataclasses.dataclass(slots=True)
-# `tags` is a class used by _Container
 class tags:
+    """Stores the tags for a widget"""
+
     container_tag: str
     tag: str
     value: any
     valid: bool
 
     def _post_init(self):
-        # Checking the arguments passed to the constructor are of the correct type.
+        """Checking the arguments passed to the constructor are of the correct type"""
         assert (
             isinstance(self.container_tag, str) and self.container_tag.strip() != ""
         ), f"{self.container_tag=}. Must be a non-empty str"
@@ -849,13 +1001,15 @@ class tags:
 
 
 @dataclasses.dataclass(slots=True)
-# Used by _Container to store the data for scroll widgets
 class widget_def:
+    """Used by _Container to store the data for scroll widgets"""
+
     widget: "_qtpyBase_Control"
     gui_widget: qtW.QWidget
 
     def _post_init(self):
-        # Checking the arguments passed to the constructor are of the correct type.
+        """Checking the arguments passed to the constructor are of the correct type."""
+
         assert isinstance(
             self.widget, _qtpyBase_Control
         ), f"{self.widget=}. Must be type _qtpyBase_Control"
@@ -865,14 +1019,16 @@ class widget_def:
 
 
 @dataclasses.dataclass(slots=True)
-# Used by _Dateedit to store the data.
 class Date_Tuple:
+    """Used by _Dateedit to store the date."""
+
     year: int
     month: int
     day: int
 
     def _post_init(self) -> None:
-        # Checking the arguments passed to the constructor are of the correct type.
+        """Checking the arguments passed to the constructor are of the correct type"""
+
         assert (
             isinstance(self.year, int) and self.year > 0
         ), f"{self.year=}. Must be an int > 0"
@@ -889,15 +1045,17 @@ class Date_Tuple:
 
 
 @dataclasses.dataclass(slots=True)
-# This class is used by the _Container to store the values of a snapshot before and after it is modified
 class _Snapshot_Modified_Values:
+    """This class is used by the _Container to store the values of a snapshot before and after it is modified"""
+
     snap1: any
     snap1_valid: bool
     snap2: any
     snap2_valid: bool
 
     def _post_init(self):
-        # Checking the arguments passed to the constructor are of the correct type.
+        """Checking the arguments passed to the constructor are of the correct type."""
+
         assert isinstance(self.snap1_valid, bool), f"{self.snap1_valid=}. Must be bool"
         assert isinstance(self.snap2_valid, bool), f"{self.snap2_valid=}. Must be bool"
 
@@ -923,13 +1081,19 @@ class _qtpyBase:
 
     def dump(self) -> None:
         """Prints all the attributes of an object"""
+
         for attr in dir(self):
             if hasattr(self, attr):
                 print("obj.%s = %s" % (attr, getattr(self, attr)))
 
+        return None
+
     @property
     def lang_tran_get(self) -> Lang_Tran:
-        """Returns the Lang Tran object"""
+        """Returns the Lang Tran object
+
+        Returns:
+            Lang_Tran: The Lang_Tran object"""
 
         return self._lang_tran
 
@@ -948,14 +1112,9 @@ class _qtpyBase:
             return None
 
 
-@define(slots=True)
-# class Colors(_qtpyBase): # Removed to get a Nuitka Compile
+@dataclasses.dataclass(slots=True)
 class Colors:
     """A class used to handle colors used in the application"""
-
-    def __init__(self, parent):
-        pass
-        # super().__init__(parent=parent) # Removed to get a Nitka Compile
 
     def rand_colours(self, num_cols: int):
         """Generates a list of random colour names pulled from TEXT_COLORS. It avoids light coloured colours and
@@ -1652,7 +1811,8 @@ class _Widget_Registry:
     # ===== Helper Class
     @dataclasses.dataclass(slots=True)
     class _widget_entry:
-        # `_widget_entry` is a class that stores the widget details.
+        """_widget_entry` is a class that stores the widget details."""
+
         container_tag: str
         tag: str
         widget: _qtpyBase | _qtpySDI_Frame  # QT 6.5.0
@@ -1953,13 +2113,13 @@ class _Widget_Registry:
 
         Examples:
             To print the entire widget dictionary to the console:
-            >>> my_widget = MyWidget()
-            >>> my_widget.print_dict()
+            flmy_widget = MyWidget()
+            my_widget.print_dict()
 
             To print a specific dictionary to a file:
-            >>> my_widget = MyWidget()
-            >>> my_dict = {"key1": {"key2": "value1"}, "key3": "value2"}
-            >>> my_widget.print_dict(_widget_items=my_dict, file="output.txt")
+            my_widget = MyWidget()
+            my_dict = {"key1": {"key2": "value1"}, "key3": "value2"}
+            my_widget.print_dict(_widget_items=my_dict, file="output.txt")
         """
 
         assert isinstance(
@@ -2738,18 +2898,19 @@ class _qtpyBase_Control(_qtpyBase):
         self.ediitable_set(self.editable)
 
         if buddy_widget is not None:
-            if isinstance(buddy_widget, _Image):
-                if buddy_widget.height() > self._widget.height():
-                    if self.pixel_unit:
-                        self.height = buddy_widget.height()
-                    else:
-                        self.height = buddy_widget.height() // char_pixel_size.height
+            if isinstance(self._widget, _Image):
+                if self.pixel_unit:
+                    widget_height = self.height
+                else:
+                    widget_height = int(self.height * char_pixel_size.height)
             else:
-                if buddy_widget.height() > self._widget.height():
-                    if self.pixel_unit:
-                        self.height = buddy_widget.height()
-                    else:
-                        self.height = buddy_widget.height() // char_pixel_size.height
+                widget_height = self._widget.height()
+
+            if buddy_widget.height() > widget_height:
+                if self.pixel_unit:
+                    self.height = buddy_widget.height()
+                else:
+                    self.height = buddy_widget.height() // char_pixel_size.height
 
         if edit_frame is not None:
             # edit_frame.setFrameShape(qtW.QFrame.Shape.Box)  # Debug
@@ -3099,7 +3260,7 @@ class _qtpyBase_Control(_qtpyBase):
             widget_instance, qtW.QWidget
         ), f"{widget_instance=} must be an instance of QWidget"
 
-        colour = Colors(self)
+        colour = Colors()
 
         if widget_font.font_name == "":
             widget_font.font_name = (
@@ -3324,7 +3485,7 @@ class _qtpyBase_Control(_qtpyBase):
             r"\d+px .+ .+", border
         ), f"{border=} must be a valid CSS border style"
 
-        color_handler = Colors(self)
+        color_handler = Colors()
 
         assert color_handler.color_string_get(
             txt_color
@@ -9232,7 +9393,7 @@ class Grid(_qtpyBase_Control):
                 value=grid_item.current_value,
                 row=grid_item.row_index,
                 col=grid_item.col_index,
-                user_data=grid_item.user_data,                
+                user_data=grid_item.user_data,
             )
 
         return widget
@@ -11268,19 +11429,15 @@ class _Resizable_Rectangle(qtW.QGraphicsRectItem):
 
 @dataclasses.dataclass
 class Image(_qtpyBase_Control):
-    # Class that instantiates an  image and its associated properties
-    @dataclasses.dataclass
-    class rect_cords:
-        rect_id: str
-        left: int
-        top: int
-        width: int
-        height: int
+    MIRROR_HORIZONTAL: int = -661
+    MIRROR_VERTICAL: int = -662
+    MIRROR_ROTATE_270: int = -663  # Mirror Horizontal And Rotate 270 CW
+    MIRROR_ROTATE_90: int = -664  # Mirror Horizontal And Rotate 90 CW
 
-    image: Optional[Union[str, qtG.QPixmap]] = None
-    rotate_degrees: int = 0
+    image: Optional[Union[str, qtG.QPixmap, bytes]] = None
     cached_height: int = -1
     cached_width: int = -1
+    rotate_degrees: int = 0
     size_fixed = False
 
     _cached_pixmap: Optional[qtG.QPixmap] = None
@@ -11293,8 +11450,8 @@ class Image(_qtpyBase_Control):
         super().__post_init__()
 
         assert isinstance(
-            self.image, (type(None), str, qtG.QIcon, qtG.QPixmap)
-        ), f"{self.image=}. Must Be None. str (file_path/file_name) or QPixmap"
+            self.image, (type(None), str, qtG.QIcon, qtG.QPixmap, bytes)
+        ), f"{self.image=}. Must Be None. str (file_path/file_name), QPixmap or bytes"
 
         assert (
             self.height >= 1 or self.height == -1
@@ -11306,11 +11463,17 @@ class Image(_qtpyBase_Control):
 
         assert (
             isinstance(self.rotate_degrees, int)
-            and self.rotate_degrees in (-661, -662, -663, -664)
+            and self.rotate_degrees
+            in (
+                self.MIRROR_HORIZONTAL,
+                self.MIRROR_VERTICAL,
+                self.MIRROR_ROTATE_270,
+                self.MIRROR_ROTATE_90,
+            )
             or 0 <= abs(self.rotate_degrees) <= 360
-        ), (  # TODO remove magic numbers
-            f"{self.rotate_degrees=}. Must be int between +- 0 and 360 or in (-661,"
-            " -662, -663, -664)"
+        ), (
+            f"{self.rotate_degrees=}. Must be int between +- 0 and 360 or in ("
+            " MIRROR_HORIZONTAL, MIRROR_VERTICAL, MIRROR_ROTATE_270, MIRROR_ROTATE_90)"
         )
 
         assert isinstance(self.cached_height, int) and (
@@ -11349,12 +11512,6 @@ class Image(_qtpyBase_Control):
             QWidget : The created image widget.
         """
 
-        # if self.height == -1:
-        #   self.height = CHECKBOX_SIZE.height
-
-        # if self.width == -1:
-        # self.width = CHECKBOX_SIZE.width
-
         widget = super()._create_widget(
             parent_app=parent_app, parent=parent, container_tag=container_tag
         )
@@ -11390,10 +11547,10 @@ class Image(_qtpyBase_Control):
         self._widget.scene().clear()
 
     def get_height_width(self) -> tuple[int, int]:
-        """Returns the high and width of the image as a tuple of pixels.
+        """Returns the height and width of the image as a tuple of pixels.
 
         Returns:
-            (tuple) : (Height,Width) in pixels
+            tuple[int, int] : (Height,Width) in pixels
         """
         assert self._widget is not None, f"{self=}. Widget not set"
 
@@ -11401,14 +11558,14 @@ class Image(_qtpyBase_Control):
 
         return (self._pix_height, self._pix_width)
 
-    def rectangle_coords_get(self, rect_id: str) -> rect_cords:
+    def rectangle_coords_get(self, rect_id: str) -> Rect_Cords:
         """Returns an instance of rect_cords  containing the coordinates of a rectangle, given its id
 
         Args:
             rect_id (str): The ID of the rectangle.
 
         Returns:
-            rect_cords : The coordinates of the rectangle.
+            Rect_Cords : The coordinates of the rectangle. These will be set to -1 if rect_id not found
                             - rect_id: str
                             - left: int
                             - top: int
@@ -11420,14 +11577,18 @@ class Image(_qtpyBase_Control):
         ), f"{rect_id=}. Must be non-empty str"
 
         if rect_id in self._user_items:
-            return self.rect_cords(
+            return Rect_Cords(
                 rect_id=rect_id,
-                left=self._user_items[rect_id][1],
-                top=self._user_items[rect_id][2],
-                width=self._user_items[rect_id][3],
-                height=self._user_items[rect_id][4],
+                coords=Coords(
+                    left=self._user_items[rect_id][1],
+                    top=self._user_items[rect_id][2],
+                    width=self._user_items[rect_id][3],
+                    height=self._user_items[rect_id][4],
+                ),
             )
-        return self.rect_cords(rect_id=rect_id, left=-1, top=-1, width=-1, height=-1)
+        return Rect_Cords(
+            rect_id=rect_id, coords=Coords(left=-1, top=-1, width=-1, height=-1)
+        )
 
     def rectangle_delete(self, rect_id: str = "") -> bool:
         """Deletes a specific rectangle if the rect_id is provided else deletes all the rectangles in the image
@@ -11477,7 +11638,7 @@ class Image(_qtpyBase_Control):
             top (int): Top position in pixels
             left (int):  Left position in pixels
             width (int):  Width of rectangle in pixels
-            height (int): Height iof rectangle in pixels
+            height (int): Height of rectangle in pixels
             colour (str): Colour of rectangle line (mostly legal HTML colours)
         """
         assert (
@@ -11623,6 +11784,8 @@ class Image(_qtpyBase_Control):
             self._user_items[new_id] = copy.copy(self._user_items[old_id])
             self._user_items.pop(old_id)
 
+        return None
+
     def rectangle_overlaps(self, overlap_ratio: float = 0.3) -> tuple[Overlap_Rect]:
         """Returns a tuple of overlapping rectangles
 
@@ -11676,7 +11839,7 @@ class Image(_qtpyBase_Control):
         """Returns the cached image
 
         Returns:
-            (Optional[qtG.QPixmap]): The cached image if it has been set
+            (Optional[qtG.QPixmap]): The cached image if it has been set or None
         """
         return self._cached_pixmap
 
@@ -11714,6 +11877,8 @@ class Image(_qtpyBase_Control):
 
         self._widget.scene().addItem(qtW.QGraphicsPixmapItem(self._cached_pixmap))
 
+        return None
+
     def clip_get(
         self, x: int, y: int, width: int, height: int
     ) -> Optional[qtG.QPixmap]:
@@ -11722,11 +11887,11 @@ class Image(_qtpyBase_Control):
         Args:
             x (int): The x coordinate of the left corner of the rectangle to be clipped.
             y (int): The y coordinate of top of the rectangle to be clipped.
-            width (int): The width of the image to be clipped.
-            height (int): The height of the image to be clipped.
+            width (int): The width of the image portion to be clipped.
+            height (int): The height of the image portion to be clipped.
 
         Returns:
-            QPixmap : A QPixmap clipped image.
+            Optional[qtG.QPixmap] : A QPixmap clipped image or None if something went wrong.
         """
         self._widget: _Image
 
@@ -11839,7 +12004,7 @@ class Image(_qtpyBase_Control):
         cached_height: int = -1,
         cached_width: int = -1,
         pixel_unit=False,
-    ) -> None:
+    ) -> int:
         """Sets an image to be displayed in this control
 
         Args:
@@ -11849,9 +12014,12 @@ class Image(_qtpyBase_Control):
             scaled (bool):  Scale the image to fit height and width
             high_quality (bool): Display image in high quality
             rotate_degrees (int): Rotate the image in degrees
-            cached_height (int): Create a cached image of a specific height. Aspect ration always maintained
-            cached_width (int):Create a cached image of a specific width. Aspect ration always maintained
+            cached_height (int): Create a cached image of a specific height. Aspect ratio always maintained
+            cached_width (int):Create a cached image of a specific width. Aspect ratio always maintained
             pixel_unit (bool): True if working with pixel sizing, False if working with char sizing
+
+        Returns:
+            int: 1 if successful, -1 if not
 
 
         """
@@ -11862,7 +12030,7 @@ class Image(_qtpyBase_Control):
 
         assert isinstance(
             image, (str, qtG.QIcon, qtG.QPixmap, bytes)
-        ), f"{image=}. Must Be str (file_path/file_name) or QPixmap"
+        ), f"{image=}. Must Be str (file_path/file_name),QPixmap or bytes"
         assert isinstance(height, int) and (
             height > 0 or height == -1
         ), f"{height=}. Must be > 0 or -1 (auto-calc)"
@@ -11894,10 +12062,11 @@ class Image(_qtpyBase_Control):
             width = char_pixel_size.width * width
 
         if isinstance(image, str):  # Attempt to load from file!
-            assert qtC.QFile.exists(image), image + " : does not exist!"
+            # assert qtC.QFile.exists(image), image + " : does not exist!"
+            if not qtC.QFile.exists(image):
+                return -1
 
             image_reader = qtG.QImageReader()
-            # image_reader.setScaledSize(qtC.QSize(width,height))
             image_reader.setAllocationLimit(1000)
             image_reader.setFileName(image)
 
@@ -11913,7 +12082,7 @@ class Image(_qtpyBase_Control):
             pixmap = image
 
         if isinstance(pixmap, qtG.QPixmap):  # Image is ok as is
-            if cached_height > 0 and cached_width > 0:
+            if cached_height > 0 or cached_width > 0:
                 if pixel_unit:
                     pass
                 else:
@@ -11967,8 +12136,6 @@ class Image(_qtpyBase_Control):
                     ),
                 )
 
-                # self.height = pixmap.height()
-
             elif self.width == -1:
                 pixmap = pixmap.scaledToHeight(
                     height,
@@ -11979,7 +12146,6 @@ class Image(_qtpyBase_Control):
                     ),
                 )
 
-                # self.width = pixmap.width()
             else:
                 pixmap = pixmap.scaled(
                     width,
@@ -11993,7 +12159,7 @@ class Image(_qtpyBase_Control):
                 )
 
             if rotate_degrees != 0:
-                if rotate_degrees == -661:  # Mirror Horizontal
+                if rotate_degrees == self.MIROR_HORIZONTAL:
                     if self._cached_pixmap is not None:
                         cached_piximage = self._cached_pixmap.toImage().mirror(
                             True, False
@@ -12002,7 +12168,7 @@ class Image(_qtpyBase_Control):
 
                     piximage = pixmap.toImage().mirror(True, False)
                     pixmap.convertFromImage(piximage)
-                elif rotate_degrees == -662:  # Mirror vertical
+                elif rotate_degrees == self.MIROR_VERTICAL:
                     if self._cached_pixmap is not None:
                         cached_piximage = self._cached_pixmap.toImage().mirror(
                             False, True
@@ -12011,7 +12177,7 @@ class Image(_qtpyBase_Control):
 
                     piximage = pixmap.toImage().mirror(False, True)
                     pixmap.convertFromImage(piximage)
-                elif rotate_degrees == -663:  # Mirror Horizontal And Rotate 270 CW
+                elif rotate_degrees == self.MIRROR_ROTATE_270:
                     if self._cached_pixmap is not None:
                         cached_piximage = (
                             self._cached_pixmap.transformed(
@@ -12029,7 +12195,7 @@ class Image(_qtpyBase_Control):
                         .mirror(True, False)
                     )
                     pixmap.convertFromImage(piximage)
-                elif rotate_degrees == -664:  # "Mirror Vertical And Rotate 90 CW"
+                elif rotate_degrees == self.MIRROR_ROTATE_90:
                     if self._cached_pixmap is not None:
                         cached_piximage = (
                             self._cached_pixmap.transformed(qtG.QTransform().rotate(90))
@@ -12061,6 +12227,8 @@ class Image(_qtpyBase_Control):
 
             self._widget.scene().addPixmap(pixmap)
             self._widget.setFixedSize(self._pix_width, self._pix_height)
+
+        return 1
 
 
 @dataclasses.dataclass
