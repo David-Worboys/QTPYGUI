@@ -22,12 +22,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Tell Black to leave this block alone (realm of isort)
 # fmt: off
-from calendar import c
 import copy
 import dataclasses
 import datetime
 import functools
-import io
 import math
 import os
 import pathlib
@@ -1994,7 +1992,7 @@ class _Widget_Registry:
         Args:
             window_id (int): The WinId (Window Id) of the window housing the widget
             container_tag (str): The container tag of the container widget that you want to check if the widget exists in.
-            tag (str): The tag of the widget to be added.
+            tag (str): The tag of the widget to check for existance or "-" to check container existance.
         Returns:
             A boolean value.
         """
@@ -2013,7 +2011,7 @@ class _Widget_Registry:
 
         if container_tag not in self._widget_dict:
             return False
-        elif tag in self._widget_dict[container_tag]:
+        elif tag == "-" or tag in self._widget_dict[container_tag]:
             return True
         else:
             found = any(  # Tag Check
@@ -2040,7 +2038,7 @@ class _Widget_Registry:
         Args:
             window_id (int): The WinId (Window Id) of the window housing the widget
             container_tag (str): The name of the container that the widget is in.
-            tag (str): The tag name  of the widget you want to get.
+            tag (str): The tag name  of the widget you want to get or "-" to get the container.
         Returns:
             _qtpyBase_Control : The wanted widget .
         """
@@ -2062,6 +2060,8 @@ class _Widget_Registry:
 
         if tag in self._widget_dict[container_tag]:
             return self._widget_dict[container_tag][tag].widget
+        elif tag == "-":
+            return self._widget_dict[container_tag]
         else:
             # First Search the container and it sub-containers for the tag
             for key, value in tuple(self._widget_dict[container_tag].items()):
@@ -2438,7 +2438,7 @@ class _qtpyBase_Control(_qtpyBase):
         Returns:
             qtW.QWidget : The QT GUI widget.
         """
-        if not isinstance(self, (Menu, _Menu_Entry)) and self._widget is None:
+        if not isinstance(self, (Menu, Menu_Entry)) and self._widget is None:
             raise RuntimeError(
                 f"{self.container_tag=} {self.tag=} {self._widget=}. Widget not created"
                 " yet!"
@@ -3235,13 +3235,17 @@ class _qtpyBase_Control(_qtpyBase):
         return available_fonts  # fonts
 
     def font_set(
-        self, app_font: Font, widget_font: Font, widget: Optional[qtW.QWidget] = None
+        self,
+        app_font: Font,
+        widget_font: Font,
+        widget: Optional[qtW.QWidget | qtG.QAction] = None,
     ) -> None:
         """Set the font for the GUI control
 
         Args:
             app_font (Font): Application font
             widget_font (Font) : Control font
+            widget (Optional[qtW.QWidget | qtG.QAction], optional): Control to apply the font to. Defaults to None.
 
         Returns:
             None
@@ -3257,7 +3261,7 @@ class _qtpyBase_Control(_qtpyBase):
             widget_instance = widget
 
         assert isinstance(
-            widget_instance, qtW.QWidget
+            widget_instance, (qtW.QWidget, qtG.QAction)
         ), f"{widget_instance=} must be an instance of QWidget"
 
         colour = Colors()
@@ -3330,7 +3334,7 @@ class _qtpyBase_Control(_qtpyBase):
 
         qml_text = ""
 
-        if isinstance(self.guiwidget_get, _Menu_Entry):
+        if isinstance(self.guiwidget_get, Menu_Entry):
             widget_instance = self._widget.parent()
 
             if widget_font.selectback != "" and widget_font.selectfore != "":
@@ -3367,7 +3371,7 @@ class _qtpyBase_Control(_qtpyBase):
             elif widget_font.backcolor == "" and widget_font.forecolor != "":
                 qml_text = f"color: {widget_font.forecolor}"
 
-            if qml_text != "":
+            if hasattr(widget_instance, "setStyleSheet") and qml_text != "":
                 widget_instance.setStyleSheet(qml_text)
 
     def font_system_get(self, fixed: bool = True) -> qtG.QFont:
@@ -3434,7 +3438,7 @@ class _qtpyBase_Control(_qtpyBase):
             else:
                 raise AssertionError(f"{icon=}. Not a valid icon type")
 
-            if isinstance(self._widget, qtW.QMenu):
+            if isinstance(self._widget, (qtW.QMenu, qtG.QAction)):
                 if hasattr(self._widget, "setIcon"):
                     self._widget.setIcon(qtG.QIcon(icon))
             else:
@@ -3507,7 +3511,7 @@ class _qtpyBase_Control(_qtpyBase):
         # Set the tooltip text
         self._widget.setToolTip(trans_tip)
 
-        if isinstance(self, _Menu_Entry):
+        if isinstance(self, Menu_Entry):
             self._widget.parent().setToolTipsVisible(True)
 
     @property
@@ -12311,7 +12315,6 @@ class LCD(_qtpyBase_Control):
     """Instantiates an LCD like number display widget"""
 
     digit_count: int = 8
-    txt_align: Align_Text = Align_Text.RIGHT
 
     def __post_init__(self) -> None:
         """Constructor that checks parameters and sets instance variables"""
@@ -12352,13 +12355,13 @@ class LCD(_qtpyBase_Control):
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
-        if self.text.strip() != "":
-            self.value_set(self.text)
-
         self._widget.setSegmentStyle(qtW.QLCDNumber.Flat)
 
         self._widget.setDigitCount(self.digit_count)
         self._widget.setSmallDecimalPoint(False)
+
+        if self.text.strip() != "":
+            self.value_set(self.text)
 
         return widget
 
@@ -12465,7 +12468,6 @@ class LineEdit(_qtpyBase_Control):
         super().__post_init__()
 
         self.original_value = ""
-        self.total_width = 0
 
         # Note: text is used as line edit placeholder text
 
@@ -12623,11 +12625,11 @@ class LineEdit(_qtpyBase_Control):
 
         return 1
 
-    def input_mask_set(self, input_mask) -> None:
+    def input_mask_set(self, input_mask: str) -> None:
         """Set the input mask.
 
         Args:
-            input_mask: A string that defines the input mask.
+            input_mask(str): A string that defines the input mask.
         """
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
@@ -12729,24 +12731,27 @@ class LineEdit(_qtpyBase_Control):
 
         self._widget.setText(trans_text)
 
-    @property
-    def width_get(self) -> int:
-        """Returns the value of the `total_width`instance variable
-
-        Returns:
-            The total width of the rectangle.
-        """
-        return self.total_width
-
 
 @dataclasses.dataclass
 class Menu_Element(_qtpyBase_Control):
     """Menu element is a menu control element added to the menu."""
 
+    checkable: bool = False
+    font: Optional[Font] = None
+    icon: None | str | qtG.QIcon | qtG.QPixmap = None
     separator: bool = False
 
     def __post_init__(self) -> None:
         """Constructor that checks parameters and sets defaults"""
+        assert isinstance(self.separator, bool), f"{self.separator=}. Must be bool"
+        assert isinstance(self.checkable, bool), f"{self.checkable=}. Must be bool"
+        assert isinstance(
+            self.icon, (type(None), str, qtG.QIcon, qtG.QPixmap)
+        ), f"{self.icon=}. Must be None | str | QIcon | QPixmap"
+        assert isinstance(
+            self.font, (type(None), Font)
+        ), f"{self.font=}. Must be None | Font"
+
         super().__post_init__()
 
         assert self.width == -1, f"{self.width=}> is ignored by menus"
@@ -12755,21 +12760,21 @@ class Menu_Element(_qtpyBase_Control):
 
 @dataclasses.dataclass
 # The _Menu_Entry class is a class that is used to create a menu item in a menu
-class _Menu_Entry(_qtpyBase_Control):
+class Menu_Entry(_qtpyBase_Control):
     """Class instance used  to store menu entry information"""
 
     parent_tag: str = ""
-    tag: str = ""
     element: Menu_Element = None
-    element_items: dict[str, any] = field(default_factory=dict)
-    menu: Union[None, qtG.QAction] = None
+
+    _element_items: dict[str, any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         """Constructor that checks parameters and sets defaults"""
-
+        assert isinstance(self.parent_tag, str), f"{self.parent_tag=}. Must be str"
+        assert isinstance(self.tag, str), f"{self.tag=}. Must be str"
         assert isinstance(
-            self.menu, (type(None), qtG.QAction)
-        ), f"{self.menu=}. Must be None or QAction "
+            self.element, Menu_Element
+        ), f"{self.element=}. Must be Menu_Element"
 
     @property
     def checked_get(self) -> bool:
@@ -12778,28 +12783,169 @@ class _Menu_Entry(_qtpyBase_Control):
         Returns:
             bool : True - Menu Item Checked, False - Menu Item Not Checked
         """
-        return self.guiwidget_get.isChecked()
+        gui_widget: qtG.QAction = self.guiwidget_get
+
+        return gui_widget.isChecked()
 
     def checked_set(self, checked: bool) -> None:
-        """Sets a menu item to checked or not checked
+        """Sets a menu item to be checked or not checked
 
         Args:
             checked (bool): True - Check menu item, False - Uncheck Menu Item
         """
         assert isinstance(checked, bool), f"{checked=}. Must be bool"
+        gui_widget: qtG.QAction = self.guiwidget_get
 
-        self.guiwidget_get.setCheckable(checked)
+        gui_widget.setCheckable(checked)
+
+    @property
+    def enabled_get(self) -> bool:
+        """Returns a boolean value whether the menu item is enabled or not
+
+        Returns:
+            bool : True - Menu Item Enabled, False - Menu Item Disabled
+        """
+
+        gui_widget: qtG.QAction = self.guiwidget_get
+
+        return gui_widget.isEnabled()
+
+    def enabled_set(self, enabled: bool) -> None:
+        """Sets a menu item to be enabled or not enabled
+
+        Args:
+            enabled (bool): True - Enable menu item, False - Disable Menu Item
+        """
+        assert isinstance(enabled, bool), f"{enabled=}. Must be bool"
+
+        gui_widget: qtG.QAction = self.guiwidget_get
+
+        gui_widget.setEnabled(enabled)
+
+    @property
+    def font_get(self) -> qtG.QFont:
+        """Returns the font of the menu item
+
+        Returns:
+            qtG.QFont : The font of the menu item
+        """
+        gui_widget: qtG.QAction = self.guiwidget_get
+        return gui_widget.font()
+
+    def font_set(self, font: Font) -> None:
+        """Sets the font of the menu item"""
+        assert isinstance(font, Font), f"{font=}. Must be Font"
+        gui_widget: qtG.QAction = self.guiwidget_get
+
+        super().font_set(
+            app_font=g_application.app_font_def, widget_font=font, widget=gui_widget
+        )
+
+    @property
+    def icon_get(self) -> qtG.QIcon:
+        """Returns the icon of the menu item
+
+        Returns:
+            qtG.QIcon : The icon of the menu item
+        """
+
+        gui_widget: qtG.QAction = self.guiwidget_get
+        return gui_widget.icon()
+
+    def icon_set(self, icon: Optional[Union[str, qtG.QPixmap, qtG.QIcon]]) -> None:
+        """Sets the icon of the menu item
+
+        Args:
+            icon (Optional[Union[str, qtG.QPixmap, qtG.QIcon]]): Icon definition object.
+        """
+        assert isinstance(
+            icon, (str, qtG.QPixmap, qtG.QIcon)
+        ), f"{icon=}. Must be str, QPixmap or QIcon"
+
+        super().icon_set(icon)
+
+    @property
+    def text_get(self) -> str:
+        """Returns the text of the menu item
+
+        Returns:
+            str : The text of the menu item
+        """
+        gui_widget: qtG.QAction = self.guiwidget_get
+
+        return gui_widget.text()
+
+    def text_set(self, text: str) -> None:
+        """Sets the text of the menu item
+
+        Args:
+            text (str): The text to set
+        """
+        assert isinstance(text, str), f"{text=}. Must be str"
+
+        gui_widget: qtG.QAction = self.guiwidget_get
+
+        gui_widget.setText(text)
+
+    @property
+    def tooltip_get(self) -> str:
+        """Returns the tooltip of the menu item
+
+        Returns:
+            str : The tooltip of the menu item
+        """
+        gui_widget: qtG.QAction = self.guiwidget_get
+
+        return gui_widget.toolTip()
+
+    def tooltip_set(self, tooltip: str) -> None:
+        """Sets the tooltip of the menu item
+
+        Args:
+            tooltip (str): The tooltip to set
+        """
+        assert isinstance(tooltip, str), f"{tooltip=}. Must be str"
+
+        gui_widget: qtG.QAction = self.guiwidget_get
+
+        gui_widget.setToolTip(tooltip)
+
+    @property
+    def visible_get(self) -> bool:
+        """Returns a boolean value whether the menu item is visible or not
+
+        Returns:
+            bool : True - Menu Item Visible, False - Menu Item Not Visible
+        """
+        gui_widget: qtG.QAction = self.guiwidget_get
+
+        return gui_widget.isVisible()
+
+    def visible_set(self, visible: bool) -> None:
+        """Sets a menu item to visible or not visible
+
+        Args:
+            visible (bool): True - Menu item visible, False - Menu item not visible
+        """
+        assert isinstance(visible, bool), f"{visible=}. Must be bool"
+
+        gui_widget: qtG.QAction = self.guiwidget_get
+
+        gui_widget.setVisible(visible)
 
 
 @dataclasses.dataclass
 class Menu(_qtpyBase_Control):
     """Instantiates a Menu and associated properties"""
 
+    container_tag: str
+    tag: str
+
+    _menu_items: dict[str, Menu_Entry] = field(default_factory=dict)
+
     def __post_init__(self) -> None:
         """Constructor that checks parameters and sets properties"""
         super().__post_init__()
-
-        self._menu_items: dict[str, _Menu_Entry] = {}
 
         assert self.width == -1, f"{self.width=}> is ignored by menus"
         assert self.height == -1, f"{self.height=}> is ignored by menus"
@@ -12809,7 +12955,7 @@ class Menu(_qtpyBase_Control):
         parent_app: QtPyApp,
         parent: qtW.QWidget,
         container_tag: str,
-        _menu: Union[dict[str, _Menu_Entry], None] = None,
+        _menu: Union[dict[str, Menu_Entry], None] = None,
         _depth: int = 0,
         _use_lambda: bool = USE_LAMBDA,
     ) -> qtW.QMenuBar:
@@ -12825,16 +12971,22 @@ class Menu(_qtpyBase_Control):
         Returns:
             qtW.QMenuBar : The created widget or the container housing it.
         """
+
         if _menu is None or len(_menu) == 0:
             self._widget = qtW.QMenuBar()
             self._widget.setMinimumWidth(parent.width())
             _menu = self._menu_items
 
-        window_id = Get_Window_ID(parent_app, parent, self)
+        window_id = Get_Window_ID(parent_app, parent, None)
 
         for key in _menu.keys():
             if _depth == 0:  # Top Level
+                container_tag = self.container_tag  # "menu"
+
                 _menu[key].guiwidget_set(self._widget.addMenu(_menu[key].element.text))
+                menu_item: Menu_Entry = self._element_find(
+                    _menu[key].tag, self._menu_items
+                )
 
                 parent_app.widget_add(
                     window_id=window_id,
@@ -12848,11 +13000,11 @@ class Menu(_qtpyBase_Control):
                 if _menu[key].element.tooltip.strip() != "":
                     self.tooltip_set(_menu[key].tag, _menu[key].element.tooltip)
 
-            if len(_menu[key].element_items) > 0:
-                parent_item: _Menu_Entry = self._element_find(
+            if len(_menu[key]._element_items) > 0:
+                parent_item: Menu_Entry = self._element_find(
                     _menu[key].parent_tag, self._menu_items
                 )
-                menu_item: _Menu_Entry = self._element_find(
+                menu_item: Menu_Entry = self._element_find(
                     _menu[key].tag, self._menu_items
                 )
 
@@ -12872,11 +13024,12 @@ class Menu(_qtpyBase_Control):
 
                     if menu_item.element.tooltip.strip() != "":
                         self.tooltip_set(menu_item.tag, menu_item.element.tooltip)
+
                 self._create_widget(
                     parent_app=parent_app,
                     parent=parent,
                     container_tag=container_tag,
-                    _menu=_menu[key].element_items,
+                    _menu=_menu[key]._element_items,
                     _depth=_depth + 1,
                 )
 
@@ -12885,17 +13038,32 @@ class Menu(_qtpyBase_Control):
                 parent_item = self._element_find(
                     _menu[key].parent_tag, self._menu_items
                 )
-                menu_item = self._element_find(_menu[key].tag, self._menu_items)
+                menu_item: Menu_Entry = self._element_find(
+                    _menu[key].tag, self._menu_items
+                )
 
                 if (
                     _menu[key].element.separator
                     or _menu[key].element.text.strip() == MENU_SEPERATOR
                 ):
                     menu_item.guiwidget_set(parent_item.guiwidget_get.addSeparator())
+
                 else:
                     menu_item.guiwidget_set(
                         parent_item.guiwidget_get.addAction(_menu[key].element.text)
                     )
+
+                    if _menu[key].element.checkable:
+                        menu_item.guiwidget_get.setCheckable(True)
+
+                    if _menu[key].element.font is not None:
+                        menu_item.font_set(_menu[key].element.font)
+
+                    if _menu[key].element.icon is not None:
+                        menu_item.icon_set(_menu[key].element.icon)
+
+                    menu_item.visible_set(_menu[key].element.visible)
+                    menu_item.enabled_set(_menu[key].element.enabled)
 
                     parent_app.widget_add(
                         window_id=window_id,
@@ -12922,7 +13090,7 @@ class Menu(_qtpyBase_Control):
                                     container_tag=container_tag,
                                     tag=menu_item.tag,
                                     event=Sys_Events.MENUCLICKED,
-                                    value=None,
+                                    value=menu_item,
                                     widget_dict=parent_app.widget_dict_get(
                                         window_id=window_id,
                                         container_tag=container_tag,
@@ -12931,6 +13099,7 @@ class Menu(_qtpyBase_Control):
                                     control_name=self.__class__.__name__,
                                 )
                             )
+
                         else:
                             menu_item.guiwidget_get.triggered.connect(
                                 functools.partial(
@@ -12941,7 +13110,7 @@ class Menu(_qtpyBase_Control):
                                     container_tag=container_tag,
                                     tag=menu_item.tag,
                                     event=Sys_Events.MENUCLICKED,
-                                    value=None,
+                                    value=menu_item,
                                     widget_dict=parent_app.widget_dict_get(
                                         window_id=window_id,
                                         container_tag=container_tag,
@@ -12950,6 +13119,7 @@ class Menu(_qtpyBase_Control):
                                     control_name=self.__class__.__name__,
                                 )
                             )
+
         return self._widget
 
     def element_add(self, parent_tag: str, menu_element: Menu_Element) -> None:
@@ -12967,7 +13137,7 @@ class Menu(_qtpyBase_Control):
             menu_element, Menu_Element
         ), f"{menu_element=}. Must be an instance of Menu_Element"
 
-        menu_item: _Menu_Entry = self._element_find(menu_element.tag, self._menu_items)
+        menu_item: Menu_Entry = self._element_find(menu_element.tag, self._menu_items)
 
         assert (
             menu_item.parent_tag == "" and menu_item.tag == ""
@@ -12979,14 +13149,14 @@ class Menu(_qtpyBase_Control):
                 f"{parent_tag=} is already installed as a top level tag"
                 f" <{self._menu_items}>"
             )
-            self._menu_items[menu_element.tag] = _Menu_Entry(
+            self._menu_items[menu_element.tag] = Menu_Entry(
                 parent_tag=menu_element.tag, tag=menu_element.tag, element=menu_element
             )
         else:
             menu_item = self._element_find(parent_tag, self._menu_items)
 
             if parent_tag == menu_item.tag:
-                menu_item.element_items[menu_element.tag] = _Menu_Entry(
+                menu_item._element_items[menu_element.tag] = Menu_Entry(
                     parent_tag=parent_tag, tag=menu_element.tag, element=menu_element
                 )
             else:
@@ -12994,9 +13164,18 @@ class Menu(_qtpyBase_Control):
                     f"{parent_tag=} not found\n <{menu_item}> !\n <{self._menu_items}> "
                 )
 
+    def menu_entry_find(self, tag: str) -> Menu_Entry:
+        assert (
+            isinstance(tag, str) and tag.strip() != ""
+        ), f"{tag=}. Must be non-empty str"
+
+        menu_entry = self._element_find(tag, self._menu_items)
+
+        return menu_entry
+
     def _element_find(
-        self, search_tag: str, menu_item: dict[str, _Menu_Entry]
-    ) -> _Menu_Entry:
+        self, search_tag: str, menu_item: dict[str, Menu_Entry]
+    ) -> Menu_Entry:
         """Finds and returns a menu element based on the search tag
 
         Args:
@@ -13006,14 +13185,14 @@ class Menu(_qtpyBase_Control):
         Returns:
             _Menu_Entry: Tme _Menu_Entry object.  If not found then both parent_tag and tag are both == ""
         """
-        menu_element = _Menu_Entry(parent_tag="", tag="", element=Menu_Element())
+        menu_element = Menu_Entry(parent_tag="", tag="", element=Menu_Element())
 
         for key in menu_item.keys():
             if menu_item[key].tag == search_tag:
                 return menu_item[key]
-            elif len(menu_item[key].element_items) > 0:
-                menu_element: _Menu_Entry = self._element_find(
-                    search_tag, menu_item[key].element_items
+            elif len(menu_item[key]._element_items) > 0:
+                menu_element: Menu_Entry = self._element_find(
+                    search_tag, menu_item[key]._element_items
                 )
 
                 if menu_element.tag == search_tag:
@@ -13022,7 +13201,7 @@ class Menu(_qtpyBase_Control):
         return menu_element
 
     def print_menu(
-        self, menu_item: Union[dict[str, _Menu_Entry], None] = None, delim: str = "*"
+        self, menu_item: Union[dict[str, Menu_Entry], None] = None, delim: str = "*"
     ) -> None:
         """Prints menu structure to command line appropriately indented with leading '*'.  For debug purposes
 
@@ -13034,8 +13213,10 @@ class Menu(_qtpyBase_Control):
             menu_item = self._menu_items
 
         for key in menu_item.keys():
-            if len(menu_item[key].element_items) > 0:
-                self.print_menu(menu_item[key].element_items, f"{' '}{delim}*")
+            if len(menu_item[key]._element_items) > 0:
+                self.print_menu(
+                    menu_item[key]._element_items, f"{' '}{delim}*{menu_item[key].tag}"
+                )
 
     def checked_get(self, tag: str) -> bool:
         """Returns the checked state of a menu item
@@ -13050,7 +13231,7 @@ class Menu(_qtpyBase_Control):
             isinstance(tag, str) and tag.strip() != ""
         ), f"{tag=}. Must be a non-empty str"
 
-        menu_item: _Menu_Entry = self._element_find(tag, self._menu_items)
+        menu_item: Menu_Entry = self._element_find(tag, self._menu_items)
 
         assert (
             menu_item.parent_tag.strip() != "" and menu_item.tag.strip() != ""
@@ -13081,7 +13262,7 @@ class Menu(_qtpyBase_Control):
         ), f"{tag=}. Must be a non-empty str"
         assert isinstance(checked, bool), f"{checked=}. Must be bool"
 
-        menu_item: _Menu_Entry = self._element_find(tag, self._menu_items)
+        menu_item: Menu_Entry = self._element_find(tag, self._menu_items)
 
         assert (
             menu_item.parent_tag.strip() != "" and menu_item.tag.strip() != ""
@@ -13115,13 +13296,13 @@ class Menu(_qtpyBase_Control):
             isinstance(tooltip, str) and tooltip.strip() != ""
         ), f"{tooltip=}. Must be a non-empty str"
 
-        menu_item: _Menu_Entry = self._element_find(tag, self._menu_items)
+        menu_item: Menu_Entry = self._element_find(tag, self._menu_items)
 
         assert (
             menu_item.parent_tag.strip() != "" and menu_item.tag.strip() != ""
         ), f"menu item <{tag=}> not found!"
 
-        parent_item: _Menu_Entry = self._element_find(
+        parent_item: Menu_Entry = self._element_find(
             menu_item.parent_tag, self._menu_items
         )
 
@@ -13154,13 +13335,13 @@ class Menu(_qtpyBase_Control):
 
         assert isinstance(visible, bool), f"{visible=}. Must be a bool"
 
-        menu_item: _Menu_Entry = self._element_find(tag, self._menu_items)
+        menu_item: Menu_Entry = self._element_find(tag, self._menu_items)
 
         assert (
             menu_item.parent_tag.strip() != "" and menu_item.tag.strip() != ""
         ), f"menu item <{tag=}> not found!"
 
-        parent_item: _Menu_Entry = self._element_find(
+        parent_item: Menu_Entry = self._element_find(
             menu_item.parent_tag, self._menu_items
         )
 

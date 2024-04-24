@@ -414,27 +414,28 @@ PyInstaller produces even larger executables!
 
 ### QTPYGUI Control API Reference
 
-| Control                   | Description                                                                                                                  |
-|---------------------------|------------------------------------------------------------------------------------------------------------------------------|
-| [Button](#button)         | Creates a button, text and icon are optional                                                                                 |
-| [Checkbox](#checkbox)     | Creates a check box that a user can click on or off                                                                          | 
-| [ComboBox](#combobox)     | Creates a drop down selection box, icon in list is <br/>optional                                                             |
-| [Dateedit](#dateedit)     | Creates a date edit control with a dropdown calendar and <br/>an erase button                                                |
-| [FolderView](#folderview) | Creates a control that displays the contents of a folder in a Grid                                                           |
-| [Grid](#grid)             | Creates a control that displays data in a table (grid) format                                                                |
-| [Image](#image)           | Creates a control that displays an image                                                                                     |
-| Label                     | Creates a text string                                                                                                        |
-| LineEdit                  | Creates a control that allows text to be edited and displayed<br/> in a single line                                          |
-| Menu                      | Creates a menu just below the title bar                                                                                      |
-| ProgressBar               | Creates a control that displays the progress of an operation                                                                 |
-| RadioButton               | Creates a radio button control. In a group only one can be <br/>selected at a time                                           |
-| [Slider](#slider)         | Creates a slider control than can be used to set a value <br/>by dragging the handle                                         |
-| Spinbox                   | Creates a spinbox control that allows numbers to be set <br/>via clicking up and down arrows or entering the number directly |
-| Switch                    | Creates a switch control that can be used to turn on and <br/>off a feature                                                  |
-| Tab                       | Creates a tab control that has multiple pages, each <br/>housing their own set of GUI controls                               |
-| TextEdit                  | Creates a text entry control that can span multiple lines                                                                    |
-| Timeedit                  | Creates a time edit control with an erase button                                                                             |
-| Treeview                  | Creates a control that displays data as a tree view                                                                          |
+| Control                     | Description                                                                                                                  |
+|-----------------------------|------------------------------------------------------------------------------------------------------------------------------|
+| [Button](#button)           | Creates a button, text and icon are optional                                                                                 |
+| [Checkbox](#checkbox)       | Creates a check box that a user can click on or off                                                                          | 
+| [ComboBox](#combobox)       | Creates a drop down selection box, icon in list is <br/>optional                                                             |
+| [Dateedit](#dateedit)       | Creates a date edit control with a dropdown calendar and <br/>an erase button                                                |
+| [FolderView](#folderview)   | Creates a control that displays the contents of a folder in a Grid                                                           |
+| [Grid](#grid)               | Creates a control that displays data in a table (grid) format                                                                |
+| [Image](#image)             | Creates a control that displays an image                                                                                     |
+| [Label](#label)             | Creates a text string                                                                                                        |
+| [LCD](#lcd)                 | Creates a control that displays an LCD calculator display<br>Only numbers can be displayed                                   |
+| [LineEdit](#lineedit)       | Creates a control that allows text to be edited and displayed<br/> in a single line                                          |
+| [Menu](#menu)               | Creates a menu just below the title bar                                                                                      |
+| [ProgressBar](#progressbar) | Creates a control that displays the progress of an operation                                                                 |
+| [RadioButton](#radiobutton) | Creates a radio button control. In a group only one can be <br/>selected at a time                                           |
+| [Slider](#slider)           | Creates a slider control than can be used to set a value <br/>by dragging the handle                                         |
+| Spinbox                     | Creates a spinbox control that allows numbers to be set <br/>via clicking up and down arrows or entering the number directly |
+| Switch                      | Creates a switch control that can be used to turn on and <br/>off a feature                                                  |
+| Tab                         | Creates a tab control that has multiple pages, each <br/>housing their own set of GUI controls                               |
+| TextEdit                    | Creates a text entry control that can span multiple lines                                                                    |
+| Timeedit                    | Creates a time edit control with an erase button                                                                             |
+| Treeview                    | Creates a control that displays data as a tree view                                                                          |
 
 ### _qtpyBase_Control
  
@@ -464,7 +465,7 @@ and the properties here are used to set the behavior of the GUI control when ins
 | label_align       | [Align_Text](#align_text) (Align_Text.RIGHT)   | The alignment of the label text                                                                                                                   |
 | label_width       | int (-1)                                       | The width of the label in  characters if pixel_unit is False, Otherwise the width is in pixels.<br> -1 automatically calculates the width         |
 | label_font        | [Font](#font) \| None (None)                   | The Font of the label                                                                                                                             |
-| pixel_unit        | bool (False)                                   | True, width and height settings are in pixels, Otherwise in characters                                                                             |
+| pixel_unit        | bool (False)                                   | True, width and height settings are in pixels, Otherwise in characters                                                                            |
 | size_fixed        | bool (True)                                    | True, Sets the size of the GUI controls as fixed, Otherwise not fixed. TODO: fix this setting as it has no effect                                 |
 | tag               | str ("")                                       | The tag of the GUI control, system generated. If "" then system generated                                                                         |
 | text              | str ("")                                       | The text displayed on the GUI control if this is supported by the GUI control                                                                     |
@@ -560,6 +561,9 @@ size correctly.
 <br>The following properties apply when a button is instantiated with the Button 
 call, as in the "fully loaded" declaration below 
 
+<br><br>Note: A subset of [_qtpyBase_Control](#qtpygui-control-api-reference) 
+properties also apply and some are used in the "fully loaded" declaration below
+
 | **Property**         | **Description**                                                                                      | **Type**                                    | **Optional** |
 |----------------------|------------------------------------------------------------------------------------------------------|---------------------------------------------|--------------|
 | auto_repeat_interval | If > 0 the button keeps firing Clicked events when <br>held down (milliseconds)                      | int >= 0 (0)                                | ✓            |
@@ -589,8 +593,9 @@ call, as in the "fully loaded" declaration below
 | visible              | Makes the button visible if True otherwise invisible                                                 | bool (True)                                 | ✓            |
 | width                | The width of the button (in characters if pixel_unit is<br> False,Otherwise pixels)                  | int > 0 (10)                                | ✓            |
 
-A fully loaded button declaration:
-- **Note: Only "tag", "text" and "callback" are usually needed**
+<br>A fully loaded button declaration:
+<br><br>**Note: Only "tag", "text" and "callback" are usually needed**
+- txt_font overrides the other text font settings
 
 ```
 Button(
@@ -642,6 +647,9 @@ size correctly.
 <br>The following properties apply when a Checkbox is instantiated with the Checkbox 
 call, as in the "fully loaded" declaration below
 
+<br><br>Note: A subset of [_qtpyBase_Control](#qtpygui-control-api-reference) 
+properties also apply and some are used in the "fully loaded" declaration below
+
 | **Property**  | **Description**                                                                                        | **Type**                                    | **Optional** |
 |---------------|--------------------------------------------------------------------------------------------------------|---------------------------------------------|--------------|
 | bold          | Sets the checkbox text bold if True otherwise not                                                      | bool (False)                                | ✓            |
@@ -669,8 +677,9 @@ call, as in the "fully loaded" declaration below
 | visible       | Makes the checkbox visible if True otherwise invisible                                                 | bool (True)                                 | ✓            |
 | width         | The width of the checkbox (in characters if pixel_unit is False,Otherwise pixels)                      | int > 0 (10)                                | ✓            |
 
-A fully loaded checkbox declaration:
-- **Note: Only "tag", "text" and "callback" are usually needed**
+<br>A fully loaded checkbox declaration:
+<br><br>**Note: Only "tag", "text" and "callback" are usually needed**
+- txt_font overrides the other text font settings
 
 ```
 Checkbox(
@@ -728,6 +737,9 @@ might not automatically size correctly.
 <br>The following properties apply when a ComboBox is instantiated with the ComboBox 
 call, as in the "fully loaded" declaration below
 
+<br><br>Note: A subset of [_qtpyBase_Control](#qtpygui-control-api-reference) 
+properties also apply and some are used in the "fully loaded" declaration below
+
 | **Property**      | **Description**                                                                                                      | **Type**                                    | **Optional** |
 |-------------------|----------------------------------------------------------------------------------------------------------------------|---------------------------------------------|--------------|
 | bold              | Sets the combobox text bold if True otherwise not                                                                    | bool (False)                                | ✓            |
@@ -757,8 +769,9 @@ call, as in the "fully loaded" declaration below
 | visible           | Makes the combobox visible if True otherwise invisible                                                               | bool (True)                                 | ✓            |
 | width             | The width of the combobox (in characters if pixel_unit is False,Otherwise pixels)                                    | int > 0 (10)                                | ✓            |
 
-A fully loaded combobox declaration:
-- **Note: Only "tag", "text" ,"callback" and "items" are usually needed**
+<br>A fully loaded combobox declaration:
+<br><br>**Note: Only "tag", "text" ,"callback" and "items" are usually needed**
+- txt_font overrides the other text font settings
 ```
 ComboBox(
             tag="combo_box",
@@ -864,6 +877,9 @@ size correctly.
 <br>The following properties apply when a Datedit is instantiated with the 
 Datedit call, as in the "fully loaded" declaration below
 
+<br><br>Note: A subset of [_qtpyBase_Control](#qtpygui-control-api-reference) 
+properties also apply and some are used in the "fully loaded" declaration below
+
 | **Property** | **Description**                                                                                                                    | **Type** | **Optional** |
 |--------------|------------------------------------------------------------------------------------------------------------------------------------|----------|--------------|
 | date         | Set to the current date if not set ("")                                                                                            | str ("") | ✓            |
@@ -871,11 +887,12 @@ Datedit call, as in the "fully loaded" declaration below
 | min_date     | Set to **MINDATE** if not set ("")                                                                                                 | str ("") | ✓            |
 | max_date     | Set to the to the current date if not set ("")                                                                                     | str ("") | ✓            |
 
-A fully loaded Dateedit declaration:
-- **Note: Only "tag", "text" ,and "callback" are usually needed **
+<br>A fully loaded Dateedit declaration:
+<br><br>**Note: Only "tag", "text" ,and "callback" are usually needed**
   - text behaves a little differently here as it serves to set the tooltip on the erase button
   - max_date, min_date and format can be used to configure the date range and 
   format of the Dateedit GUI Control if desired
+  - txt_font overrides the other text font settings
 
 ```
 Dateedit(
@@ -951,6 +968,9 @@ selected might not automatically size correctly.
 <br>The following properties apply when a FolderView is instantiated with the 
 FolderView call, as in the "fully loaded" declaration below
 
+<br><br>Note: A subset of [_qtpyBase_Control](#qtpygui-control-api-reference) 
+properties also apply and some are used in the "fully loaded" declaration below
+
 | **Property**  | **Description**                                                                                                                                                                    | **Type**                                 | **Optional** |
 |---------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------|--------------|
 | width         | The width of the FolderView GUI control <br>Generally not set as header_widths determines the widths<br> Characters if [pixel_unit](#_qtpybase_control) is False, Otherwise pixels | int (40)                                 | ✓            |
@@ -962,8 +982,9 @@ FolderView call, as in the "fully loaded" declaration below
 | header_font   | Sets the font properties of the header row                                                                                                                                         | [Font](#font) \| None (None)             | ✓            |
 | click_expand  | True, expand folders when clicked on, Otherwise only expand folders if the handle is clicked                                                                                       | bool (False)                             | ✓            |
 
-A fully loaded FolderView declaration:
-- **Note: Only "tag", "text", "callback", "header_widths" and "height" are usually needed **
+<br>A fully loaded FolderView declaration:
+<br><br>**Note: Only "tag", "text", "callback", "header_widths" and "height" are usually needed**
+- txt_font overrides the other text font settings
 
 ```
 FolderView(
@@ -1030,6 +1051,9 @@ the only arguments used.
 <br>The following properties apply when a Grid is instantiated with the 
 Grid call, as in the "fully loaded" declaration below
 
+<br><br>Note: A subset of [_qtpyBase_Control](#qtpygui-control-api-reference) 
+properties also apply and some are used in the "fully loaded" declaration below
+
 | **Property** | **Description**                                                                                                                                             | **Type**                          | **Optional** |
 |--------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------|--------------|
 | width        | The width of the Grid <br>-1 defaults to the grid column widths being used to calculate the width                                                           | int (-1)                          | ✓            |
@@ -1040,9 +1064,10 @@ Grid call, as in the "fully loaded" declaration below
 | noselection  | True, do not allow any selections in the grid, Otherwise allow selections                                                                                   | bool (False)                      | ✓            |
 | header_sort  | True, Allow header sorting, Otherwise do not                                                                                                                | bool (True)                       | ✓            |
 
-A fully loaded Grid declaration:
-- **Note: Only "tag", "text", "callback", "col_def" and "height" are usually needed **
+<br>A fully loaded Grid declaration:
+<br><br>**Note: Only "tag", "text", "callback", "col_def" and "height" are usually needed**
   - Initial Grid loading is usually done by loading grid_items as below
+  - txt_font overrides the other text font settings
 
 ```
 Grid(
@@ -1202,7 +1227,9 @@ only arguments used.
 
 <br>**Properties**
 <br>The following properties apply when an Image is instantiated with the 
-Image call, as in the "fully loaded" declaration below
+Image call, as in the "fully loaded" declaration below.
+<br><br>Note: A subset of [_qtpyBase_Control](#qtpygui-control-api-reference) 
+properties also apply and some are used in the "fully loaded" declaration below 
 
 | **Property**   | **Description**                               | **Type**                                                                                                                                 | **Optional** |
 |----------------|-----------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------|--------------|
@@ -1213,13 +1240,11 @@ Image call, as in the "fully loaded" declaration below
 | cached_width   | int (-1)                                      | If -1, no cached image is stored , Otherwise the cached image will be stored at the specified width<br>Aspect ratio is always maintained | ✓            |
 | rotate_degrees | int (0)                                       | Rotates the image by the specified number of degrees<br>Must be int between +- 0 and 360                                                 | ✓            |
 
-
-
-A fully loaded Image declaration:
+<br>A fully loaded Image declaration:
 <br><br>**Note: Only "tag", "text", "callback", "height", "width" and "image" are usually needed**
-    <br>- For implementation reasons, txt_fontsize affects image size and I would 
+  - For implementation reasons, txt_fontsize affects image size and I would 
     suggest setting to 10 or 12. 
-    <br>-txt_font overrides the other text font settings
+  - txt_font overrides the other text font settings
 
 ```
 qtg.Image(
@@ -1306,6 +1331,557 @@ qtg.Image(
 |                      | suppress_rect_check | bool (False)                              | Used for debugging, suppresses the assert for checking if a rect_id is in the image                                                                                                                                                                                                                                              | ✓            |
 |                      | visible             | bool                                      | True shows the rectangle, False hides the rectangle                                                                                                                                                                                                                                                                              | ❌            |
 | rectangles_changed   |                     | dict [str, [Rect_Changed](#rect_changed)] | Returns a dict of changed rectangles <br><b>Returns:</b><br> Dict of changed rectangles.<br>                                                                                                                                                                                                                                     |              |
+
+### Label
+
+Calling Label in a layout will generate a Label control on a form. 
+
+The "tag" and "text"  are generally the only arguments used, and "tag" is only 
+needed if you plan on referencing the label in your code. It is suggested to set
+"height" and width arguments as the font selected might not automatically
+size correctly.
+
+<br>**Properties**
+<br> A Label has no special properties, but can use a subset of 
+[_qtpyBase_Control](#_qtpybase_control) properties as in the "fully loaded" example below
+
+<br>A fully loaded Label declaration:
+<br><br>**Note: Only "tag", "text"are usually needed** 
+   - txt_font overrides the other text font settings
+
+```
+Label(
+        tag="example03",
+        label="Label",
+        text="Example 03",
+        label_font=qtg.Font(
+            font_name="Courier",
+            style=qtg.Font_Style.OBLIQUE,
+            size=42,
+            backcolor="yellow",
+            forecolor="blue",
+        ),
+        txt_fontsize=42,
+        txt_align=qtg.Align_Text.CENTER,
+        txt_font=qtg.Font(
+            font_name="DejaVu Sans Mono",
+            backcolor="blue",
+            forecolor="yellow",
+            size=50,
+        ),
+        width=8,
+        frame=qtg.Widget_Frame(
+            frame_style=qtg.Frame_Style.BOX,
+            frame=qtg.Frame.RAISED,
+            line_width=5,
+            midline_width=2,
+        ),
+        height=2,
+        tune_hsize=30,
+        tune_vsize=15
+    )
+```
+
+<br>**Methods**
+<br>A subset of the [_qtpyBase_Control](#_qtpybase_control) methods apply to Label instances
+| **Method** | **Arguments** | **Type** | **Description**                            | **Optional** |
+|------------|---------------|----------|--------------------------------------------|--------------|
+| value_get  |               | str      | <br><b>Returns:</b><br> The label text<br> |              |
+| value_set  |               | None     |  Sets the label text                       |              |
+|            | value         | str      | text value to set in the label             |  ❌            |
+
+### LCD
+Calling LCD in a layout will generate an LCD control, with an LCD like number 
+display, on a form. This control is unusual in that it only displays a limited set 
+0/O, 1, 2, 3, 4, 5/S, 6, 7, 8, 9/g, minus, decimal point, A, B, C, D, E, F, 
+h, H, L, o, P, r, u, U, Y, colon, degree sign (which is specified as single 
+quote in the string) and space.
+
+Refer to the [Calculator](./Examples/example_02_calculator.py) for a simple program example
+
+The "tag" and "text"  are generally the only arguments used, and "tag" is only 
+needed if you plan on referencing the label in your code. It is suggested to set
+"height" and width arguments as the font selected might not automatically
+size correctly.
+ Instantiates an LCD like number display widget
+
+<br>**Properties**
+<br> An LCD has the following properties, but can also use a subset of 
+[_qtpyBase_Control](#_qtpybase_control) properties as in the "fully loaded" example below
+
+
+| **Property** | **Description**             | **Type** | **Optional** |
+|--------------|-----------------------------|----------|--------------|
+| digit_count  | Number of digits in display | int (8)  | ✓            |
+
+<br>A fully loaded LCD declaration:
+<br><br>**Note: Only "tag", "text"are usually needed**
+
+   - txt_font, other than size, has little effect on the LCD control display and most text 
+settings will not apply.
+
+```
+qtg.LCD(
+        tag="lcd",
+        label="LCD",
+        callback=self.event_handler,
+        label_align=qtg.Align_Text.CENTER,
+        label_width=10,
+        label_font=qtg.Font(style=qtg.Font_Style.OBLIQUE, backcolor="yellow", size=14),
+        txt_font=qtg.Font(size=15),
+        width=8,
+        height=1,        
+        txt_fontsize=12,
+        digit_count=9,
+        text="-123456.7",
+        width=9,
+        enabled=True,
+        visible=True,
+        tooltip="LCD Control",
+        tune_hsize=15,
+        tune_vsize=15,
+        user_data={"key": "value"},
+        buddy_control=qtg.HBoxContainer().add_row(
+            qtg.Spacer(width=1),
+            qtg.Button(
+                tag="lcd_button",
+                text="Press Me!",
+                callback=self.event_handler,
+                width=12,
+            ),
+        )
+```
+ 
+<br>**Methods**
+<br>A subset of the [_qtpyBase_Control](#_qtpybase_control) methods apply to LCD instances
+
+| **Method** | **Arguments** | **Type**            | **Description**                                                  | **Optional** |
+|------------|---------------|---------------------|------------------------------------------------------------------|--------------|
+| value_set  |               | None                | Sets the LCD number display                                      |              |
+|            | value         | str \| int \| float | The value to be displayed in the LCD<br>Only numbers are allowed | ❌            |
+
+
+### LineEdit
+Calling LineEdit in a layout will generate a LineEdit control on a form. 
+
+The "tag", "text" and "callback" arguments are generally the only arguments used. It is suggested to set
+"height" and width arguments as the font selected might not automatically
+size correctly.
+
+<br>**Properties**
+<br> A LineEdit has the following properties, but can also use a subset of 
+[_qtpyBase_Control](#_qtpybase_control) properties as in the "fully loaded" example below
+
+| **Property**      | **Description**                                                      | **Type**               | **Optional** |
+|-------------------|----------------------------------------------------------------------|------------------------|--------------|
+| char_length       | The maximum number of characters that can be entered in the LineEdit | int (MAX_CHARS)        | ✓            |
+| input_mask        | The input mask that determines what is shown in the LineEdit         | str ("")               | ✓            |
+| text              | Place holder text                                                    | str ("")               | ✓            |
+| validate_callback | A callback that validates the text entered                           | Callable\| None (None) | ✓            |
+
+
+<br>**Input Mask**
+
+| **Character** | **Meaning**                                                                                                           |
+|---------------|-----------------------------------------------------------------------------------------------------------------------|
+| A             | Character of the Letter category required, such as A-Z, a-z.                                                          |
+| a             | Character of the Letter category permitted but not required.                                                          |
+| N             | Character of the Letter or Number category required, such as A-Z, a-z, 0-9                                            |
+| n             | Character of the Letter or Number category permitted but not required                                                 |
+| X             | Any non-blank character required                                                                                      |
+| x             | Any non-blank character permitted but not required                                                                    |
+| 9             | Character of the Number category required, e.g 0-9                                                                    |
+| 0             | Character of the Number category permitted but not required                                                           |
+| D             | Character of the Number category and larger than zero required, such as 1-9                                           |
+| d             | Character of the Number category and larger than zero permitted but not required, such as 1-9                         |
+| #             | Character of the Number category, or plus/minus sign permitted but not required                                       |
+| H             | Hexadecimal character required. A-F, a-f, 0-9                                                                         |
+| h             | Hexadecimal character permitted but not required                                                                      |
+| B             | Binary character required. 0-1                                                                                        |
+| b             | Binary character permitted but not required                                                                           |
+| >             | All following alphabetic characters are uppercased                                                                    |
+| <             | All following alphabetic characters are lowercased                                                                    |
+| !             | Switch off case conversion                                                                                            |
+| ;c            | Terminates the input mask and sets the blank character to c.                                                          |
+| [ ] { }       | Reserved                                                                                                              |
+| \             | Use \ to escape the special characters listed above to use them as separators                                         |                                                                                               |
+| @             | First char indicates password, following chars is the input mask. Display characters as they are entered              |
+| *             | First char indicates password, following chars is the input mask. Display platform-dependent password mask characters |                                       |
+
+<br>A fully loaded LineEdit declaration:
+<br><br>**Note: Only "tag" is  usually needed and "text" if a placeholder is required**
+    
+  - If an input mask is provided the placeholder text is not visible
+  - A password mask would look like this:  *XXXXXXXX
+  - txt_font overrides the other text font settings
+ 
+```
+LineEdit(
+            tag="lineedit",
+            label="Line Edit",
+            text="Place Holder",
+            callback=self.event_handler,
+            input_mask="(9999) 999-9999",
+            width=15,
+            height=1,
+            char_length=15,
+            label_align=qtg.Align_Text.CENTER,
+            label_width=10,
+            label_font=qtg.Font(style=qtg.Font_Style.OBLIQUE, size=10),
+            txt_align=qtg.Align_Text.CENTER,
+            txt_font=qtg.Font(style=qtg.Font_Style.NORMAL, size=10),
+            txt_fontsize=12,
+            bold=True,
+            italic=True,
+            underline=True,
+            enabled=True,
+            visible=True,
+            tooltip="LineEDit ",
+            tune_hsize=15,
+            tune_vsize=15,
+            user_data={"key": "value"},
+            buddy_control=qtg.HBoxContainer().add_row(
+                qtg.Checkbox(
+                    tag="telephone_checkbox_check",
+                    text="Phone Number!",
+                    callback=self.event_handler,
+                    width=13,
+                ),
+            ),
+        )
+```
+ 
+<br>**Methods**
+<br>A subset of the [_qtpyBase_Control](#_qtpybase_control) methods apply to LineEdit instances
+
+| **Method**     | **Arguments**  | **Type**     | **Description**                                                                                                                                      | **Optional** |
+|----------------|----------------|--------------|------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
+| input_mask_set |                | None         | Set the input mask                                                                                                                                   |              |
+|                | input_mask     | str          | Input mask character string                                                                                                                          |              |
+| max_chars_get  |                | int          | Returns the maximum number of characters allowed in the text field<br><b>Returns:</b><br>The max number of characters allowed in the text field.<br> |              |
+| max_chars_set  |                | None         | Sets char_length and checks if is > 0 and < MAX_CHARS                                                                                                |              |
+|                | max_chars      | int          | The maximum number of characters to use in the line edit control.                                                                                    |              |
+| modified       |                | bool         | True, LineEdit modified, Otherwise not modified                                                                                                      |              |
+| value_get      |                | str          | <br><b>Returns:</b><br> original taxt if `original_value` is `True otherwise the modified text<br>                                                   |              |
+|                | original_value | bool (False) | True - Return original value, Otherwise return the current value                                                                                     |              |
+| value_set      |                | None         | Set the LineEdit text to the value string                                                                                                            |              |
+|                | value          | str          | The value to set.                                                                                                                                    |              |
+
+### Menu
+Calling Menu in a layout will generate a menu control on the top of the window 
+that contains the application forms.
+
+<br>**Properties**
+<br> A Menu_Element has the following properties, but can also use a subset of 
+[_qtpyBase_Control](#_qtpybase_control) properties.
+
+| **Property**  | **Description**                                                                                           | **Type** | **Optional** |
+|---------------|-----------------------------------------------------------------------------------------------------------|----------|--------------|
+| container_tag | The system name of the menu container (required if the [Menu_Entry](#menu_entry) is accessed at run time) | str      | ✓❌           |
+| tag           | The system name of the menu                                                                               | str      | ✓            |
+
+
+A menu is built up of [menu elements](#menu_element) and creating a menu is straight forward:
+<br>
+1. Create a Menu instance
+2. Add The top row menu elements with the element_add method and the parent_tag = ""
+3. Add submenu elements with the parent tag pointing to the tag of the parent menu element
+4. Repeat Step 3 as often as needed to make up the menu structure.
+5. If a seperator is needed set menu element text to "---" which is the constant MENU_SEPERATOR <br>
+or set menu element seperator=True
+
+The code below illustrates this process
+
+
+```
+menu = qtg.Menu(container_tag="main_menu",tag="top_level") # Create menu object
+
+# Make top row menu elements - as many as needed, in this case one        
+menu.element_add(
+    parent_tag="",
+    menu_element=qtg.Menu_Element(
+        text="&Test", tag="test", callback=self.event_handler
+    ),
+)
+
+
+
+# Add menu elements to the top row menu elements
+menu.element_add(
+    parent_tag="test",
+    menu_element=qtg.Menu_Element(
+        text="&Level 2 Test 1",
+        tag="level2_test1",
+        callback=self.event_handler,
+        tooltip="Test 2",
+    ),
+)
+
+# A seperator draws a line between menu elements - there are 2 ways as illustrated.
+# The least preferred (using text) is commented out 
+menu.element_add(
+        parent_tag="test",
+        menu_element=qtg.Menu_Element(                
+            separator=True,
+            # text= MENU_SEPERATOR                
+        ),
+)
+
+menu.element_add(
+    parent_tag="test",
+    menu_element=qtg.Menu_Element(
+        text="&Level 2 Test 2",
+        tag="level2_test",
+        callback=self.event_handler,
+        tooltip="",
+    ),
+)
+
+# Add sub-menus in this case to parent_tag="level2_test
+menu.element_add(
+    parent_tag="level2_test",
+    menu_element=qtg.Menu_Element(
+        text="&Level 3 Test",
+        tag="level3_test",
+        callback=self.event_handler,
+        tooltip="",
+    ),
+)
+
+# Add sub-menus in this case to parent_tag="level3_test 
+menu.element_add(
+    parent_tag="level3_test",
+    menu_element=qtg.Menu_Element(
+        text="&Level 4 Test",
+        tag="level4_test",
+        callback=self.event_handler,
+        checkable=True,
+        font=qtg.Font(style=qtg.Font_Style.ITALIC, forecolor="red", size=14),
+        tooltip="level4_test",
+        icon= qtg.Sys_Icon.filenew.get(),
+    ),
+)
+
+(
+    menu.element_add(
+        parent_tag="level3_test", menu_element=qtg.Menu_Element(text="---")
+    ),
+)
+
+menu.element_add(
+    parent_tag="level3_test",
+    menu_element=qtg.Menu_Element(
+        text="&Level 4 Test 1",
+        tag="level4_test1",
+        callback=self.event_handler,
+        tooltip="",
+    ),
+)
+```
+ 
+| **Method**      | **Arguments** | **Type**                      | **Description**                                                             | **Optional** |
+|-----------------|---------------|-------------------------------|-----------------------------------------------------------------------------|--------------|
+| element_add     |               | None                          |                                                                             |              |
+|                 | menu_element  | [Menu_Element](#menu_element) | Menu Element instance                                                       | ❌             |
+|                 | parent_tag    | str                           | Menu element tag of the parent menu element. "" is the top level parent_tag | ❌             |
+
+#### Menu_Element
+A Menu_Element is a menu control element added to the [Menu](#menu) via the 
+element_add method that defines a menu item entry.
+
+<br>**Properties**
+<br> A Menu_Element has the following properties, but can also use a subset of 
+[_qtpyBase_Control](#_qtpybase_control) properties.
+
+| **Property** | **Description**                                                                                | **Type**                               | **Optional** |
+|--------------|------------------------------------------------------------------------------------------------|----------------------------------------|--------------|
+| callback     | The event handler method to call when the menu item is clicked on                              | Callable                               | ❌            |
+| checkable    | Makes a check box in te menu item                                                              | bool (False)                           | ✓            |
+| enabled      | If True enables the menu_item, Otherwise disabled the menu item                                | bool (True)                            | ✓            |
+| font         | Sets the font of the menu item (colours are not currently working)                             | [Font](#font) \| Nonw (None)           | ✓            |
+| icon         | Sets an icon on the menu item                                                                  | str \| qtG.QIcon \| qtG.QPixmap (None) | ✓            |
+| separator    | Draws a line to separate menu items                                                            | bool (False)                           | ✓            |
+| tag          | The menu items system name (required if the [Menu_Entry](#menu_entry) is accessed at run time) | str                                    | ✓❌           |
+| text         | The menu item text                                                                             | str                                    | ❌            |
+| tooltip      | The menu item tooltip that displays when the cursor is hovering over the menu item             | str                                    | ✓            |
+| visible      | if True makes the menu item visible, otherwise the menu_item is invisible                      | bool (True)                            | ✓            |
+
+
+#### Menu_Entry
+A Menu_Entry instance is returned in the callback event handler method when a 
+[Menu](#menu) item is selected
+
+<br>**Properties**
+<br> A Menu_Entry has the following properties, but can also use a subset of 
+[_qtpyBase_Control](#_qtpybase_control) properties.
+
+| **Property** | **Description**                                                                                                                           | **Type**                      | **Optional** |
+|--------------|-------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------|--------------|
+| element      | The [Menu Element](#menu_element) definition that is contained in this Menu Entry                                                         | [Menu_Element](#menu_element) | ❌            |
+| parent_tag   | The tag name of the [Menu Element](#menu_element) that is the parent of this Menu_Entry<br> Top level menu items do not have a parent_tag | str ("")                      | ✓            |
+| tag          | The tag name of the [Menu Element](#menu_element) that is contained in this Menu Entry                                                    | str                           | ❌            |
+
+<br>**Methods**
+<br>A subset of the [_qtpyBase_Control](#_qtpybase_control) methods apply to Menu_Entry instances
+<br><br>**Note: A menu item cannot have a checked box and an icon simultaneously. If an icon is set then a checkbox is not displayed**
+
+| **Method**  | **Arguments** | **Type**                                | **Description**                                                                       | **Optional** |
+|-------------|---------------|-----------------------------------------|---------------------------------------------------------------------------------------|--------------|
+| checked_get |               | bool                                    | <br><b>Returns:</b><br> True - Menu Item Checked, Otherwise Menu Item Not Checked<br> |              |
+| checked_set |               | None                                    | Sets a menu item to be checked or not checked                                         |              |
+|             | checked       | bool                                    | True - Check menu item, False - Uncheck Menu Item                                     | ❌            |
+| enabled_get |               | bool                                    | br><b>Returns:</b><br> True - Menu Item Enabled, False - Menu Item Disabled<br>       |              |
+| enabled_set |               | None                                    | Sets a menu item to be enabled or not enabled                                         |              |
+|             | enabled       | bool                                    | True - Enable menu item, Otherwise disable Menu Item                                  | ❌            |
+| font_get    |               | QFont                                   | <br><b>Returns:</b><br> The font of the menu item<br>                                 |              |
+| font_set    |               | None                                    | Sets the font of the menu item                                                        |              |
+|             | font          | [Font](#font)                           |                                                                                       | ❌            |
+| icon_get    |               | None                                    | <br><b>Returns:</b><br> The icon of the menu item<br>                                 |              |
+| icon_set    |               | str \| qtG.QPixmap \| qtG.QIcon \| None | Sets the icon of the menu item                                                        |              |
+| text_get    |               | str                                     | <br><b>Returns:</b><br> The text of the menu item<br>                                 | ❌            |
+| text_set    |               | None                                    | Sets the text of the menu item                                                        |              |
+|             | text          | str                                     | The text to set                                                                       | ❌            |
+| tooltip_get |               | str                                     | <br><b>Returns:</b><br> The tooltip of the menu item<br>                              |              |
+| tooltip_set |               | None                                    | Sets the tooltip of the menu item                                                     |              |
+|             | tooltip       | str                                     | The tooltip to set                                                                    | ❌            |
+| visible_get |               | bool                                    | <br><b>Returns:</b><br> True - Menu Item Visible, False - Menu Item Not Visible<br>   |              |
+| visible_set |               | None                                    | Sets a menu item to visible or not visible                                            |              |
+|             | visible       | bool                                    | True - Menu item visible, Otherwise Menu item not visible                             | ❌            |
+
+
+### ProgressBar
+
+Calling ProgressBar in a layout will generate a ProgressBar control on a form. 
+
+The "tag", "text" and "callback" arguments are generally the only arguments used. It is suggested to set
+"height" and width arguments as the font selected might not automatically
+size correctly.
+
+<br>**Properties**
+<br> A ProgressBar has the following properties, but can also use a subset of 
+[_qtpyBase_Control](#_qtpybase_control) properties as in the "fully loaded" example below
+ 
+| **Property** | **Description**                                                           | **Type**    | **Optional** |
+|--------------|---------------------------------------------------------------------------|-------------|--------------|
+| callback     | The event handler method to call when the PrgressBar is does something    | Callable    | ❌            |
+| horizontal   | True a horizontal ProgressBath, Otherwise a vertical ProgressBar          | bool (True) | ✓            |
+| tag          | The system name of the ProgressBar (required for updates)                 | str         | ❌            |
+| label        | The label to the left of the ProgressBar that indicates what is is for    | str         | ✓            |
+ | range_min    | The minimum range of a ProgressBar >=0                                    | int (0)     | ✓            |
+| range_max    | The maximum range of a ProgressBar >= 0                                   | int (100)   | ✓            |
+| width        | Characters if [pixel_unit](#_qtpybase_control) is False, Otherwise pixels | int (10)    | ✓            |
+| height       | Characters if [pixel_unit](#_qtpybase_control) is False, Otherwise pixels | int (1)     | ✓            |
+              
+<br>A fully loaded ProgressBar declaration:
+<br><br>**Note: Only "tag","range_min","range_max" and "callback" is usually needed**
+```
+ProgressBar(
+            tag="progressbar",
+            label="Progress Bar",
+            label_font=qtg.Font(style=qtg.Font_Style.OBLIQUE, size=10),
+            callback=self.event_handler,
+            horizontal=True,
+            width=15,
+            height=1,
+            range_min=0,
+            range_max=200,
+            enabled=True,
+            visible=True,
+            tooltip="Progress Bar",
+            tune_hsize=15,
+            tune_vsize=15,
+            user_data={"key": "value"},
+            buddy_control=qtg.HBoxContainer().add_row(
+                qtg.Button(
+                    tag="progressbar_button",
+                    text="Press Me!",
+                    callback=self.event_handler,
+                    width=12,
+                ),
+            ),
+        )
+```
+
+<br>**Methods**
+<br>A subset of the [_qtpyBase_Control](#_qtpybase_control) methods apply to ProgressBar instances
+
+| **Method** | **Arguments** | **Type** | **Description**                                           | **Optional** |
+|------------|---------------|----------|-----------------------------------------------------------|--------------|
+| range_set  |               | None     | Sets the range of the progressbar.                        |              |
+|            | max           | int      | The maximum value of the progressbar.                     | ❌            |
+|            | min           | int      | The minimum value of the progressbar.                     | ❌            |
+| reset      |               | None     | Resets the progressbar to the minimum value               |              |
+| value_get  |               | int      | <br><b>Returns:</b><br> The value of the progressbar.<br> |              |
+| value_set  |               | None     | Sets the value of the progressbar                         |              |
+|            | value         | int      | The value to set the progressbar to.                      | ❌            |
+
+
+### RadioButton
+ 
+Calling RadioButton in a layout will generate a RadioButton control on a form. 
+Normally, there is a group of radio buttons, and they are placed in a container 
+to ensure only one can be selected at a time. The container will have its text 
+property set to make it a visible groupbox housing the radio buttons 
+
+<br>**Properties**
+<br> A RadioButton has the following properties, but can also use a subset of 
+[_qtpyBase_Control](#_qtpybase_control) properties as in the "fully loaded" example below
+ 
+| **Property** | **Description**                                                         | **Type** | **Optional** |
+|--------------|-------------------------------------------------------------------------|----------|--------------|
+| callback     | The event handler method to call when the RadioButton is does something | Callable | ❌            |
+| tag          | The system name of the RadioButton (required for updates)               | str      | ❌            |
+| text         | The text displayed to the left of the RadioButton                       | str      | ❌            |
+
+<br>A fully loaded RadioButton declaration:
+<br><br>**Note: This example is hardly realistic but shows the reader what is possible**
+<br>- Normally all that is required is this:
+    ```
+    qtg.RadioButton(tag="radio2", text="Radio 2", callback=self.event_handler)
+    ```
+
+
+```
+HBoxContainer(text="Radio Buttons", tag="radios").add_row(
+                        qtg.RadioButton(
+                            tag="radio1",
+                            text="Radio 1",
+                            checked=True,
+                            callback=self.event_handler,
+                            label="Radio Button 1",
+                            label_font=qtg.Font(style=qtg.Font_Style.OBLIQUE, size=10),
+                            enabled=True,
+                            visible=True,
+                            tooltip="Radio Button",
+                            tune_hsize=15,
+                            tune_vsize=15,
+                            user_data={"key": "value"},
+                            buddy_control=qtg.HBoxContainer().add_row(
+                                qtg.Button(
+                                    tag="radio_button_push",
+                                    text="R1 Push Me!",
+                                    callback=self.event_handler,
+                                    width=15,
+                                    height=1,
+                                )),
+                        ),
+                        qtg.RadioButton(
+                            tag="radio2", text="Radio 2", callback=self.event_handler
+                        ),
+                    )
+```
+
+<br>**Methods**
+<br>A subset of the [_qtpyBase_Control](#_qtpybase_control) methods apply to a RadioButton instance
+ 
+| **Method**     | **Arguments** | **Type** | **Description**                                                                         | **Optional** |
+|----------------|---------------|----------|-----------------------------------------------------------------------------------------|--------------|
+| button_checked |               | bool     | <br><b>Returns:</b><br> True - Checked, False - Not Checked<br>                         |              |
+| button_toggle  |               | None     | Set the radiobutton to checked or unchecked                                             |              |
+|                | value         | bool     | True - radio button checked. False - radio button not-checked.                          | ❌            |
+| value_get      |               | bool     | <br><b>Returns:</b><br> True - Radiobutton Checked, False - Radiobutton not checked<br> |              |
+| value_set      |               | None     | Sets the radiobutton to checked or unchecked                                            |              |
+|                | value         | bool     | True - checked. False - not checked.                                                    | ❌            |
 
 
 ### Slider
@@ -1427,9 +2003,10 @@ Combo_Item is a helper class used to set combo box items.  All attributes are ma
 Coords is a helper class used by [Image](#image) helper classes to represent co-ordinates
 
 **Properties**
+
 | **Property** | **Description**                               | **Type** |
 |--------------|-----------------------------------------------|----------|
- | top          | Top position in pixels                        | NUMBER   |
+| top          | Top position in pixels                        | NUMBER   |
 | left         | Left position in pixels                       | NUMBER   |
 | height       | Height in pixels                              | NUMBER   |
 | width        | Width in pixels                               | NUMBER   |
@@ -1439,13 +2016,12 @@ Coords is a helper class used by [Image](#image) helper classes to represent co-
 
 
  **Methods**
+
 | **Method** | **Arguments** | **Type**    | **Description**                                                            | **Optional** |
 |------------|---------------|-------------|----------------------------------------------------------------------------|--------------|
 | overlaps   |               | bool        | True if another set of Coords overlaps this set of Coords, Otherwise False |              |
 |            | other_cords   | Coords      | The other set of coordinates to check for overlap                          | ❌    |
 |            | overlap_ratio | float (0.3) | The ratio to determine overlapping. 0 - No overlap to 1 - Complete overlap | ✓|
-
-
 
 
 ### Date_Tuple
@@ -1582,25 +2158,3 @@ Rect_Changed is a helper class used by [Image](#image) to represent a changed re
 
 
 # TO BE CONTINUED....
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
