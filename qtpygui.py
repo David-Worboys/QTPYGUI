@@ -41,7 +41,7 @@ from collections import deque, namedtuple
 from contextlib import contextmanager
 from dataclasses import field
 from enum import Enum, IntEnum
-from typing import (Callable, ClassVar, Literal, NoReturn, Optional, Union,
+from typing import (Callable, ClassVar, Final, Literal, NoReturn, Optional, Union,
                     cast, overload)
 
 import PySide6.QtCore as qtC
@@ -66,10 +66,14 @@ sys.setrecursionlimit(
 g_application: Union["QtPyApp", None] = None
 
 # Constants
-DEFAULT_FONT_SIZE = 10
-MAX_CHARS = 32767
-MENU_SEPERATOR = "---"
-USE_LAMBDA = False
+DEFAULT_FONT_SIZE: Final[int] = 10
+MAX_CHARS: Final[int] = 32767
+MENU_SEPERATOR: Final[str] = "---"
+MIRROR_HORIZONTAL: Final[int] = -661
+MIRROR_VERTICAL: Final[int] = -662
+MIRROR_ROTATE_270: Final[int] = -663  # Mirror Horizontal And Rotate 270 CW
+MIRROR_ROTATE_90: Final[int] = -664  # Mirror Horizontal And Rotate 90 CW
+USE_LAMBDA: Final[bool] = False
 
 
 def Command_Button_Container(
@@ -8458,15 +8462,76 @@ class Dateedit(_qtpyBase_Control):
                 date = qtC.QDate.currentDate().toString(self.format)
 
             if date_format.strip() == "":
-                date_format = qtC.QLocale.system().dateFormat(
-                    qtC.QLocale.system().ShortFormat
+                date_format = qtC.QLocale.system().dateFormat(qtC.QLocale.ShortFormat)
+
+            if "/" in date_format:
+                date_format_seperator = "/"
+            elif "-" in date_format:
+                date_format_seperator = "-"
+            elif "." in date_format:
+                date_format_seperator = "."
+            elif " " in date_format:
+                date_format_seperator = " "
+            elif ":" in date_format:
+                date_format_seperator = ":"
+            elif "," in date_format:
+                date_format_seperator = ","
+            else:
+                raise RuntimeError(
+                    f"Dateformat <{date_format}> seperator not determined"
                 )
 
-            actual_date = qtC.QDate.fromString(date, date_format)
+            if "/" in date:
+                date_seperator = "/"
+            elif "-" in date:
+                date_seperator = "-"
+            elif "." in date:
+                date_seperator = "."
+            elif " " in date:
+                date_seperator = " "
+            elif ":" in date:
+                date_seperator = ":"
+            elif "," in date:
+                date_seperator = ","
+            else:
+                raise RuntimeError(f"Dateformat <{date}> seperator not determined")
+
+            actual_date = qtC.QDate.fromString(
+                date.replace(date_seperator, date_format_seperator), date_format
+            )
+
+            # Hail mary work around - might not extract correct date
+            if not actual_date.isValid():
+                date_elements: list[str] = date.split(date_seperator)
+
+                date_elements = date_elements[0:2]
+
+                for order in [
+                    (0, 1, 2),
+                    (0, 2, 1),
+                    (1, 0, 2),
+                    (1, 2, 0),
+                    (2, 0, 1),
+                    (2, 1, 0),
+                ]:
+                    if (
+                        date_elements[order[0]].isnumeric()
+                        and date_elements[order[1]].isnumeric()
+                        and date_elements[order[2]].isnumeric()
+                    ):
+                        year = int(date_elements[order[0]])
+                        month = int(date_elements[order[1]])
+                        day = int(date_elements[order[2]])
+
+                        test_date = qtC.QDate(year, month, day)
+
+                        if test_date.isValid():
+                            actual_date = test_date
+                            break
 
             assert actual_date.isValid(), (
                 f"Date <{date}> Or Format <{format}> is not valid! Converted Date Is"
-                f" <{actual_date}>"
+                f"<{date=}> <{actual_date=}> <{date_format=}>"
             )
 
             self._widget.setDate(actual_date, "clicked")
@@ -11433,11 +11498,6 @@ class _Resizable_Rectangle(qtW.QGraphicsRectItem):
 
 @dataclasses.dataclass
 class Image(_qtpyBase_Control):
-    MIRROR_HORIZONTAL: int = -661
-    MIRROR_VERTICAL: int = -662
-    MIRROR_ROTATE_270: int = -663  # Mirror Horizontal And Rotate 270 CW
-    MIRROR_ROTATE_90: int = -664  # Mirror Horizontal And Rotate 90 CW
-
     image: Optional[Union[str, qtG.QPixmap, bytes]] = None
     cached_height: int = -1
     cached_width: int = -1
@@ -11469,10 +11529,10 @@ class Image(_qtpyBase_Control):
             isinstance(self.rotate_degrees, int)
             and self.rotate_degrees
             in (
-                self.MIRROR_HORIZONTAL,
-                self.MIRROR_VERTICAL,
-                self.MIRROR_ROTATE_270,
-                self.MIRROR_ROTATE_90,
+                MIRROR_HORIZONTAL,
+                MIRROR_VERTICAL,
+                MIRROR_ROTATE_270,
+                MIRROR_ROTATE_90,
             )
             or 0 <= abs(self.rotate_degrees) <= 360
         ), (
@@ -12181,7 +12241,7 @@ class Image(_qtpyBase_Control):
 
                     piximage = pixmap.toImage().mirror(False, True)
                     pixmap.convertFromImage(piximage)
-                elif rotate_degrees == self.MIRROR_ROTATE_270:
+                elif rotate_degrees == MIRROR_ROTATE_270:
                     if self._cached_pixmap is not None:
                         cached_piximage = (
                             self._cached_pixmap.transformed(
@@ -12199,7 +12259,7 @@ class Image(_qtpyBase_Control):
                         .mirror(True, False)
                     )
                     pixmap.convertFromImage(piximage)
-                elif rotate_degrees == self.MIRROR_ROTATE_90:
+                elif rotate_degrees == MIRROR_ROTATE_90:
                     if self._cached_pixmap is not None:
                         cached_piximage = (
                             self._cached_pixmap.transformed(qtG.QTransform().rotate(90))
