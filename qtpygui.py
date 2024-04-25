@@ -13680,34 +13680,30 @@ class Spacer(_qtpyBase_Control):
 class Switch(_qtpyBase_Control):
     """Instantiates a switch widget and sets the properties"""
 
-    label: str = "&"
-    width: int = 4  # RADIOBUTTON_SIZE.width
-    height: int = 1  # RADIOBUTTON_SIZE.height
-    widget_align: Align = Align.CENTER
-    checked: bool = False
+    label: str = ""
+    width: int = 4
+    height: int = 1
+    text = ""
 
-    # Pad text with spaces to be all be this size
-    txt_pad_size: int = 0
-    txt_pad_unit: str = "c"  # c - Char, p - Pixel
+    checked: bool = False
 
     def __post_init__(self) -> None:
         """Constructor that checks parameters and sets properties"""
         super().__post_init__()
 
-        assert isinstance(self.txt_pad_size, int), f"{self.txt_pad_size=}. Must be bool"
-
-        assert isinstance(self.txt_pad_unit, str) and self.txt_pad_unit in (
-            "c",
-            "p",
-        ), f"{self.txt_pad_unit=}. Must be str c | p"
-
-        if self.buddy_control is None:
-            self.buddy_control = Label(text=self.text)
+        if self.text.strip() != "":
+            text_label = Label(text=self.text, width=len(self.trans_str(self.text)))
         else:
-            if self.text.strip() != "":
-                self.buddy_control = HBoxContainer().add_row(
-                    Label(text=self.text), self.buddy_control
-                )
+            text_label = None
+
+        if self.buddy_control is None and text_label is None:
+            pass
+        elif self.buddy_control is None and text_label is not None:
+            self.buddy_control = text_label
+        elif self.buddy_control is not None and text_label is None:
+            pass
+        elif self.buddy_control is not None and text_label is not None:
+            self.buddy_control = HBoxContainer().add_row(text_label, self.buddy_control)
 
     def _create_widget(
         self, parent_app: QtPyApp, parent: qtW.QWidget, container_tag: str = ""
@@ -13738,10 +13734,6 @@ class Switch(_qtpyBase_Control):
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
-        self._widget.setAutoExclusive(
-            False
-        )  # When 1 rb in group then cannot check it otherwise! - Not sure if this applies to switch
-
         self.button_toggle(self.checked)
 
         self._widget.setAutoExclusive(False)  # switch groups must not be auto exclusive
@@ -13763,7 +13755,7 @@ class Switch(_qtpyBase_Control):
         """Returns the widget's checked state
 
         Returns:
-            bool: True - Checked, False - Not Checked.
+            bool: True - Switch on, False Switch off
         """
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
@@ -13775,7 +13767,7 @@ class Switch(_qtpyBase_Control):
         """Set the widget's checked state
 
         Args:
-            value (bool): True - Checked, False not Checked. Defaults to True
+            value (bool): True - Switch on, False Switch off
         """
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
@@ -13789,15 +13781,15 @@ class Switch(_qtpyBase_Control):
         """Returns the current state of the button
 
         Returns:
-            bool : True - Checked, False - Not Checked.
+            bool : True - Switch on, False Switch off
         """
         return self.button_checked
 
     def value_set(self, value: bool) -> None:
-        """Sets the Checked state of the Switch.
+        """Sets the state of the Switch.
 
         Args:
-            value (bool): True - Checked, False - Not Checked.
+            value (bool):True - Switch on, False Switch off
         """
         assert isinstance(value, bool), f"value <{value}> must be bool"
 
@@ -14018,8 +14010,8 @@ class _Switch(qtW.QAbstractButton):
         """Sets the colour of the switch track.
 
         Args:
-            enable (str): TEXT_COLORS  word
-            disable (str): TEXT_COLORS  word
+            enable (str): TEXT_COLORS
+            disable (str): TEXT_COLORS
         """
         assert (
             isinstance(enable, str)
