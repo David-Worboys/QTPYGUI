@@ -2215,33 +2215,33 @@ tab = qtg.Tab(
     - This means any GUI controls, including another [Tab](#tab) control, can be
     placed on a tab page
     - **Note: Only "tag", "title" (tab page title), "control" and "callback" are usually needed**
-<br>
-```
-tab.page_add(
-                tag="tab_pg1",
-                title="Page 1",
-                control=qtg.VBoxContainer(align=qtg.Align.CENTER).add_row(
-                    qtg.Spacer(height=1),
-                    qtg.Image(
-                        tag="image",
-                        # label="Image",
-                        width=20,
-                        height=20,
-                        callback=self.event_handler,
-                        image="example.jpg",
+
+    ```
+    tab.page_add(
+                    tag="tab_pg1",
+                    title="Page 1",
+                    control=qtg.VBoxContainer(align=qtg.Align.CENTER).add_row(
+                        qtg.Spacer(height=1),
+                        qtg.Image(
+                            tag="image",
+                            # label="Image",
+                            width=20,
+                            height=20,
+                            callback=self.event_handler,
+                            image="example.jpg",
+                        ),
+                        qtg.Spacer(height=1),
+                        qtg.Button(
+                            tag="add_page", text="Add Page", callback=self.event_handler
+                        ),
+                        qtg.Button(
+                            tag="delete_page",
+                            text="Delete Page",
+                            callback=self.event_handler,
+                        ),
                     ),
-                    qtg.Spacer(height=1),
-                    qtg.Button(
-                        tag="add_page", text="Add Page", callback=self.event_handler
-                    ),
-                    qtg.Button(
-                        tag="delete_page",
-                        text="Delete Page",
-                        callback=self.event_handler,
-                    ),
-                ),
-            )
-```
+                )
+    ```
 
 - 3 Repeat Step 2 until done
 
