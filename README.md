@@ -12,8 +12,7 @@
 4. [Hello World Application](#building-your-first-application)
 5. [Application Distribution](#distributing-your-application)
 6. [Boot Camp](#boot-camp)
-7. [QTPYGUI Control Reference](#qtpygui-control-api-reference)
-   - [Button](#button) 
+7. [QTPYGUI Control Reference](#qtpygui-control-api-reference) 
 8. [QTPYGUI Enumerated Types/Classes](#qtpygui-enumerated-typesclass-reference)
 
 ## Introduction
@@ -446,7 +445,6 @@ Where the "txt_font" is set, it overrides the other text related font properties
 GUI Controls are housed in [Containers](#containers) and the container_tag and 
 tag make a unique pair in the form layout
 
-
 | Control                     | Description                                                                                                                  |
 |-----------------------------|------------------------------------------------------------------------------------------------------------------------------|
 | [Button](#button)           | Creates a button, text and icon are optional                                                                                 |
@@ -465,8 +463,8 @@ tag make a unique pair in the form layout
 | [Slider](#slider)           | Creates a slider control than can be used to set a value <br/>by dragging the handle                                         |
 | [Spacer](#spacer)           | Creates a spacer control used to format layout                                                                               |
 | [Spinbox](#spinbox)         | Creates a spinbox control that allows numbers to be set <br/>via clicking up and down arrows or entering the number directly |
-| Switch                      | Creates a switch control that can be used to turn on and <br/>off a feature                                                  |
-| Tab                         | Creates a tab control that has multiple pages, each <br/>housing their own set of GUI controls                               |
+| [Switch](#switch)           | Creates a switch control that can be used to turn on and <br/>off a feature                                                  |
+| [Tab](#tab)                 | Creates a tab control that has multiple pages, each <br/>housing their own set of GUI controls                               |
 | TextEdit                    | Creates a text entry control that can span multiple lines                                                                    |
 | Timeedit                    | Creates a time edit control with an erase button                                                                             |
 | Treeview                    | Creates a control that displays data as a tree view                                                                          |
@@ -581,7 +579,6 @@ and the properties here are used to set the behavior of the GUI control when ins
 | visible_get         |                 | bool                                                                                           | <br><b>Returns:</b><br> True - widget visible, False - widget hidden.<br>                                                            |              |
 | visible_set         |                 | None                                                                                           |                                                                                                                                      |              |
 |                     | visible         | bool                                                                                           | True, sets widget visible, Otherwise widget hidden.                                                                                  | ❌            |
-
 
 #### Button
 
@@ -2172,6 +2169,241 @@ Switch(
 | value_get        |               | bool                          | <br><b>Returns:</b><br> True - Switch is on, False - Switch is off<br> |              |
 | value_set        |               | None                          |                                                                        |              |
 |                  | value         | bool                          | True - Switch on, False Switch off                                     |              |
+
+
+### Tab
+ 
+Calling Tab in a layout will generate a Tab control on a form. A Tab control 
+can have multiple pages that can house GUI controls.
+ 
+
+<br>**Properties**
+<br> A Tab control has the following properties, but can also use a subset of 
+[_qtpyBase_Control](#_qtpybase_control) properties, which are not shown in the "fully loaded" example below
+
+| **Property**       | **Description**                                                                                                   | **Type** | **Optional** |
+|--------------------|-------------------------------------------------------------------------------------------------------------------|----------|--------------|
+| height             | Characters if [pixel_unit](#_qtpybase_control) is False, Otherwise pixels. This will need setting                 | int (1)  | ✓            |
+| page_right_margin  | Controls the right margin of the [Container](#containers) that fills the form. <br>- Seldom Used <br>- in pixels  | int (10) | ✓            |
+| page_bottom_margin | Controls the bottom margin of the [Container](#containers) that fills the form. <br>- Seldom Used <br>- in pixels | int (50) | ✓            |
+| tag                | The system name of the Tab (required for application processing)                                                  | str      | ❌            |
+| width              | Characters if [pixel_unit](#_qtpybase_control) is False, Otherwise pixels. This will need setting                 | int (10) | ✓            |
+
+<br>A fully loaded Tab declaration:
+<br><br>**Note: Only "tag" and "callback" are usually needed**
+
+Creating a Tab control is a three-step process
+<br>
+- 1 Create the tab instance (label properties are optional) 
+<br><br>
+```
+tab = qtg.Tab(
+                tag="tab",
+                label="Example Tab",
+                label_font=qtg.Font(backcolor="yellow", forecolor="blue", size=20),
+                callback=self.event_handler,
+                width=35,
+                height=13,
+            ) 
+```
+
+- 2 Add pages (The control argument is mandatory, even if it is only an empty [Container](#containers)) 
+  - Here we add a VBoxContainer with an [Image](#image) and two [Buttons](#button) 
+  as an example
+  - It is a good idea to declare the control layout as a separate declaration 
+  (like tab in Step 1, except it will be a [Container](#containers)) as it will be clearer
+    - This means any GUI controls, including another [Tab](#tab) control, can be
+    placed on a tab page
+    - **Note: Only "tag", "title" (tab page title), "control" and "callback" are usually needed**
+<br>
+```
+tab.page_add(
+                tag="tab_pg1",
+                title="Page 1",
+                control=qtg.VBoxContainer(align=qtg.Align.CENTER).add_row(
+                    qtg.Spacer(height=1),
+                    qtg.Image(
+                        tag="image",
+                        # label="Image",
+                        width=20,
+                        height=20,
+                        callback=self.event_handler,
+                        image="example.jpg",
+                    ),
+                    qtg.Spacer(height=1),
+                    qtg.Button(
+                        tag="add_page", text="Add Page", callback=self.event_handler
+                    ),
+                    qtg.Button(
+                        tag="delete_page",
+                        text="Delete Page",
+                        callback=self.event_handler,
+                    ),
+                ),
+            )
+```
+
+- 3 Repeat Step 2 until done
+
+Putting it all together, this is how to declare a Tab with one page ([Example 04](./Examples/example_04_tab_control.py))
+ 
+```
+        def tab_definition() -> qtg.Tab:
+            """Creates the tab control definition"""
+
+            # 1st Create a tab page layout (this could be in another function, file or method)
+            # Here we have an Image with two buttons layed out horizontally under it
+            tab_page_layout = qtg.VBoxContainer(align=qtg.Align.CENTER).add_row(
+                qtg.Spacer(height=1),
+                qtg.Image(
+                    tag="image",
+                    # label="Image",
+                    width=20,
+                    height=20,
+                    callback=self.event_handler,
+                    image="example.jpg",
+                ),
+                qtg.Spacer(height=1),
+                qtg.HBoxContainer().add_row(
+                    qtg.Button(
+                        tag="add_page", text="Add Page", callback=self.event_handler
+                    ),
+                    qtg.Button(
+                        tag="delete_page",
+                        text="Delete Page",
+                        callback=self.event_handler,
+                    ),
+                ),
+            )
+
+            # 2nd, Create the tab
+            tab = qtg.Tab(
+                tag="tab",
+                label="Example Tab",
+                label_font=qtg.Font(backcolor="yellow", forecolor="blue", size=20),
+                callback=self.event_handler,
+                width=35,
+                height=13,
+            )
+
+            # 3rd, Add Pages
+            tab.page_add(
+                tag="tab_pg1",
+                title="Page 1",
+                control=tab_page_layout,
+            )
+
+            return tab
+```
+
+And this is how the Tab control can be manipulated at application run time in the callback method "event_handler"
+<br>
+```
+    def event_handler(self, event: qtg.Action):
+        """Handles  form events
+        Args:
+            event (qtg.Action): The triggering event
+        """
+        assert isinstance(event, qtg.Action), f"{event=}. Must be Action"
+
+        match event.event:
+            case qtg.Sys_Events.CLICKED:
+                if event.tag == "add_page":
+                    # Get tab widget
+                    tab_widget = cast(
+                        qtg.Tab,
+                        event.widget_get(container_tag="tab_container", tag="tab"),
+                    )
+
+                    # Add page
+                    page_count = tab_widget.page_count()
+
+                    new_page_tag = f"tab_page{page_count + 1}"
+
+                    if tab_widget.page_exists(new_page_tag):
+                        tab_widget.page_remove(new_page_tag)
+
+                    tab_widget.page_add(
+                        tag=new_page_tag,
+                        title=f"Page {page_count + 1}",
+                        control=qtg.VBoxContainer().add_row(
+                            qtg.Label(
+                                text=f"Page {page_count + 1}",
+                                align=qtg.Align.CENTER,
+                            ),
+                            qtg.Button(
+                                text="Delete Page",
+                                tag=f"delete_page{page_count + 1}",
+                                callback=self.event_handler,
+                            ),
+                        ),
+                    )
+                elif event.tag.startswith("delete_page"):
+                    # Get tab widget
+                    tab_widget = cast(
+                        qtg.Tab,
+                        event.widget_get(container_tag="tab_container", tag="tab"),
+                    )
+
+                    page_count = tab_widget.page_count()
+                    page_tag = tab_widget.current_page_tag()
+
+                    # Never delete the first page. page_index returns 0 if first page   
+                    if page_count == 1 or tab_widget.page_index(page_tag) == 0:
+                        popups.PopError(
+                            title="Error...",
+                            message="A Tab Must Have One Page And First Page Can Not Be Deleted",
+                        ).show()
+                    else:
+                        # Delete page
+                        tab_widget.page_remove(page_tag)
+                        # tab_widget.page_remove(event.tag)
+                elif event.tag == "ok":
+                    self.example_04.app_exit()
+```
+
+<br>**Methods**
+<br>A subset of the [_qtpyBase_Control](#_qtpybase_control) methods apply to a Tab instance
+ 
+| **Method**       | **Arguments**  | **Type**                                                 | **Description**                                                                                                                                                                                                                                                       | **Optional** |
+|------------------|----------------|----------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
+| current_page_tag |                | str                                                      | <br><b>Returns:</b><br> The current tab page tag<br>                                                                                                                                                                                                                  |              |
+| enable_get       |                | bool                                                     |                                                                                                                                                                                                                                                                       |              |
+|                  | tag            | str                                                      | The tag name of the Tab control or tab page depending on which enable state is required.                                                                                                                                                                              | ❌            |
+| enable_set       |                | int                                                      | <br><b>Returns:</b><br> 1 - Success, -1 - Failure<br>                                                                                                                                                                                                                 |              |
+|                  | enable (True)  | bool                                                     | True - Enable the tab or tab page, False - Disable the tab or tab page.                                                                                                                                                                                               | ✓            |
+|                  | tag ("")       | str                                                      | The tag name of the tab or tab page depending on which enable state is required.<br>-If tag is "" then enable applies to all tab pages <br>-If tag is the Tab tag name then enable applies to the Tab control, Otherwise it applies to the tab page with the tag name | ✓            |
+| page_add         |                | None                                                     | Creates and adds a new tab page <br><b>Returns:</b><br> The Tab control<br>                                                                                                                                                                                           |              |
+|                  | control        | [Container](#containers) \| [GUI Control](#gui-controls) | The [Container](#containers) \| [GUI Control](#gui-controls) defining the tab page GUI layout                                                                                                                                                                         | ❌            |
+|                  | enabled (True) | bool                                                     | Sets the tab page enabled/disabled                                                                                                                                                                                                                                    | ✓            |
+|                  | icon           | str [File Name] \| QPixmap \| qtG.QIcon (None)           | Add an icon to the tab page title                                                                                                                                                                                                                                     | ✓            |
+|                  | tag            | str                                                      | Tab page tag                                                                                                                                                                                                                                                          | ❌            |
+|                  | title          | str                                                      | Tab page title                                                                                                                                                                                                                                                        | ❌            |
+|                  | tooltip ("")   | str                                                      | The tab page tooltip                                                                                                                                                                                                                                                  | ✓            |
+|                  | visible (True) | bool                                                     | Sets the tab page visible/invisible                                                                                                                                                                                                                                   | ✓            |
+| page_count       |                | int                                                      | <br><b>Returns:</b><br> The number of tab pages<br>                                                                                                                                                                                                                   |              |
+| page_exists      |                | bool                                                     | <br><b>Returns:</b><br> True if the tab page exists<br>                                                                                                                                                                                                               |              |
+|                  | tag            | str                                                      | The tag name of the tab page                                                                                                                                                                                                                                          | ❌            |
+| page_icon_set    |                | None                                                     | Sets a tab page icon                                                                                                                                                                                                                                                  |              |
+|                  | icon           | str [File Name] \| QPixmap \| qtG.QIcon (None)           | Add an icon to the tab page title                                                                                                                                                                                                                                     | ❌            |
+|                  | tag            | str                                                      | The tag name of the page whose icon is to be set on.                                                                                                                                                                                                                  | ❌            |
+| page_index       |                | int                                                      | <br><b>Returns:</b><br> The index of the tab page or -1 if tab not found<br>                                                                                                                                                                                          |              |
+|                  | tag            | str                                                      | The tag name of the tab page                                                                                                                                                                                                                                          | ❌            |
+| page_remove      |                | None                                                     | Removes a tab page from the tab widget                                                                                                                                                                                                                                |              |
+|                  | tag            | str                                                      | tag name of the page to be removed                                                                                                                                                                                                                                    | ❌            |
+| pages_remove_all |                | None                                                     | Removes all the pages from the Tab control                                                                                                                                                                                                                            |              |
+| page_visible_get |                | bool                                                     | <br><b>Returns:</b><br> `<br>True` if the tab page with the given tag name is visible, `False` otherwise<br>                                                                                                                                                          |              |
+|                  | tag            | str                                                      | tag name of the page to be checked                                                                                                                                                                                                                                    | ❌            |
+| page_visible_set |                | None                                                     | Sets the visibility of a tab page                                                                                                                                                                                                                                     |              |
+|                  | tag            | str                                                      | tag name of the page to be set                                                                                                                                                                                                                                        | ❌            |
+|                  | visible        | bool                                                     | True to make the page visible, False to hide it                                                                                                                                                                                                                       | ❌            |
+| select_tab       |                | None                                                     | Selects the tab page with the given tag name                                                                                                                                                                                                                          |              |
+|                  | tag_name       | str                                                      | The tag name of the tab page to be selected                                                                                                                                                                                                                           | ❌            |
+| tooltip_get      |                | str                                                      | <br><b>Returns:</b><br> The tooltip text for the tab page with the tag name.<br>                                                                                                                                                                                      |              |
+|                  | tag            | str                                                      | The tag name of the tab to get the tooltip from.                                                                                                                                                                                                                      | ❌            |
+| tooltip_set      |                | None                                                     | Selects the tab page with the given tag name                                                                                                                                                                                                                          |              |
+|                  | tag            | str                                                      | tag name of the tab page to set the tooltip text                                                                                                                                                                                                                      | ❌            |
+|                  | tooltip        | str                                                      | The tooltip text                                                                                                                                                                                                                                                      | ❌            |
 
 ### QTPYGUI Enumerated Types/Helper Class Reference
 

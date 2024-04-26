@@ -14791,7 +14791,7 @@ class Tab(_qtpyBase_Control):
         tag: str,
         title: str,
         control: Union[_qtpyBase_Control, _Container],
-        icon: Optional[Union[str, qtG.QPixmap]] = None,
+        icon: Optional[Union[ str, qtG.QPixmap, qtG.QIcon]] = None,
         tooltip: str = "",
         enabled: bool = True,
         visible: bool = True,
@@ -14802,7 +14802,7 @@ class Tab(_qtpyBase_Control):
             tag (str): Tab page tag
             title (str): Tab page title
             control (Union[_qtpyBase_Control, _Container]): The qtgui(s) control to be placed on the tab page
-            icon (Optional[Union[str, qtG.QPixmap]]): Tab page icon.  Can a str pointing to an icon file or an icon
+            icon (Optional[Union[ str, qtG.QPixmap, qtG.QIcon]]): Tab page icon.  Can be a str pointing to an icon file or an icon
             tooltip (str): The tab page tooltip
             enabled (bool): Sets the tab page enabled/disabled (default:True)
             visible (bool): Sets the tab page visible/invisible (default:TRue)
@@ -14826,7 +14826,7 @@ class Tab(_qtpyBase_Control):
                     raise RuntimeError(f"Tab Page  {tag=}. Already exists")
 
         tab_page_container = VBoxContainer(
-            # text="test",
+            # text="test", # Groupbox fo debugging
             tag=tag,
             height=self.height - 2,
             width=self.width - 2,
@@ -14932,7 +14932,7 @@ class Tab(_qtpyBase_Control):
     def page_icon_set(
         self, tag: str, icon: Union[None, str, qtG.QPixmap, qtG.QIcon]
     ) -> None:
-        """Sets the tab page icon
+        """Sets a tab page icon
 
         Args:
             tag (str): The tag name of the page whose icon is to be set on.
