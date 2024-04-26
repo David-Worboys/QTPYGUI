@@ -2921,6 +2921,7 @@ class _qtpyBase_Control(_qtpyBase):
             return edit_frame
         else:
             # self._widget.setStyle(qtW.QStyleFactory.create("Windows"))  # Debug
+
             return self._widget
 
     def buddy_text_set(self, value: str) -> None:
@@ -10870,7 +10871,7 @@ class Grid(_qtpyBase_Control):
             col (int): The column index of the cell to set the widget for.
             widget (_qtpyBase_Control): The widget to be inserted into the grid
             group_text (str): If group_text is provided the widget will be displayed
-              in a group box with the group_text as a title
+            in a group box with the group_text as a title
         """
         self._widget: qtW.QTableWidget
 
@@ -14490,6 +14491,9 @@ class Timeedit(_qtpyBase_Control):
 class Tab(_qtpyBase_Control):
     """Instantiates a Tab control and associated properties"""
 
+    page_right_margin: int = 10
+    page_bottom_margin: int = 50
+
     @dataclasses.dataclass
     class _Page_Def:
         """Internal page definition class"""
@@ -14506,6 +14510,13 @@ class Tab(_qtpyBase_Control):
 
     def __post_init__(self) -> None:
         """Constructor check parameters ans sets properties"""
+
+        assert isinstance(
+            self.page_right_margin, int
+        ), f"{self.page_right_margin=}. Must be int"
+        assert isinstance(
+            self.page_bottom_margin, int
+        ), f"{self.page_bottom_margin=}. Must be int"
 
         super().__post_init__()
 
@@ -14528,6 +14539,16 @@ class Tab(_qtpyBase_Control):
         if self.height < 1:
             self.height = WIDGET_SIZE.height
 
+        # Expect no impact from this as it just adds a container and a spacer
+        # Poxy work-around without a buddy control Tab width is a little off but
+        # with a buddy it is fine.
+        if self.buddy_control is None:
+            self.buddy_control = HBoxContainer().add_row(Spacer(width=1, height=1))
+        else:  # With a buddy it is left a little, but with another buddy it is fine
+            self.buddy_control = HBoxContainer().add_row(
+                Spacer(width=1, height=1), self.buddy_control
+            )
+
         widget = super()._create_widget(
             parent_app=parent_app, parent=parent, container_tag=container_tag
         )
@@ -14544,15 +14565,7 @@ class Tab(_qtpyBase_Control):
         if self._widget is None:
             raise RuntimeError(f"{self._widget=} is not set")
 
-        char_pixel_size = self.pixel_char_size(1, 1)
-        page_width = (
-            self.width - 16
-        ) * char_pixel_size.width  # 16 is magic but it fits right
-        page_height = (
-            self.height - 2
-        ) * char_pixel_size.height  # 2 is magic but it fits right
-
-        for page in self._tab_pages.values():
+        for page_index, page in enumerate(self._tab_pages.values()):
             if page.created:
                 continue
 
@@ -14566,9 +14579,12 @@ class Tab(_qtpyBase_Control):
             tab_page_layout.addWidget(tab_widget)
             tab_page_layout.setContentsMargins(0, 0, 0, 0)
 
+            found_child_widget = None
+
             # Set size policy for child widgets
-            for page_index in range(tab_page_layout.count()):
-                page_item = tab_page_layout.itemAt(page_index)
+            for page_item_index in range(tab_page_layout.count()):
+                page_item = tab_page_layout.itemAt(page_item_index)
+
                 if page_item is not None:
                     page_widget = page_item.widget()
                     if page_widget is not None:
@@ -14578,17 +14594,22 @@ class Tab(_qtpyBase_Control):
                             if child_item is not None:
                                 child_widget = child_item.widget()
                                 if child_widget is not None:
-                                    child_widget.setFixedHeight(
-                                        page_height - 45
-                                    )  # More magic to fit
+                                    found_child_widget = child_widget
                                     # child_widget.setFrameStyle(Frame_Style.BOX.value)  # Debug
 
             tab_page = qtW.QWidget(self._widget)
             tab_page.setLayout(tab_page_layout)
-            tab_page.setFixedWidth(page_width)
-            tab_widget.setFixedHeight(page_height + char_pixel_size.height)
 
             page.index = self._widget.addTab(tab_page, page.title)
+            self._widget.widget(page.index).setFixedWidth(self._widget.width() - 20)
+
+            if found_child_widget is not None:
+                found_child_widget.setFixedWidth(
+                    self._widget.widget(page.index).width() - self.page_right_margin
+                )
+                found_child_widget.setFixedHeight(
+                    self._widget.height() - self.page_bottom_margin
+                )
 
             if page.icon is not None:
                 self.page_icon_set(page.tag, page.icon)
@@ -14598,6 +14619,7 @@ class Tab(_qtpyBase_Control):
 
             self.enable_set(page.tag, page.enabled)
             self.page_visible_set(page.tag, page.visible)
+            self._widget.widget(page_index).setObjectName(page.tag)
 
             page.created = True
 
@@ -14718,7 +14740,11 @@ class Tab(_qtpyBase_Control):
             tag in self._tab_pages
         ), f"{tag=}. Not found in Tab {self.tag=}  or tab pages: {self._tab_pages=}"
 
-        return self._widget.isTabEnabled(self._tab_pages[tag].index)
+        for index in range(self._widget.count()):
+            if self._widget.widget(index).objectName() == tag:
+                return self._widget.isTabEnabled(index)
+
+        return False
 
     def enable_set(self, tag: str = "", enable: bool = True) -> int:
         """Sets the tab or the tab pages enable state depending on the tag name property value.
@@ -14745,14 +14771,19 @@ class Tab(_qtpyBase_Control):
         else:
             if tag.strip() == "":
                 for page_tag in self._tab_pages.keys():
-                    self._widget.setTabEnabled(self._tab_pages[page_tag].index, enable)
+                    for index in range(self._widget.count()):
+                        if self._widget.widget(index).objectName() == page_tag:
+                            self._widget.setTabEnabled(index, enable)
             else:
                 assert tag in self._tab_pages, (
                     f"{tag=}. Not found in Tab {self.tag=}  or tab pages:"
                     f" {self._tab_pages=}"
                 )
 
-                self._widget.setTabEnabled(self._tab_pages[tag].index, enable)
+                for index in range(self._widget.count()):
+                    if self._widget.widget(index).objectName() == tag:
+                        self._widget.setTabEnabled(index, enable)
+
         return 1
 
     def page_add(
@@ -14785,15 +14816,20 @@ class Tab(_qtpyBase_Control):
         ), f"{tag=}. Must be a non-empty str"
 
         assert isinstance(title, str), f"{title=}. Must be str"
-
         assert isinstance(
             control, (_qtpyBase_Control, _Container)
         ), f"{control=}. Must be a descendant of _qtpyBase_Control or _Container"
 
+        if self._widget is not None:
+            for index in range(self._widget.count()):
+                if self._widget.widget(index).objectName() == tag:
+                    raise RuntimeError(f"Tab Page  {tag=}. Already exists")
+
         tab_page_container = VBoxContainer(
             # text="test",
             tag=tag,
-            height=40,
+            height=self.height - 2,
+            width=self.width - 2,
             margin_left=10,
             margin_right=10,
             margin_top=10,
@@ -14803,7 +14839,13 @@ class Tab(_qtpyBase_Control):
 
         control.scroll = True
 
-        tab_page_container.add_row(control)
+        # Putting GUI controls in a container stops them stretching
+        if isinstance(control, _Container):
+            tab_page_container.add_row(control)
+        else:
+            tab_page_container.add_row(
+                HBoxContainer(align=Align.CENTER).add_control(control)
+            )
 
         assert isinstance(
             self.icon, (type(None), str, qtG.QPixmap, qtG.QIcon)
@@ -14831,6 +14873,15 @@ class Tab(_qtpyBase_Control):
 
         return self
 
+    def current_page_tag(self) -> str:
+        """Returns the current tab page
+
+        Returns:
+            str: The current tab page tag
+        """
+
+        return self._widget.widget(self._widget.currentIndex()).objectName()
+
     def select_tab(self, tag_name: str):
         """Selects the tab page with the given tag name
 
@@ -14841,8 +14892,42 @@ class Tab(_qtpyBase_Control):
         assert (
             tag_name in self._tab_pages
         ), f"{tag_name=}. Not found in tab pages: {self._tab_pages=}"
+        for index in range(self._widget.count()):
+            if self._widget.widget(index).objectName() == tag_name:
+                self._widget.setCurrentIndex(index)
+                break
 
-        self._widget.setCurrentIndex(self._tab_pages[tag_name].index)
+    def page_count(self) -> int:
+        """Returns the number of tab pages
+
+        Returns:
+            int: The number of tab pages
+        """
+        if self._widget is None:
+            return 0
+
+        return self._widget.count()
+
+    def page_exists(self, tag: str) -> bool:
+        """Returns True if the tab page exists
+
+        Args:
+            tag (str): The tag name of the tab page
+
+        Returns:
+            bool: True if the tab page exists
+
+        """
+        assert (
+            isinstance(tag, str) and tag.strip() != ""
+        ), f"{tag=}. Must be a non-empty str"
+        assert isinstance(tag, str), f"{tag=}. Must be non-empty str"
+
+        for index in range(self._widget.count()):
+            if self._widget.widget(index).objectName() == tag:
+                return True
+
+        return tag in self._tab_pages
 
     def page_icon_set(
         self, tag: str, icon: Union[None, str, qtG.QPixmap, qtG.QIcon]
@@ -14876,8 +14961,29 @@ class Tab(_qtpyBase_Control):
                 pass  # All Good
             else:
                 raise AssertionError(f"{icon=}. Not a valid icon type")
+            for index in range(self._widget.count()):
+                if self._widget.widget(index).objectName() == tag:
+                    self._widget.setTabIcon(index, qtG.QIcon(icon))
+                    break
+        return None
 
-            self._widget.setTabIcon(self._tab_pages[tag].index, qtG.QIcon(icon))
+    def page_index(self, tag: str) -> int:
+        """Returns the index of the tab page
+
+        Args:
+            tag (str): The tag name of the tab page
+
+        Returns:
+            int: The index of the tab page or -1 if tab not found
+        """
+        assert (
+            isinstance(tag, str) and tag.strip() != ""
+        ), f"{tag=}. Must be a non-empty str"
+
+        for index in range(self._widget.count()):
+            if self._widget.widget(index).objectName() == tag:
+                return index
+        return -1
 
     def pages_remove_all(self) -> None:
         """Removes all the pages from the Tab control"""
@@ -14909,13 +15015,14 @@ class Tab(_qtpyBase_Control):
             self._tab_pages[tag].index >= 0
         ), f"{self._tab_pages[tag].index=} {self._tab_pages[tag]=}. Page not created!"
 
-        window_id = Get_Window_ID(self.parent_app, self.parent, self)
-
         self._tab_pages[tag].container.widgets_clear()
-        self.parent_app.widget_del(window_id=window_id, container_tag=self.tag, tag=tag)
-        self._widget.removeTab(self._tab_pages[tag].index)
 
-        self._tab_pages.pop(tag)
+        for index in range(self._widget.count()):
+            if self._widget.widget(index).objectName() == tag:
+                self._widget.removeTab(index)
+                self._tab_pages.pop(tag)
+                break
+        return None
 
     def page_visible_get(self, tag: str) -> bool:
         """Determines the visibility of a tab page
@@ -14940,7 +15047,11 @@ class Tab(_qtpyBase_Control):
             self._tab_pages[tag].index >= 0
         ), f"{self._tab_pages[tag]=}. Page not created!"
 
-        return self._widget.isTabVisible(self._tab_pages[tag].index)
+        for index in range(self._widget.count()):
+            if self._widget.widget(index).objectName() == tag:
+                return self._widget.isTabVisible(index)
+
+        return False
 
     def page_visible_set(self, tag: str, visible: bool) -> None:
         """Sets the visibility of a tab page
@@ -14969,8 +15080,11 @@ class Tab(_qtpyBase_Control):
         assert (
             self._tab_pages[tag].index >= 0
         ), f"{self._tab_pages[tag]=}. Page not created!"
-
-        self._widget.setTabVisible(self._tab_pages[tag].index, visible)
+        for index in range(self._widget.count()):
+            if self._widget.widget(index).objectName() == tag:
+                self._widget.setTabVisible(index, visible)
+                return None
+        return None
 
     def tooltip_get(self, tag: str) -> str:
         """Get the tooltip text of a tab page
@@ -14996,7 +15110,11 @@ class Tab(_qtpyBase_Control):
             tag in self._tab_pages
         ), f"{tag=}. Not found in Tab {self.tag=}  or tab pages: {self._tab_pages=}"
 
-        return self._widget.tabToolTip(self._tab_pages[tag].index)
+        for index in range(self._widget.count()):
+            if self._widget.widget(index).objectName() == tag:
+                return self._widget.tabToolTip(index)
+
+        return ""
 
     def tooltip_set(self, tag: str, tooltip: str) -> None:
         """Sets the tooltip for a tab.
@@ -15021,7 +15139,11 @@ class Tab(_qtpyBase_Control):
                 tag in self._tab_pages
             ), f"{tag=}. Not found in Tab {self.tag=}  or tab pages: {self._tab_pages=}"
 
-            self._widget.setTabToolTip(self._tab_pages[tag].index, tooltip)
+            for index in range(self._widget.count()):
+                if self._widget.widget(index).objectName() == tag:
+                    self._widget.setTabToolTip(index, tooltip)
+                    return None
+        return None
 
 
 @dataclasses.dataclass
