@@ -2910,11 +2910,19 @@ class _qtpyBase_Control(_qtpyBase):
             else:
                 widget_height = self._widget.height()
 
-            if buddy_widget.height() > widget_height:
+            if isinstance(buddy_widget.height, Callable):
+                buddy_widget_height = buddy_widget.height()
+            elif isinstance(buddy_widget.height, int):
+                buddy_widget_height = buddy_widget.height    
+            else:
+                raise RuntimeError(f"{buddy_widget=}. buddy_widget.height() must be int or Callable")
+            
+            if (buddy_widget_height > widget_height
+            ):
                 if self.pixel_unit:
-                    self.height = buddy_widget.height()
+                    self.height = buddy_widget_height
                 else:
-                    self.height = buddy_widget.height() // char_pixel_size.height
+                    self.height = buddy_widget_height // char_pixel_size.height
 
         if edit_frame is not None:
             # edit_frame.setFrameShape(qtW.QFrame.Shape.Box)  # Debug
@@ -14791,7 +14799,7 @@ class Tab(_qtpyBase_Control):
         tag: str,
         title: str,
         control: Union[_qtpyBase_Control, _Container],
-        icon: Optional[Union[ str, qtG.QPixmap, qtG.QIcon]] = None,
+        icon: Optional[Union[str, qtG.QPixmap, qtG.QIcon]] = None,
         tooltip: str = "",
         enabled: bool = True,
         visible: bool = True,
