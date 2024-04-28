@@ -2913,12 +2913,13 @@ class _qtpyBase_Control(_qtpyBase):
             if isinstance(buddy_widget.height, Callable):
                 buddy_widget_height = buddy_widget.height()
             elif isinstance(buddy_widget.height, int):
-                buddy_widget_height = buddy_widget.height    
+                buddy_widget_height = buddy_widget.height
             else:
-                raise RuntimeError(f"{buddy_widget=}. buddy_widget.height() must be int or Callable")
-            
-            if (buddy_widget_height > widget_height
-            ):
+                raise RuntimeError(
+                    f"{buddy_widget=}. buddy_widget.height() must be int or Callable"
+                )
+
+            if buddy_widget_height > widget_height:
                 if self.pixel_unit:
                     self.height = buddy_widget_height
                 else:
@@ -14045,7 +14046,7 @@ class _Switch(qtW.QAbstractButton):
 class TextEdit(_qtpyBase_Control):
     """Instantiates a text edit widget and associated properties"""
 
-    label: str = "&"
+    # label: str = "&"
     max_chars: int = -1
     word_wrap: bool = True
 
@@ -14119,17 +14120,42 @@ class TextEdit(_qtpyBase_Control):
 
             self._widget.moveCursor(qtG.QTextCursor.End)
 
+            # txt_font is overridden by label font for some reason
+            if self.txt_font is not None:
+                self.font_set(
+                    app_font=g_application.app_font_def,
+                    widget_font=self.txt_font,
+                    widget=self._widget,
+                )
+
+            self._widget.textChanged.connect(
+                functools.partial(self._text_input_changed, self._widget)
+            )
+
         return widget
 
-    def _check_max_chars(self) -> None:
-        """Checks the max characters and sets the widget to read only if max characters is reached"""
-        self._widget: qtW.QTextEdit
+    def _text_input_changed(self, text_widget: qtW.QTextEdit) -> None:
+        """Called when the text in the TextEdit widget is changed and prevents
+        text entry if the maximum length has been reached
 
-        diff = len(self._widget.toPlainText()) - self.max_chars
+        Args:
+            text_input (qtW.QTextEdit): The text widget
+        """
+        assert isinstance(
+            text_widget, qtW.QTextEdit
+        ), f"{text_widget=}. Must be a qtW.QTextEdit"
 
-        if diff > 0:  # Max length exceeded
-            self._widget.setText(self._widget.toPlainText()[0 : self.max_chars])
-            self._widget.moveCursor(qtG.QTextCursor.End)
+        text = text_widget.toPlainText()
+
+        if self.max_chars > 0 and len(text) > self.max_chars:
+            cursor = text_widget.textCursor()
+            pos = cursor.columnNumber()
+            text = text[: pos - 1] + text[pos:]
+            text_widget.setPlainText(text)
+            cursor.setPosition(pos - 1)
+            text_widget.setTextCursor(cursor)
+
+        return None
 
     def value_set(self, value: str = "") -> None:
         """Sets the text of the widget to the string value
@@ -14141,7 +14167,7 @@ class TextEdit(_qtpyBase_Control):
 
         assert isinstance(value, str), f"text <{value=}>. Must be a str"
 
-        self._widget.setText(self.trans_str(value))
+        self._widget.setText(value)
         self._widget.moveCursor(qtG.QTextCursor.End)
 
     def value_get(self, plain_text: bool = True) -> str:

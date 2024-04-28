@@ -2124,7 +2124,7 @@ control is used to flick a setting on and off.
 <br><br>**Note: Only "tag","label","text" and "callback" are usually needed**
 <br>It is suggested **NOT** to set width and height as the defaults suit the Switch style.
 - It has been noted with a buddy_control it is necessary to adjust ```tune_vsize=-10```
-Where 10 is an arbituary figure and the programmer will need to experiment to find 
+Where 10 is an arbitrary figure and the programmer will need to experiment to find 
 the correct value
 
 ```
@@ -2357,7 +2357,6 @@ And this is how the Tab control can be manipulated at application run time in th
                     else:
                         # Delete page
                         tab_widget.page_remove(page_tag)
-                        # tab_widget.page_remove(event.tag)
                 elif event.tag == "ok":
                     self.example_04.app_exit()
 ```
@@ -2404,6 +2403,74 @@ And this is how the Tab control can be manipulated at application run time in th
 | tooltip_set      |                | None                                                     | Selects the tab page with the given tag name                                                                                                                                                                                                                          |              |
 |                  | tag            | str                                                      | tag name of the tab page to set the tooltip text                                                                                                                                                                                                                      | ❌            |
 |                  | tooltip        | str                                                      | The tooltip text                                                                                                                                                                                                                                                      | ❌            |
+
+### TextEdit
+
+Calling TextEdit in a layout will generate a TextEdit control on a form. 
+A TextEdit control is used to enter a large amount of text.
+ 
+
+<br>**Properties**
+<br> A TextEdit control has the following properties, but can also use a subset of 
+[_qtpyBase_Control](#_qtpybase_control) properties, which are not shown in the "fully loaded" example below
+
+| **Property** | **Description**                                                                                   | **Type**      | **Optional** |
+|--------------|---------------------------------------------------------------------------------------------------|---------------|--------------|
+| height       | Characters if [pixel_unit](#_qtpybase_control) is False, Otherwise pixels. This will need setting | int (1)       | ✓            | |
+| max_chars    | The maximum number of characters that can be entered into the TextEdit control                    | int (-1)      | ✓            |
+| width        | Characters if [pixel_unit](#_qtpybase_control) is False, Otherwise pixels. This will need setting | int (10)      | ✓            | |
+| word_wrap    | True, text line wraps, Otherwise it does not                                                      | bool (True)   | ✓            |
+| tag          | The system name of the TextEdit control (required for application processing)                     | str           | ❌            |
+ 
+
+<br>A fully loaded Switch declaration:
+<br><br>**Note: Only "tag", "text" (To preload the TextEdit control) and "callback" are usually needed**
+- It is possible to paste text into the TextEdit control and to a large degree 
+this will retain the original formatting
+
+```
+TextEdit(
+            tag="textedit",
+            text="Text Edit",
+            label="Text Edit",
+            callback=self.event_handler,
+            height=5,
+            max_chars=10,
+            word_wrap=True,
+    
+            label_font=qtg.Font(
+                style=qtg.Font_Style.OBLIQUE, backcolor="blue",forecolor="yellow", size=12
+            ),
+            txt_font=qtg.Font(
+                style=qtg.Font_Style.NORMAL, backcolor="yellow", size=15,font_name="DejaVu Sans Mono"
+            ),
+            enabled=True,
+            visible=True,
+            tooltip="Text Edit",
+            tune_hsize=15,
+            tune_vsize=15,
+            user_data={"key": "value"},
+            buddy_control=qtg.HBoxContainer().add_row(
+                qtg.Button(
+                    tag="textedit_push",
+                    text="Text Edit!",
+                    callback=self.event_handler,
+                    width=10,
+                    height=1,
+                )
+            ),
+        )
+```
+
+<br>**Methods**
+<br>A subset of the [_qtpyBase_Control](#_qtpybase_control) methods apply to a Tab instance
+ 
+| **Method** | **Arguments**     | **Type** | **Description**                                                                                                                                     | **Optional** |
+|------------|-------------------|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
+| value_get  |                   | str      | Returns the text from the TextEdit` widget as either plain text or HTML<br><b>Returns:</b><br> The text in the text box in the selected format.<br> |              |
+|            | plain_text (True) | bool     | True - Returns the text as plain text, Otherwise Returns the text as HTML.                                                                          | ✓            |
+| value_set  |                   | None     | Sets the text of the widget to the string value                                                                                                     |              |
+|            | value             | str      | The string value to set the TextEdit widget to.                                                                                                     | ❌            |
 
 ### QTPYGUI Enumerated Types/Helper Class Reference
 
