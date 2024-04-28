@@ -1003,6 +1003,81 @@ class tags:
 
 
 @dataclasses.dataclass(slots=True)
+class Time_Struct:
+    _hour: int
+    _min: int
+    _sec: int
+    _msec: int
+
+    def _post_init(self):
+        """Checking the arguments passed to the constructor are of the correct type"""
+        assert isinstance(self._hour, int) and self._hour >= 0 and self._hour < 24
+        assert isinstance(self._min, int) and self._min >= 0 and self._min < 60
+        assert isinstance(self._sec, int) and self._sec >= 0 and self._sec < 60
+        assert isinstance(self._msec, int) and self._msec >= 0 and self._msec < 1000
+
+    @property
+    def hour(self) -> int:
+        """Get the hour"""
+        return self._hour
+
+    @hour.setter
+    def hour(self, value: int) -> None:
+        """Sets the hour
+
+        Args:
+            value (int): The hour
+        """
+        assert isinstance(value, int) and value >= 0 and value < 24
+        self._hour = value
+
+    @property
+    def min(self) -> int:
+        """Get the minutes"""
+        return self._min
+
+    @min.setter
+    def min(self, value: str) -> None:
+        """Sets the minutes
+
+        Args:
+            value (int): The minutes
+        """
+        assert isinstance(value, int) and value >= 0 and value < 60
+        self._min = value
+
+    @property
+    def sec(self) -> int:
+        """Get the seconds"""
+        return self._sec
+
+    @sec.setter
+    def sec(self, value: int) -> None:
+        """Sets the seconds
+
+        Args:
+            value (int): The seconds
+        """
+        assert isinstance(self.sec, int) and self.sec >= 0 and self.sec < 60
+        self._sec = value
+
+    @property
+    def msec(self) -> int:
+        """Get the milliseconds"""
+        return self._msec
+
+    @msec.setter
+    def msec(self, value: int) -> None:
+        """Sets the milliseconds
+
+        Args:
+            value (int): The milliseconds
+        """
+        assert isinstance(value, int) and value >= 0 and value < 1000
+        self._msec = value
+
+
+@dataclasses.dataclass(slots=True)
 class widget_def:
     """Used by _Container to store the data for scroll widgets"""
 
@@ -14204,8 +14279,7 @@ class Timeedit(_qtpyBase_Control):
     AP 	interpret as an AM/PM time. AP must be either “AM” or “PM”.
     ap 	Interpret as an AM/PM time. ap must be either “am” or “pm”.
     """
-
-    label: str = "&"
+    
     display_width: int = 10
     hour: int = -1
     min: int = -1
@@ -14215,13 +14289,6 @@ class Timeedit(_qtpyBase_Control):
     validate_callback: Optional[
         Union[Callable, types.FunctionType, types.MethodType, types.LambdaType]
     ] = None
-
-    @dataclasses.dataclass
-    class time_struct:
-        hour: int
-        min: int
-        sec: int
-        msec: int
 
     def __post_init__(self) -> None:
         """Constructor checks argument and sets associated properties"""
@@ -14266,11 +14333,6 @@ class Timeedit(_qtpyBase_Control):
 
         if self.hour == -1 and self.min == -1 and self.sec == -1 and self.msec == -1:
             pass
-            # now = qtC.QTime.currentTime().toString("hh.mm.ss.zzz").split(".")
-            # self.hour = int(now[0])
-            # self.min = int(now[1])
-            # self.sec = int(now[2])
-            # self.msec = int(now[3])
         else:
             assert 0 <= self.hour <= 23, f"hour <{self.hour}> must be >= 0 and <= 23"
             assert 0 <= self.min <= 59, f"min <{self.min}> must be >= 0 and <= 59"
@@ -14308,10 +14370,17 @@ class Timeedit(_qtpyBase_Control):
             raise RuntimeError(f"{self._widget=}. Not set")
 
         self._widget.setDisplayFormat(self.display_format)
-        # line_edit.setInputMask(self.display_format)
 
         self.time_set(self.hour, self.min, self.sec, self.msec)
 
+        # txt_font is overridden by label font for some reason
+        if self.txt_font is not None:
+            self.font_set(
+                app_font=g_application.app_font_def,
+                widget_font=self.txt_font,
+                widget=self._widget,
+            )
+        
         return widget
 
     def _event_handler(
@@ -14450,7 +14519,7 @@ class Timeedit(_qtpyBase_Control):
         self._widget.setTime(time)
 
     @property
-    def time_get(self) -> time_struct:
+    def time_get(self) -> Time_Struct:
         """Returns the time value as a time_struct (hour,min,sec,msec)
 
         Returns:
@@ -14462,27 +14531,27 @@ class Timeedit(_qtpyBase_Control):
             raise RuntimeError(f"{self._widget=}. Not set")
 
         time = self._widget.time()
-
-        return self.time_struct(
-            hour=time.hour(), min=time.minute(), sec=time.second(), msec=time.msec()
+        
+        return Time_Struct(
+            time.hour(), time.minute(), time.second(), time.msec()
         )
 
     @overload
-    def value_get(self, format: str = "", time_tuple=False) -> tuple: ...
+    def value_get(self, format: str = "", time_struct=False) -> Time_Struct: ...
 
     @overload
-    def value_get(self, format: str = "", time_tuple=False) -> str: ...
+    def value_get(self, format: str = "", time_struct=False) -> str: ...
 
-    def value_get(self, format: str = "", time_tuple=False) -> time_struct | str:
+    def value_get(self, format: str = "", time_struct=False) -> Time_Struct | str:
         """Returns the time value.
 
             if format is "-" then the time is returned as a string formatted to system short-format.
-            if format is "" then a time_tuple from time get is returned
+            if format is "" then a time_struct from is returned
             otherwise the format statement is used and a formatted time string returned
 
         Args:
             format (str): Format string
-            time_tuple (bool): True - Return time as a time_tuple (hour,min,sec,msec), False - Return time as a string
+            time_struct (bool): True - Return time as a time_struct (hour,min,sec,msec), False - Return time as a string
         """
         self._widget: qtW.QTimeEdit
 
@@ -14490,9 +14559,9 @@ class Timeedit(_qtpyBase_Control):
             raise RuntimeError(f"{self._widget=}. Not set")
 
         assert isinstance(format, str), f"{format=}. Must be a str"
-        assert isinstance(time_tuple, bool), f"{time_tuple=}. Must be bool"
+        assert isinstance(time_struct, bool), f"{time_struct=}. Must be bool"
 
-        if time_tuple:
+        if time_struct:
             return self.time_get
 
         if format.strip() == "-" or format.strip() == "":

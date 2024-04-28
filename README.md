@@ -373,7 +373,7 @@ that can be copied to a host machine.
 
 Nuitka's Kay Hayen is simply the Python GOAT when it comes to this type of thing.
 
-To compile ```hello_world.py``` the reader will need to install Nuika
+To compile ```hello_world.py``` the reader will need to install Nuitka
 
 ```pip install Nuitka```
 
@@ -465,8 +465,8 @@ tag make a unique pair in the form layout
 | [Spinbox](#spinbox)         | Creates a spinbox control that allows numbers to be set <br/>via clicking up and down arrows or entering the number directly |
 | [Switch](#switch)           | Creates a switch control that can be used to turn on and <br/>off a feature                                                  |
 | [Tab](#tab)                 | Creates a tab control that has multiple pages, each <br/>housing their own set of GUI controls                               |
-| TextEdit                    | Creates a text entry control that can span multiple lines                                                                    |
-| Timeedit                    | Creates a time edit control with an erase button                                                                             |
+| [TextEdit](#textedit)       | Creates a text entry control that can span multiple lines                                                                    |
+| [Timeedit](#timeedit)       | Creates a time edit control with an erase button                                                                             |
 | Treeview                    | Creates a control that displays data as a tree view                                                                          |
 
 ### _qtpyBase_Control
@@ -2183,11 +2183,11 @@ can have multiple pages that can house GUI controls.
 
 | **Property**       | **Description**                                                                                                   | **Type** | **Optional** |
 |--------------------|-------------------------------------------------------------------------------------------------------------------|----------|--------------|
-| height             | Characters if [pixel_unit](#_qtpybase_control) is False, Otherwise pixels. This will need setting                 | int (1)  | ✓            |
+| height             | Characters if [pixel_unit](#_qtpybase_control) is False, Otherwise pixels. This will need setting                 | int (1)  | ✓            ||
 | page_right_margin  | Controls the right margin of the [Container](#containers) that fills the form. <br>- Seldom Used <br>- in pixels  | int (10) | ✓            |
 | page_bottom_margin | Controls the bottom margin of the [Container](#containers) that fills the form. <br>- Seldom Used <br>- in pixels | int (50) | ✓            |
 | tag                | The system name of the Tab (required for application processing)                                                  | str      | ❌            |
-| width              | Characters if [pixel_unit](#_qtpybase_control) is False, Otherwise pixels. This will need setting                 | int (10) | ✓            |
+| width              | Characters if [pixel_unit](#_qtpybase_control) is False, Otherwise pixels. This will need setting                 | int (10) | ✓            ||
 
 <br>A fully loaded Tab declaration:
 <br><br>**Note: Only "tag" and "callback" are usually needed**
@@ -2423,7 +2423,7 @@ A TextEdit control is used to enter a large amount of text.
 | tag          | The system name of the TextEdit control (required for application processing)                     | str           | ❌            |
  
 
-<br>A fully loaded Switch declaration:
+<br>A fully loaded TextEdit declaration:
 <br><br>**Note: Only "tag", "text" (To preload the TextEdit control) and "callback" are usually needed**
 - It is possible to paste text into the TextEdit control and to a large degree 
 this will retain the original formatting
@@ -2463,7 +2463,7 @@ TextEdit(
 ```
 
 <br>**Methods**
-<br>A subset of the [_qtpyBase_Control](#_qtpybase_control) methods apply to a Tab instance
+<br>A subset of the [_qtpyBase_Control](#_qtpybase_control) methods apply to a TextEdit instance
  
 | **Method** | **Arguments**     | **Type** | **Description**                                                                                                                                     | **Optional** |
 |------------|-------------------|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
@@ -2471,6 +2471,112 @@ TextEdit(
 |            | plain_text (True) | bool     | True - Returns the text as plain text, Otherwise Returns the text as HTML.                                                                          | ✓            |
 | value_set  |                   | None     | Sets the text of the widget to the string value                                                                                                     |              |
 |            | value             | str      | The string value to set the TextEdit widget to.                                                                                                     | ❌            |
+
+### Timeedit
+
+Calling Timeedit in a layout will generate a Timeedit control on a form. 
+A Timeedit control is used to enter the time.
+ 
+
+<br>**Properties**
+<br> A Timeedit control has the following properties, but can also use a subset of 
+[_qtpyBase_Control](#_qtpybase_control) properties, which are not shown in the "fully loaded" example below
+
+| **Property**      | **Description**                                                                                                                                              | **Type**               | **Optional** |
+|-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------|--------------|
+| display_format    | The time format display                                                                                                                                      | str ("hh:mm")          |              |
+| display_width     | The width of the display. It is unlikely this will need setting                                                                                              | int (10)               |              |
+| height            | Characters if [pixel_unit](#_qtpybase_control) is False, Otherwise pixels. It is unlikely this will need setting but this depends on the display format mask | int (1)                | ✓            | 
+| hour              | The hour as an integer number                                                                                                                                | int (-1)               |              |
+| min               | The minute as an integer number                                                                                                                              | int (-1)               |              |
+| sec               | The second as an integer number                                                                                                                              | int (-1)               |              |
+| msec              | The milliseconds as an intger number                                                                                                                         | int (-1)               |              |
+| width             | Characters if [pixel_unit](#_qtpybase_control) is False, Otherwise pixels. This will need setting if the display format is different from the default        | int (10)               | ✓            | 
+| tag               | The system name of the TextEdit control (required for application processing)                                                                                | str                    | ❌            |
+| validate_callback | A callback that validates the time entered                                                                                                                   | Callable\| None (None) | ✓            |
+ 
+<br>**Display Format Mask Characters**
+
+| **Format** | **Description**                                                        |
+|------------|------------------------------------------------------------------------|
+| h          | 	the hour without a leading zero (0 to 23 or 1 to 12 if AM/PM display) |
+| hh         | 	the hour with a leading zero (00 to 23 or 01 to 12 if AM/PM display)  |
+| m          | 	the minute without a leading zero (0 to 59)                           |
+| mm         | 	the minute with a leading zero (00 to 59)                             |
+| s          | 	the second without a leading zero (0 to 59)                           |
+| ss         | 	the second with a leading zero (00 to 59)                             |
+| z          | 	the milliseconds without leading zeroes (0 to 999)                    |
+| zzz        | 	the milliseconds with leading zeroes (000 to 999)                     |
+| AP         | 	interpret as an AM/PM time. AP must be either “AM” or “PM”.           |
+| ap         | 	Interpret as an AM/PM time. ap must be either “am” or “pm”.           |
+
+<br>A fully loaded Timeedit declaration:
+<br><br>**Note: Only "tag", "hour", "min", "sec","msec"" (If the Timedit is to be preloaded then all these properties are required) and "callback" are usually needed**
+
+```
+Timeedit(
+            tag="timeedit",
+            label="Time Edit",
+            callback=self.event_handler,
+            hour=12,
+            min=23,
+            sec=1,
+            msec=0,
+            txt_font=qtg.Font(
+                style=qtg.Font_Style.NORMAL,
+                backcolor="wheat",
+                forecolor="darkgray",
+                size=15,
+                font_name="DejaVu Sans Mono",
+            ),
+            label_font=qtg.Font(
+                style=qtg.Font_Style.OBLIQUE,
+                backcolor="blue",
+                forecolor="yellow",
+                size=20,
+            ),
+            enabled=True,
+            visible=True,
+            tooltip="Time Edit",
+            tune_hsize=15,
+            tune_vsize=15,
+            user_data={"key": "value"},
+            buddy_control=qtg.HBoxContainer().add_row(
+                qtg.Button(
+                    tag="timeedit_push",
+                    text="Time Edit!",
+                    callback=self.event_handler,
+                    width=10,
+                    height=1,
+                )
+            ),
+        )
+```
+
+
+
+<br>**Properties**
+<br> A Timeedit control has the following properties, but can also use a subset of 
+[_qtpyBase_Control](#_qtpybase_control) properties, which are not shown in the "fully loaded" example below
+ 
+| **Method** | **Arguments** | **Type**                          | **Description**                                                                                                                                                                                                                          | **Optional** |
+|------------|---------------|-----------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
+| clear      |               | None                              | Clears the displayed value                                                                                                                                                                                                               |              |
+|            | default_text  | str   ("-")                       | The time text string or "-" for no time text to be `displayed                                                                                                                                                                            | ✓            |
+| time_get   |               | [Time_Struct](#time_struct)       | <br><b>Returns:</b><br> [Time_Struct](#time_struct) (hour,min,sec,msec)<br>                                                                                                                                                              |              |
+| time_set   |               | None                              | Sets the time.<br>If the hour = -1 & min = -1 & sec = -1 & msec = -1 then the displayed value is cleared<br> All arguments must be set                                                                                                   |              |
+|            | hour          | int (-1)                          | Hour value                                                                                                                                                                                                                               | ✓            |
+|            | min           | int (-1)                          | Minute value                                                                                                                                                                                                                             | ✓            |
+|            | msec          | int (-1)                          | Millisecond value                                                                                                                                                                                                                        | ✓            |
+|            | sec           | int (-1)                          | Second value                                                                                                                                                                                                                             | ✓            |
+| value_get  |               | str\| [Time_Struct](#time_struct) | Returns the time value                                                                                                                                                                                                                   |              |
+|            | format        | str ("-")                         | Format string. <br>If "-" then the time is returned as a string formatted to system short-format <br>if "" then a [Time_Struct](#time_struct) is returned<br>Otherwise the format statement is used and a formatted time string returned | ✓            |
+|            | time_struct   | bool (False)                      | If True return a [Time_Struct](#time_struct), Otherwise return a string                                                                                                                                                                  | ✓            | 
+| value_set  |               | None                              |                                                                                                                                                                                                                                          |              |
+|            | hour          | int (-1)                          | Hour value                                                                                                                                                                                                                               | ✓            |
+|            | min           | int (-1)                          | Minute value                                                                                                                                                                                                                             | ✓            |
+|            | msec          | int (-1)                          | Millisecond value                                                                                                                                                                                                                        | ✓            |
+|            | sec           | int (-1)                          | Second value                                                                                                                                                                                                                             | ✓            |
 
 ### QTPYGUI Enumerated Types/Helper Class Reference
 
@@ -2681,10 +2787,10 @@ of two rectangles
 ### Rect_Changed
 Rect_Changed is a helper class used by [Image](#image) to represent a changed rectangle
 
-| **Property** | **Description**        | **Type** |
-|--------------|------------------------|----------|
-| rect_id      | Rectangle Id           | str      |
-| coords       | Rectangle Co-ordinates | [Coords](#coords)   |
+| **Property** | **Description**        | **Type**          |
+|--------------|------------------------|-------------------|
+| rect_id      | Rectangle Id           | str               |
+| coords       | Rectangle Co-ordinates | [Coords](#coords) |
 
 ### Rect_Cords
  
@@ -2700,8 +2806,26 @@ Rect_Changed is a helper class used by [Image](#image) to represent a changed re
 | width        | Width in pixels         | int               |
 | height       | Height in pixels        | int               |
 
+
+### Time_Struct
+Time_Struct is a helper class used by [Timeedit](#timeedit) to return Time information
+ 
+| **Method** | **Arguments** | **Type** | **Description**      | **Optional** |
+|------------|---------------|----------|----------------------|--------------|
+| hour       |               | int      | Get the hour         |              |
+| hour       |               | None     | Set the hour         |              |
+|            | value         | int      | The hour             | ❌            |
+| min        |               | int      | Get the minute       |              |
+| msec       |               | int      | Get the milliseconds |              |
+| msec       |               | None     | Set the milliseconds |              |
+|            | value         | int      | The milliseconds     | ❌            |
+| sec        |               | int      | Get the second       |              |
+| sec        |               | None     | Set the second       |              |
+|            | value         | int      | The seconds          | ❌            |
+
+
 #### Widget_Frame
- Widget_Frame` is a helper class that defines the style of the frame around a widget
+ Widget_Frame is a helper class that defines the style of the frame around a widget
 
 | **Property**  | **Description** | **Type**                    |
 |---------------|-----------------|-----------------------------|
