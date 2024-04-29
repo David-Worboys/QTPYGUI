@@ -32,7 +32,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install build twine
+        pip install build twine        
     - name: Build package
       run: python -m build --wheel
     - name: Publish package            
@@ -41,3 +41,4 @@ jobs:
         user: __token__
         password: ${{ secrets.PYPI_API_TOKEN }}
         package: ./dist/*.whl
+        working-directory: ./
