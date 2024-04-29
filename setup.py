@@ -3,13 +3,6 @@ QTPYGU setup.py file
 """
 
 from setuptools import setup, find_packages
-import codecs
-import os
-
-here = os.path.abspath(os.path.dirname(__file__))
-
-with codecs.open(os.path.join(here, "README.md"), encoding="utf-8") as fh:
-    long_description = "\\n" + fh.read()
 
 setup(
     name="QTPYGUI",
@@ -19,7 +12,7 @@ setup(
     description="A Simple Python Declarative User Interface Wrapper Around Pyside6 ",
     url="https://github.com/David-Worboys/QTPYGUI",
     long_description_content_type="text/markdown",
-    long_description=long_description,
+    long_description=open("README.md").read(),
     packages=find_packages(),
     install_requires=[
         "appdirs",
@@ -33,7 +26,8 @@ setup(
         "numpy",
         "pathvalidate",
         "platformdirs",
-        "pycryptodome" "PySide6",
+        "pycryptodome",
+        "PySide6",
         "PySide6_Addons",
         "PySide6_Essentials",
         "python-dateutil",
@@ -45,11 +39,31 @@ setup(
         "titlecase",
         "urllib3",
     ],
-    keywords=["pypi", "cicd", "python"],
+    keywords=[
+        "pypi",
+        "cicd",
+        "python",
+        "pyside6",
+        "ui",
+        "gui",
+        "qt",
+        "qtpygui",
+        "declarative",
+        "wrapper",
+        "user-interface",
+        "qt-bindings",
+        "python-qt",
+        "gui-framework",
+        "ui-library",
+        "pyside6-wrapper",
+    ],
     classifiers=[
         "Development Status :: Beta 1 Release",
         "Intended Audience :: Developers",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Operating System :: Unix",
     ],
 )
