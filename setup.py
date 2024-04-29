@@ -4,6 +4,9 @@ QTPYGU setup.py file
 
 from setuptools import setup, find_packages
 
+with open('requirements.txt') as f:
+    install_requires = [line.strip() for line in f.readlines()]
+
 setup(
     name="QTPYGUI",
     version="{{VERSION_PLACEHOLDER}}",
@@ -14,31 +17,7 @@ setup(
     long_description_content_type="text/markdown",
     long_description=open("README.md").read(),
     packages=find_packages(),
-    install_requires=[
-        "appdirs",
-        "attrs",
-        "certifi",
-        "charset-normalizer",
-        "fs",
-        "idna",
-        "Naked",
-        "netifaces",
-        "numpy",
-        "pathvalidate",
-        "platformdirs",
-        "pycryptodome",
-        "PySide6",
-        "PySide6_Addons",
-        "PySide6_Essentials",
-        "python-dateutil",
-        "PyYAML",
-        "requests",
-        "shellescape",
-        "shiboken6",
-        "six",
-        "titlecase",
-        "urllib3",
-    ],
+    install_requires=install_requires,
     keywords=[
         "pypi",
         "cicd",
