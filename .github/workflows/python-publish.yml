@@ -32,6 +32,9 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
+        pip install virtualenv
+        virtualenv -p /usr/bin/python .venv
+        source .venv/bin/activate
         pip install build twine
         python setup.py
     - name: Build package
