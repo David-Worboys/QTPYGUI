@@ -1,0 +1,49 @@
+[build-system]
+requires = ["build"]
+build-backend = "build"
+
+[tool.build]
+name = "QTPYGUI"
+version = "{{VERSION_PLACEHOLDER}}"
+description = "A Simple Python Declarative User Interface Wrapper Around Pyside6"
+author = "David Worboys"
+url = "https://github.com/David-Worboys/QTPYGUI"
+long_description = "README.md"
+long_description_content_type = "text/markdown"
+
+[tool.build.keywords]
+pypi = true
+cicd= true
+python= true
+pyside6= true
+ui= true
+gui= true
+qt= true
+qtpygui= true
+declarative= true
+wrapper= true
+user-interface= true
+qt-bindings= true
+python-qt= true
+gui-framework= true
+ui-library= true
+pyside6-wrapper= true
+
+[tool.build.classifiers]
+Development Status :: Beta 1 Release
+Intended Audience :: Developers
+Programming Language :: Python :: 3.8
+Programming Language :: Python :: 3.9
+Programming Language :: Python :: 3.10
+Programming Language :: Python :: 3.11
+Operating System :: Unix
+
+[tool.build.dependencies]
+python = "^3.8"
+pyside6 = "^6.7.0"
+
+[tool.build.dev-dependencies]
+build = "^0.10.0"
+
+[build]
+wheel = "python -m build --wheel --requirement requirements.txt"
