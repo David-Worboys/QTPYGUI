@@ -6,7 +6,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Upload Python Package
+name: Upload QTPYGUI Package
 
 on:
   release:
@@ -16,12 +16,9 @@ permissions:
   contents: read
 
 jobs:
-  deploy:
-
+  publish:
     runs-on: ubuntu-latest
-    env:
-        name: pypi
-        url: https://pypi.org/p/QTPYGUI
+    
     permissions:
       id-token: write  
     strategy:
@@ -31,23 +28,17 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install setuptools
         pip install build
-        pip install twine
-        pip install wheel
         python -m pip install  -r requirements.txt
     - name: Build package
       run: python -m build --wheel
-    - name: Publish package
-      env:
-        TWINE_USERNAME: ${{ __token__ }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+    - name: Publish package      
       uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
       with:
         user: __token__
