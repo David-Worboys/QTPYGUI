@@ -19,6 +19,11 @@ jobs:
   deploy:
 
     runs-on: ubuntu-latest
+    env:
+        name: pypi
+        url: https://pypi.org/p/QTPYGUI
+    permissions:
+      id-token: write  
     strategy:
       matrix:
         python-version: ['3.8', '3.9', '3.10', '3.11']
@@ -41,8 +46,8 @@ jobs:
       run: python -m build --wheel
     - name: Publish package
       env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        TWINE_USERNAME: ${{ __token__ }}
+        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
       uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
       with:
         user: __token__
