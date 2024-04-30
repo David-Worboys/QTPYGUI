@@ -31,13 +31,14 @@ jobs:
     
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install build
-    - name: Build package
-      run: python -m build --wheel
-    - name: Publish package      
-      uses: pypa/gh-action-twine@v1
+        python -m pip install --upgrade pip        
+        pip install build twine
+    - name: Build package      
+      run:  python -m build --wheel
+    - name: Publish package            
+      uses: pypa/gh-action-pypi-publish@release/v1
       with:
         user: __token__
         password: ${{ secrets.PYPI_API_TOKEN }}
         package: ./dist/*.whl
+        working-directory: ./        
