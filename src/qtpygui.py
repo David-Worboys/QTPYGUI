@@ -3966,7 +3966,7 @@ class QtPyApp(_qtpyBase):
 
         # Load IBM-Plex-font
         if qtC.QFileInfo(
-            App_Path("../IBM-Plex-Mono")
+            App_Path("IBM-Plex-Mono")
         ).exists():  # Load for Plex Mono fonts if they exist
             qtG.QFontDatabase.addApplicationFont(
                 App_Path(f"IBM-Plex-Mono{os.path.sep}IBMPlexMono-BoldItalic.ttf")
@@ -8327,7 +8327,7 @@ class Dateedit(_qtpyBase_Control):
             width=2,
             height=1,
             tooltip=f"{self.trans_str('Erase')} {SDELIM}{self.text}{SDELIM}",
-            icon=App_Path("../backspace.svg"),  # qta.icon("mdi.backspace"),
+            icon=App_Path("backspace.svg"),  # qta.icon("mdi.backspace"),
             txt_font=self.txt_font,
             callback=self._event_handler,  # if self.buddy_callback is None else self.buddy_callback
         )
@@ -14315,7 +14315,7 @@ class Timeedit(_qtpyBase_Control):
             width=2,
             height=1,
             tooltip=f"{self.trans_str('Erase')} {SDELIM}{self.text}{SDELIM}",
-            icon=App_Path("../backspace.svg"),  # qta.icon("mdi.backspace"),
+            icon=App_Path("backspace.svg"),  # qta.icon("mdi.backspace"),
             txt_font=self.txt_font,
             callback=self.buddy_event,
         )

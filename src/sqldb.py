@@ -1312,7 +1312,7 @@ class SQLDB:
                                 col_definition[1] = SQL.DECIMAL
                                 col_definition[2] = (
                                     len(col_values[col_index])
-                                    - col_values[col_index].index("..")
+                                    - col_values[col_index].index(".")
                                 ) - 1
                             else:
                                 col_definition[1] = SQL.VARCHAR
