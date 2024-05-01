@@ -1,12 +1,17 @@
 [build-system]
-requires = ["build"]
-build-backend = "build"
+requires = ["build", "setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [tool.build]
 name = "QTPYGUI"
 version = "{{VERSION_PLACEHOLDER}}"
 description = "A Simple Python Declarative User Interface Wrapper Around Pyside6"
-author = "David Worboys"
+readme = "README.md"
+requires-python = ">= 3.8"
+license.file = "LICENSE.md"
+authors = [
+  { name = "David Worboys"},
+]
 url = "https://github.com/David-Worboys/QTPYGUI"
 long_description = "README.md"
 long_description_content_type = "text/markdown"
@@ -30,13 +35,15 @@ ui-library= true
 pyside6-wrapper= true
 
 [tool.build.classifiers]
-Development Status :: Beta 1 Release
-Intended Audience :: Developers
-Programming Language :: Python :: 3.8
-Programming Language :: Python :: 3.9
-Programming Language :: Python :: 3.10
-Programming Language :: Python :: 3.11
-Operating System :: Unix
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: Unix"
+]
 
 [tool.build.dependencies]
 python = "^3.8"

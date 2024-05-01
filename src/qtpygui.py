@@ -3966,7 +3966,7 @@ class QtPyApp(_qtpyBase):
 
         # Load IBM-Plex-font
         if qtC.QFileInfo(
-            App_Path("IBM-Plex-Mono")
+            App_Path("../IBM-Plex-Mono")
         ).exists():  # Load for Plex Mono fonts if they exist
             qtG.QFontDatabase.addApplicationFont(
                 App_Path(f"IBM-Plex-Mono{os.path.sep}IBMPlexMono-BoldItalic.ttf")
@@ -8327,7 +8327,7 @@ class Dateedit(_qtpyBase_Control):
             width=2,
             height=1,
             tooltip=f"{self.trans_str('Erase')} {SDELIM}{self.text}{SDELIM}",
-            icon=App_Path("backspace.svg"),  # qta.icon("mdi.backspace"),
+            icon=App_Path("../backspace.svg"),  # qta.icon("mdi.backspace"),
             txt_font=self.txt_font,
             callback=self._event_handler,  # if self.buddy_callback is None else self.buddy_callback
         )
@@ -14279,7 +14279,7 @@ class Timeedit(_qtpyBase_Control):
     AP 	interpret as an AM/PM time. AP must be either “AM” or “PM”.
     ap 	Interpret as an AM/PM time. ap must be either “am” or “pm”.
     """
-    
+
     display_width: int = 10
     hour: int = -1
     min: int = -1
@@ -14315,7 +14315,7 @@ class Timeedit(_qtpyBase_Control):
             width=2,
             height=1,
             tooltip=f"{self.trans_str('Erase')} {SDELIM}{self.text}{SDELIM}",
-            icon=App_Path("backspace.svg"),  # qta.icon("mdi.backspace"),
+            icon=App_Path("../backspace.svg"),  # qta.icon("mdi.backspace"),
             txt_font=self.txt_font,
             callback=self.buddy_event,
         )
@@ -14380,7 +14380,7 @@ class Timeedit(_qtpyBase_Control):
                 widget_font=self.txt_font,
                 widget=self._widget,
             )
-        
+
         return widget
 
     def _event_handler(
@@ -14531,10 +14531,8 @@ class Timeedit(_qtpyBase_Control):
             raise RuntimeError(f"{self._widget=}. Not set")
 
         time = self._widget.time()
-        
-        return Time_Struct(
-            time.hour(), time.minute(), time.second(), time.msec()
-        )
+
+        return Time_Struct(time.hour(), time.minute(), time.second(), time.msec())
 
     @overload
     def value_get(self, format: str = "", time_struct=False) -> Time_Struct: ...

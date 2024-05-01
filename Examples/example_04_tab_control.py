@@ -19,8 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from typing import cast
 
-import popups
-import qtpygui as qtg
+from src import popups, qtpygui as qtg
 
 
 class Example_04:

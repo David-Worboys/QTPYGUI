@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # Tell Black to leave this block alone (realm of isort)
 # fmt: off
 import datetime
-from collections import namedtuple
 from typing import Final
 
 import platformdirs
