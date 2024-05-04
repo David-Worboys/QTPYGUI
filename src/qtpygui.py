@@ -12308,7 +12308,7 @@ class Image(_qtpyBase_Control):
                 )
 
             if rotate_degrees != 0:
-                if rotate_degrees == self.MIROR_HORIZONTAL:
+                if rotate_degrees == MIRROR_HORIZONTAL:
                     if self._cached_pixmap is not None:
                         cached_piximage = self._cached_pixmap.toImage().mirror(
                             True, False
@@ -12317,7 +12317,7 @@ class Image(_qtpyBase_Control):
 
                     piximage = pixmap.toImage().mirror(True, False)
                     pixmap.convertFromImage(piximage)
-                elif rotate_degrees == self.MIROR_VERTICAL:
+                elif rotate_degrees == MIRROR_VERTICAL:
                     if self._cached_pixmap is not None:
                         cached_piximage = self._cached_pixmap.toImage().mirror(
                             False, True
