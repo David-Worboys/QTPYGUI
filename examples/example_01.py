@@ -17,7 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from src import popups, qtpygui as qtg
+# Needed now that library files are in src
+import sys
+
+sys.path.insert(0, "../src")
+
+from src import qtpygui as qtg
+from src import popups
 
 
 class Example_01:

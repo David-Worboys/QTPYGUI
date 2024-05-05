@@ -1433,7 +1433,7 @@ display, on a form. This control is unusual in that it only displays a limited s
 h, H, L, o, P, r, u, U, Y, colon, degree sign (which is specified as single 
 quote in the string) and space.
 
-Refer to the [Calculator](./Examples/example_02_calculator.py) for a simple program example
+Refer to the [Calculator](examples/example_02_calculator.py) for a simple program example
 
 The "tag" and "text"  are generally the only arguments used, and "tag" is only 
 needed if you plan on referencing the label in your code. 
@@ -2245,7 +2245,7 @@ tab = qtg.Tab(
 
 - 3 Repeat Step 2 until done
 
-Putting it all together, this is how to declare a Tab with one page ([Example 04](./Examples/example_04_tab_control.py))
+Putting it all together, this is how to declare a Tab with one page ([Example 04](examples/example_04_tab_control.py))
  
 ```
         def tab_definition() -> qtg.Tab:
