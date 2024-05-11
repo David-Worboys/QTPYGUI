@@ -55,7 +55,7 @@ def App_Path(file_name: str = "", trailing_slash=False) -> str:
         getattr(sys, "frozen", False)
         and hasattr(sys, "_MEIPASS")
         or globals().get("__compiled__", False)
-    ):  # Pyinstaller handling
+    ):  # Compiled ot Pyinstaller handling
         if globals().get("__compiled__", False) and globals().get("__spec__", False):
             application_path = globals()["__spec__"].origin
             application_path = os.path.dirname(application_path)
@@ -63,31 +63,59 @@ def App_Path(file_name: str = "", trailing_slash=False) -> str:
             application_path = os.getcwd()
         else:
             application_path: str = sys._MEIPASS  # type: ignore
-        # running_mode = 'Frozen/executable'
-        # print("Running Frozen")
-    else:
-        try:
-            app_full_path = os.path.abspath(
-                __file__
-            )  # realpath does not work with symbolic links
-            application_path = os.path.dirname(app_full_path)
-            # running_mode = "Non-interactive
-        except NameError:
-            application_path = os.getcwd()
-            # running_mode = 'Interactive'
 
-    if file_name.strip() == "":
+        if file_name.strip() == "":
+            return (
+                f"{application_path}{os.pathsep}"
+                if trailing_slash
+                else f"{application_path}"
+            )
+
         return (
-            f"{application_path}{os.pathsep}"
+            f"{os.path.join(application_path, file_name)}{os.pathsep}"
             if trailing_slash
-            else f"{application_path}"
+            else f"{os.path.join(application_path, file_name)}"
         )
+    else:  # Running as a script
+        if file_name.strip() == "":
+            application_path = os.getcwd()
+            path_name = (
+                f"{application_path}{os.pathsep}"
+                if trailing_slash
+                else f"{application_path}"
+            )
 
-    return (
-        f"{os.path.join(application_path, file_name)}{os.pathsep}"
-        if trailing_slash
-        else f"{os.path.join(application_path, file_name)}"
-    )
+            if not (os.path.isdir(path_name) or os.path.isfile(path_name)):
+                application_path = os.path.dirname(os.path.abspath(__file__))
+                path_name = (
+                    f"{application_path}{os.pathsep}"
+                    if trailing_slash
+                    else f"{application_path}"
+                )
+
+                if not (os.path.isdir(path_name) or os.path.isfile(path_name)):
+                    raise RuntimeError(f"App_Path A {path_name=} Does Not Exist!")
+            return path_name
+        else:
+            application_path = os.getcwd()
+
+            path_name = (
+                f"{os.path.join(application_path, file_name)}{os.pathsep}"
+                if trailing_slash
+                else f"{os.path.join(application_path, file_name)}"
+            )
+
+            if not (os.path.isdir(path_name) or os.path.isfile(path_name)):
+                application_path = os.path.dirname(os.path.abspath(__file__))
+                path_name = (
+                    f"{os.path.join(application_path, file_name)}{os.pathsep}"
+                    if trailing_slash
+                    else f"{os.path.join(application_path, file_name)}"
+                )
+
+                if not (os.path.isdir(path_name) or os.path.isfile(path_name)):
+                    raise RuntimeError(f"App_Path B {path_name=} Does Not Exist!")
+            return path_name
 
 
 def Special_Path(special_path_name: str) -> str:

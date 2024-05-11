@@ -40,7 +40,8 @@ import file_utils
 import sqldb
 import sys_consts
 from file_utils import App_Path
-from qtpygui import (Action, Align, Button, Col_Def, Combo_Data, Combo_Item,
+
+from .qtpygui import (Action, Align, Button, Col_Def, Combo_Data, Combo_Item,
                      ComboBox, Command_Button_Container, Cursor, FolderView,
                      Font, Frame, Frame_Style, Grid, Grid_Col_Value,
                      GridContainer, HBoxContainer, Image, Label, LineEdit,

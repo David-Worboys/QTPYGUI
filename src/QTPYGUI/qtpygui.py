@@ -339,9 +339,7 @@ class Grid_Item:
 
 # An enumeration of all the application events that can be handled by the GUI.
 class Sys_Events(IntEnum):
-    """This is used to determine which event handler type is ro be passed to the event handler call when a GUI event is
-    triggered.
-    """
+    """The event handler type passed to the event handler call when a GUI event is triggered."""
 
     APPINIT = 0  #: The application is being initialised
     APPPOSTINIT = 1  #: The application just finished initialising
@@ -372,7 +370,7 @@ class Sys_Events(IntEnum):
     RELEASED = 26  #: The widget has been released
     POPUP = 27  #: The popup has been shown
     POPCAL = 28  #: The popup calendar has been shown
-    POSTINIT = 28  #: The post init event has been triggered
+    POSTINIT = 29  #: The post init event has been triggered
     SCROLLH = 30  #: The horizontal scroll bar has been moved
     SCROLLV = 31  #: The vertical scroll bar has been moved
     SELECTIONCHANGED = 32  #: The selection has changed
@@ -1887,7 +1885,7 @@ class _Widget_Registry:
 
     # ===== Helper Class
     @dataclasses.dataclass(slots=True)
-    class _widget_entry:
+    class _Widget_Entry:
         """_widget_entry` is a class that stores the widget details."""
 
         container_tag: str
@@ -1937,7 +1935,7 @@ class _Widget_Registry:
             self._widget_dict[container_tag] = {}
 
         self._widget_dict[container_tag].update({
-            tag: self._widget_entry(container_tag=container_tag, tag=tag, widget=widget)
+            tag: self._Widget_Entry(container_tag=container_tag, tag=tag, widget=widget)
         })
 
     def widget_del(
@@ -2542,8 +2540,8 @@ class _qtpyBase_Control(_qtpyBase):
     ) -> None:
         """Installs the event handler for the given event on the widget.
 
-        Note: Pyside6 6.5.1 broke lambda connects - TODO test later releases
-              Nuitka 1.8.4  Seems to have addressed the issue (And nope after a long session finally locked)
+        Note:   Pyside6 6.5.1 broke lambda connects - TODO test later releases
+                Nuitka 1.8.4  Seems to have addressed the issue (And nope after a long session finally locked)
 
         Args:
 
@@ -3855,7 +3853,7 @@ class QtPyApp(_qtpyBase):
             trans_file (str): str = "trans/fr_FR",. Defaults to trans/fr_FR
             height (int): int = 1080,. Defaults to 1080
             width (int): int = 1920,. Defaults to 1920
-          app_font (Font): Font = Font(font_name="IBM Plex Mono", size=DEFAULT_FONT_SIZE),
+            app_font (Font): Font = Font(font_name="IBM Plex Mono", size=DEFAULT_FONT_SIZE),
         """
 
         # Stop Annoying QT Badwindow debug error messages - that are not supposed to be errors
@@ -3894,6 +3892,15 @@ class QtPyApp(_qtpyBase):
         assert isinstance(height, int) and height > 0, f"{height=}. Must be > 0"
         assert isinstance(width, int) and width > 0, f"{width=}. Must be > 0"
         assert isinstance(app_font, Font), f"{app_font=}. Must be Font"
+
+        # Load preferred default font - IBM-Plex-Mono
+        if qtC.QFileInfo(
+            App_Path("IBM-Plex-Mono")
+        ).exists():  # Load for Plex Mono fonts if they exist
+            for font_file in os.listdir(App_Path("IBM-Plex-Mono")):
+                qtG.QFontDatabase().addApplicationFont(
+                    App_Path(os.path.join(App_Path("IBM-Plex-Mono"), font_file))
+                )
 
         # TODO Add language, file and icon check
 
@@ -3963,59 +3970,6 @@ class QtPyApp(_qtpyBase):
         assert isinstance(
             requested_font, Font
         ), f"{requested_font=}. Must be an instance of FONT"
-
-        # Load IBM-Plex-font
-        if qtC.QFileInfo(
-            App_Path("IBM-Plex-Mono")
-        ).exists():  # Load for Plex Mono fonts if they exist
-            qtG.QFontDatabase.addApplicationFont(
-                App_Path(f"IBM-Plex-Mono{os.path.sep}IBMPlexMono-BoldItalic.ttf")
-            )
-            qtG.QFontDatabase.addApplicationFont(
-                App_Path(f"IBM-Plex-Mono{os.path.sep}IBMPlexMono-Medium.ttf")
-            )
-            qtG.QFontDatabase.addApplicationFont(
-                App_Path(f"IBM-Plex-Mono{os.path.sep}IBMPlexMono-Bold.ttf")
-            )
-            qtG.QFontDatabase.addApplicationFont(
-                App_Path(f"IBM-Plex-Mono{os.path.sep}IBMPlexMono-Regular.ttf")
-            )
-            qtG.QFontDatabase.addApplicationFont(
-                App_Path(f"IBM-Plex-Mono{os.path.sep}IBMPlexMono-ExtraLightItalic.ttf")
-            )
-            qtG.QFontDatabase.addApplicationFont(
-                App_Path(f"IBM-Plex-Mono{os.path.sep}IBMPlexMono-SemiBoldItalic.ttf")
-            )
-            qtG.QFontDatabase.addApplicationFont(
-                App_Path(f"IBM-Plex-Mono{os.path.sep}IBMPlexMono-ExtraLight.ttf")
-            )
-            qtG.QFontDatabase.addApplicationFont(
-                App_Path(f"IBM-Plex-Mono{os.path.sep}IBMPlexMono-SemiBold.ttf")
-            )
-            qtG.QFontDatabase.addApplicationFont(
-                App_Path(f"IBM-Plex-Mono{os.path.sep}IBMPlexMono-Italic.ttf")
-            )
-            qtG.QFontDatabase.addApplicationFont(
-                App_Path(f"IBM-Plex-Mono{os.path.sep}IBMPlexMono-TextItalic.ttf")
-            )
-            qtG.QFontDatabase.addApplicationFont(
-                App_Path(f"IBM-Plex-Mono{os.path.sep}IBMPlexMono-LightItalic.ttf")
-            )
-            qtG.QFontDatabase.addApplicationFont(
-                App_Path(f"IBM-Plex-Mono{os.path.sep}IBMPlexMono-Text.ttf")
-            )
-            qtG.QFontDatabase.addApplicationFont(
-                App_Path(f"IBM-Plex-Mono{os.path.sep}IBMPlexMono-Light.ttf")
-            )
-            qtG.QFontDatabase.addApplicationFont(
-                App_Path(f"IBM-Plex-Mono{os.path.sep}IBMPlexMono-ThinItalic.ttf")
-            )
-            qtG.QFontDatabase.addApplicationFont(
-                App_Path(f"IBM-Plex-Mono{os.path.sep}IBMPlexMono-MediumItalic.ttf")
-            )
-            qtG.QFontDatabase.addApplicationFont(
-                App_Path(f"IBM-Plex-Mono{os.path.sep}IBMPlexMono-Thin.ttf")
-            )
 
         app_font = self._app.font()  # type: ignore  # Default System font in this case
         preferred_font = requested_font.font_name
@@ -4428,13 +4382,11 @@ class Action(_qtpyBase):
     parent_app: QtPyApp
     container_tag: str
     tag: str
-    event: IntEnum
+    event: Sys_Events
     action: str
     value: any
-    object: Optional[_qtpyBase]
-    widget_dict: dict[
-        str, Union[types.FunctionType, types.LambdaType, types.MethodType]
-    ]
+    object: "_Event_Handler"
+    widget_dict: dict[str, _Widget_Registry._Widget_Entry]
     parent_widget: _qtpyBase_Control
     control_name: str = ""
 
@@ -4454,14 +4406,13 @@ class Action(_qtpyBase):
             self.event, Sys_Events
         ), f"{self.event=}. Must be an entry in SYSEVENTS"
         assert isinstance(self.action, str), f"{self.action=}. Must be str"
-        assert isinstance(self.object, (type(None), _qtpyBase)), (
+        assert isinstance(self.object, (type(None), _Event_Handler)), (
             f"{self.object=} || {type(self.object)}. Must be None or an instance of"
-            " _qtpyBase"
+            "_Event_Handler"
         )
-        assert isinstance(self.widget_dict, dict), (
-            f"{self.widget_dict=}. Must be a Dic[str, Union[types.FunctionType,"
-            " types.LambdaType, types.MethodType]]"
-        )
+        assert isinstance(
+            self.widget_dict, dict
+        ), f"{self.widget_dict=}. Must be a Dic[str, _qtpyBase_Control]"
         assert (
             isinstance(self.parent_widget, (_qtpyBase, _qtpySDI_Frame))
             or self.parent_widget is None
@@ -4485,7 +4436,7 @@ class Action(_qtpyBase):
         """
         return self._lang_tran.translate(text, SDELIM)
 
-    def value_get(self, container_tag: str = "", tag: str = "") -> any:
+    def value_get(self, container_tag: str, tag: str) -> any:
         """Returns the value sourced from a widget
 
         Args:
@@ -4509,9 +4460,7 @@ class Action(_qtpyBase):
         else:
             raise AssertionError(f"{container_tag=} {tag=} Does Not Have A value_get")
 
-    def value_set(
-        self, container_tag: str = "", tag: str = "", value: any = None
-    ) -> None:
+    def value_set(self, container_tag: str, tag: str, value: any = None) -> None:
         """Sets the value of a widget
 
         Args:
@@ -4560,7 +4509,7 @@ class Action(_qtpyBase):
             window_id=self.window_id, container_tag=container_tag, tag=tag
         )
 
-    def widget_exist(self, container_tag: str = "", tag: str = "") -> bool:
+    def widget_exist(self, container_tag: str, tag: str) -> bool:
         """Returns True if the widget with the given tag name exists in the given container
 
         Args:
@@ -4584,66 +4533,70 @@ class Action(_qtpyBase):
         return widget
 
     @overload
-    def widget_get(
-        self, container_tag: str = "", tag: str = ""
-    ) -> _qtpyBase_Control: ...
+    def widget_get(self, container_tag: str, tag: str) -> _qtpyBase_Control: ...
 
     @overload
-    def widget_get(self, container_tag: str = "", tag: str = "") -> "Button": ...
+    def widget_get(self, container_tag: str, tag: str) -> "Button": ...
 
     @overload
-    def widget_get(self, container_tag: str = "", tag: str = "") -> "ComboBox": ...
+    def widget_get(self, container_tag: str, tag: str) -> "ComboBox": ...
 
     @overload
-    def widget_get(self, container_tag: str = "", tag: str = "") -> "FolderView": ...
+    def widget_get(self, container_tag: str, tag: str) -> "Dateedit": ...
 
     @overload
-    def widget_get(self, container_tag: str = "", tag: str = "") -> "Grid": ...
+    def widget_get(self, container_tag: str, tag: str) -> "FolderView": ...
 
     @overload
-    def widget_get(self, container_tag: str = "", tag: str = "") -> "GridContainer": ...
+    def widget_get(self, container_tag: str, tag: str) -> "Grid": ...
 
     @overload
-    def widget_get(self, container_tag: str = "", tag: str = "") -> "Image": ...
+    def widget_get(self, container_tag: str, tag: str) -> "GridContainer": ...
 
     @overload
-    def widget_get(self, container_tag: str = "", tag: str = "") -> "LineEdit": ...
+    def widget_get(self, container_tag: str, tag: str) -> "Image": ...
 
     @overload
-    def widget_get(self, container_tag: str = "", tag: str = "") -> "FormContainer": ...
+    def widget_get(self, container_tag: str, tag: str) -> "LineEdit": ...
 
     @overload
-    def widget_get(self, container_tag: str = "", tag: str = "") -> "HBoxContainer": ...
+    def widget_get(self, container_tag: str, tag: str) -> "FormContainer": ...
 
     @overload
-    def widget_get(self, container_tag: str = "", tag: str = "") -> "VBoxContainer": ...
+    def widget_get(self, container_tag: str, tag: str) -> "HBoxContainer": ...
 
     @overload
-    def widget_get(self, container_tag: str = "", tag: str = "") -> "ProgressBar": ...
+    def widget_get(self, container_tag: str, tag: str) -> "VBoxContainer": ...
 
     @overload
-    def widget_get(self, container_tag: str = "", tag: str = "") -> "RadioButton": ...
+    def widget_get(self, container_tag: str, tag: str) -> "ProgressBar": ...
 
     @overload
-    def widget_get(self, container_tag: str = "", tag: str = "") -> "Slider": ...
+    def widget_get(self, container_tag: str, tag: str) -> "RadioButton": ...
 
     @overload
-    def widget_get(self, container_tag: str = "", tag: str = "") -> "Spinbox": ...
+    def widget_get(self, container_tag: str, tag: str) -> "Slider": ...
 
     @overload
-    def widget_get(self, container_tag: str = "", tag: str = "") -> "Switch": ...
+    def widget_get(self, container_tag: str, tag: str) -> "Spinbox": ...
 
     @overload
-    def widget_get(self, container_tag: str = "", tag: str = "") -> "Tab": ...
+    def widget_get(self, container_tag: str, tag: str) -> "Switch": ...
 
-    def widget_get(self, container_tag: str = "", tag: str = "") -> _qtpyBase_Control:
+    @overload
+    def widget_get(self, container_tag: str, tag: str) -> "Tab": ...
+
+    @overload
+    def widget_get(self, container_tag: str, tag: str) -> "Timeedit": ...
+
+    def widget_get(self, container_tag: str, tag: str) -> _qtpyBase_Control:
         """Returns a widget from the parent app's widget dictionary.
 
         Assumes widget exists. Please use widget_exist call before calling this method
 
         Args:
-            container_tag (str): The tag name of the container widget that holds the widget you want to get. Default: "".
-            tag (str): The tag name of the widget to get. Default: "".
+            container_tag (str): The tag name of the container widget that holds the widget you want to get.
+            tag (str): The tag name of the widget to get.
 
         Returns:
             _qtpyBase_Control: The requested widget.
@@ -4667,11 +4620,9 @@ class Action(_qtpyBase):
         )
 
         if widget is None:  # Dev Error
-            print(
-                "DEV Error Shutting Down, Widget Not Found -"
-                f" {self.window_id=} {container_tag=} {tag=}"
+            raise RuntimeError(
+                f"{self.window_id=} {container_tag=} {tag=} Dev Error - Widget Not Found!"
             )
-            sys.exit(1)
 
         return widget
 
@@ -8376,6 +8327,8 @@ class Dateedit(_qtpyBase_Control):
             qtW.QLineEdit, self._widget.findChild(qtW.QLineEdit)
         )
 
+        # self._widget.dateChanged.connect(lambda: self._event_handler())
+
         self.date_set(self.date, self.format)
 
         return widget
@@ -8389,7 +8342,7 @@ class Dateedit(_qtpyBase_Control):
         Returns:
             int : 1 is OK, -1 is a problem
         """
-
+        print(f"DBG DEA {args=}")
         event = cast(Action, args[0])  # type: Action
 
         if isinstance(event, Action):
