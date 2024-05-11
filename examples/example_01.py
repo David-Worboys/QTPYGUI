@@ -20,10 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # Needed now that library files are in src
 import sys
 
-sys.path.insert(0, "../src")
+sys.path.insert(0, "../src/QTPYGUI")
 
-from src import qtpygui as qtg
-from src import popups
+import qtpygui as qtg
+import popups
 
 
 class Example_01:

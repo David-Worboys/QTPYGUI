@@ -1,20 +1,83 @@
 [build-system]
-requires = ["build", "setuptools", "wheel"]
+# The lower bound is for <https://github.com/pypa/setuptools/issues/3865>.
+requires = ["setuptools>=67.6.1", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
-[tool.build]
+
+[project]
 name = "QTPYGUI"
-version = "{{VERSION_PLACEHOLDER}}"
+version = "1.0.0-beta01"
+authors = [
+  { name = "David Worboys", email = "davidaworboys@gmail.com"},
+]
 description = "A Simple Python Declarative User Interface Wrapper Around Pyside6"
 readme = "README.md"
 requires-python = ">= 3.8"
 license.file = "LICENSE.md"
-authors = [
-  { name = "David Worboys"},
-]
+
+[tool.build]
 url = "https://github.com/David-Worboys/QTPYGUI"
 long_description = "README.md"
 long_description_content_type = "text/markdown"
+build-number = "0"
+filename = "{name}-{version}-{build-number}-py3-none-any.whl"
+dependecies = [
+    "appdirs >= 1.4.4",
+"attrs >= 23.2.0",
+"certifi >= 2024.2.2",
+"charset-normalizer >= 3.3.2",
+"fs >= 2.4.16",
+"idna >= 3.7",
+"Naked >= 0.1.32",
+"netifaces >= 0.11.0",
+"numpy >= 1.26.4",
+"pathvalidate >= 3.2.0",
+"platformdirs >= 4.2.0",
+"pycryptodome >= 3.20.0",
+"PySide6 >= 6.7.0",
+"PySide6_Addons >= 6.7.0",
+"PySide6_Essentials >= 6.7.0",
+"python-dateutil >= 2.9.0.post0",
+"PyYAML >= 6.0.1",
+"requests >= 2.31.0",
+"shellescape >= 3.8.1",
+"shiboken6 >= 6.7.0",
+"six >= 1.16.0",
+"titlecase >= 2.4.1",
+"urllib3 >= 2.2.1"
+]
+
+
+[project.urls]
+Homepage = "https://github.com/David-Worboys/QTPYGUI"
+Documentation = "https://github.com/David-Worboys/QTPYGUI/README.md"
+Repository = "https://github.com/David-Worboys/QTPYGUI"
+Issues = "https://github.com/David-Worboys/QTPYGUI/issues"
+
+#[tool.setuptools.packages]
+#
+#[tool.setuptools.packages.find]
+#here = ["src"]
+#include = ["pkg*"]  # alternatively: `exclude = ["additional*"]`
+#namespaces = false
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.package-data]
+QTPYGUI = ["*.svg","IBM-Plex-Mono/*.ttf"]
+
+
+#[tool.setuptools.package-data]
+
+
+#[tool.setuptools.package-data]
+#mypkg = ["*.svg","IBM-Plex-Mono"]
+#[tool.setuptools.packages.find]
+#where = ["src"]
+
+#[tool.setuptools.package-data]
+#"*" = ["*.svg","*.py","*.txt"]
 
 [tool.build.keywords]
 pypi = true
@@ -45,12 +108,5 @@ classifiers = [
     "Operating System :: Unix"
 ]
 
-[tool.build.dependencies]
-python = "^3.8"
-pyside6 = "^6.7.0"
-
-[tool.build.dev-dependencies]
-build = "^0.10.0"
-
 [build]
-wheel = "python -m build --wheel --requirement requirements.txt"
+wheel = "python -m build--wheel   --verbose"
