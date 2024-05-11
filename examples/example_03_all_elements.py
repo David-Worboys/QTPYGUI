@@ -23,9 +23,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # Needed now that library files are in src
 import sys
 
-sys.path.insert(0, "../src")
+sys.path.insert(0, "../src/QTPYGUI")
 
-from src import popups, qtpygui as qtg
+import popups
+import qtpygui as qtg
 
 
 class Example_03:
@@ -48,7 +49,8 @@ class Example_03:
         """
         assert isinstance(event, qtg.Action), f"{event=}. Must be Action"
 
-        print(f"DBG {event.event=} {event.container_tag=} {event.tag=} {event.value=}")
+        print(f"{event.action=} {event.event=} {event.container_tag=} {event.tag=} {event.value=}")
+
         match event.event:
             case qtg.Sys_Events.APPPOSTINIT:
                 self._treeview.child_add(treeview_path="Test 1", items="Test 3")
