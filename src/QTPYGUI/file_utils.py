@@ -70,12 +70,33 @@ def App_Path(file_name: str = "", trailing_slash=False) -> str:
                 if trailing_slash
                 else f"{application_path}"
             )
+        # folder above is Nuitka related
+        if application_path.strip() == "":
+            application_path_above = ""
+        else:
+            application_path_above = os.sep.join(application_path.split(os.sep)[:-1])
 
-        return (
+        path_name_above = (
+            f"{os.path.join(application_path_above, file_name)}{os.pathsep}"
+            if trailing_slash
+            else f"{os.path.join(application_path_above, file_name)}"
+        )
+
+        path_name = (
             f"{os.path.join(application_path, file_name)}{os.pathsep}"
             if trailing_slash
             else f"{os.path.join(application_path, file_name)}"
         )
+
+        # If the path does not exist, try folder above- Nuitka related
+        if not (os.path.isdir(path_name) or os.path.isfile(path_name)):
+            if not (os.path.isdir(path_name_above) or os.path.isfile(path_name_above)):
+                raise RuntimeError(f"App_Path C {path_name_above=} Does Not Exist!")
+
+            path_name = path_name_above
+
+        return path_name
+
     else:  # Running as a script
         if file_name.strip() == "":
             application_path = os.getcwd()

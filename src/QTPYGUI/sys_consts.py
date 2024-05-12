@@ -23,15 +23,18 @@ import datetime
 from typing import Final
 
 import platformdirs
-
-import file_utils
-import utils
+try:
+    from file_utils import App_Path, File
+    from utils import strEnum
+except ImportError:
+    from .file_utils import App_Path, File
+    from .utils import strEnum
 
 # fmt: on
 
-executable_folder = file_utils.App_Path()
+executable_folder = App_Path()
 
-file_sep = file_utils.File().ossep
+file_sep = File().ossep
 
 PROGRAM_NAME: Final[str] = "Not Set"
 PROGRAM_VERSION: Final[str] = "Not Set"
@@ -64,7 +67,7 @@ APP_LANG_DBK: Final[str] = "app_lang"  # All qtgui apps
 APP_COUNTRY_DBK: Final[str] = "app_country"  # All qtgui apps
 
 
-class SPECIAL_PATH(utils.strEnum):
+class SPECIAL_PATH(strEnum):
     """Contains enums for strings that represent special paths on the user's computer"""
 
     DESKTOP: Final[str] = platformdirs.user_desktop_dir()

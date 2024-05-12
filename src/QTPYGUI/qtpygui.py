@@ -52,11 +52,23 @@ import numpy as np
 import shiboken6  # type: ignore
 from attrs import define
 
-import utils
-from file_utils import App_Path
-from langtran import Lang_Tran
-from sys_consts import SDELIM
-from utils import Coords, Is_Complied, amper_length, country_date_formatmask
+try:
+    import file_utils
+    import langtran
+    import sys_consts
+    from file_utils import App_Path
+    from langtran import Lang_Tran
+    from sys_consts import SDELIM
+    from utils import Coords, Is_Complied, amper_length, country_date_formatmask,NUMBER, Transform_Str_To_Value, Get_Unique_Int
+except ImportError:
+    from .file_utils import *
+    from .langtran import *
+    from .sys_consts import *
+    from .file_utils import App_Path
+    from .langtran import Lang_Tran
+    from .sys_consts import SDELIM
+    from .utils import Coords, Is_Complied, amper_length, country_date_formatmask,NUMBER, Transform_Str_To_Value, Get_Unique_Int
+
 
 # fmt: on
 sys.setrecursionlimit(
@@ -550,82 +562,82 @@ class Rect_Cords:
         ), f"{self.coords=}. Must be a Coords instance"
 
     @property
-    def top(self) -> utils.NUMBER:
+    def top(self) -> NUMBER:
         """Get the top coordinate of the rectangle
 
         Returns:
-            utils.NUMBER: int or float
+            NUMBER: int or float
         """
         return self.coords.top
 
     @top.setter
-    def top(self, value: utils.NUMBER):
+    def top(self, value: NUMBER):
         """Set the top coordinate of the rectangle
 
         Args:
-            value (utils.NUMBER): int or float
+            value (NUMBER): int or float
         """
-        assert isinstance(value, utils.NUMBER), f"{value=}. Must NUMBER"
+        assert isinstance(value, NUMBER), f"{value=}. Must NUMBER"
 
         self.coords.top = value
 
     @property
-    def left(self) -> utils.NUMBER:
+    def left(self) -> NUMBER:
         """Get the left coordinate of the rectangle
 
         Returns:
-            utils.NUMBER: int or float
+            NUMBER: int or float
         """
         return self.coords.left
 
     @left.setter
-    def left(self, value: utils.NUMBER):
+    def left(self, value: NUMBER):
         """Set the left coordinate of the rectangle
 
         Args:
-            value (utils.NUMBER): int or float
+            value (NUMBER): int or float
         """
-        assert isinstance(value, utils.NUMBER), f"{value=}. Must NUMBER"
+        assert isinstance(value, NUMBER), f"{value=}. Must NUMBER"
 
         self.coords.left = value
 
     @property
-    def width(self) -> utils.NUMBER:
+    def width(self) -> NUMBER:
         """Get the width of the rectangle
 
         Returns:
-            utils.NUMBER: int or float
+            NUMBER: int or float
         """
         return self.coords.width
 
     @width.setter
-    def width(self, value: utils.NUMBER):
+    def width(self, value: NUMBER):
         """Set the width of the rectangle
 
         Args:
-            value (utils.NUMBER): int or float
+            value (NUMBER): int or float
         """
-        assert isinstance(value, utils.NUMBER), f"{value=}. Must NUMBER"
+        assert isinstance(value, NUMBER), f"{value=}. Must NUMBER"
 
         self.coords.width = value
 
     @property
-    def height(self) -> utils.NUMBER:
+    def height(self) -> NUMBER:
         """Get the height of the rectangle
 
         Returns:
-            utils.NUMBER: int or float
+            NUMBER: int or float
         """
         return self.coords.height
 
     @height.setter
-    def height(self, value: utils.NUMBER):
+    def height(self, value: NUMBER):
         """Set the height of the rectangle
 
         Args:
-            value (utils.NUMBER): int or float
+            value (NUMBER): int or float
         """
-        assert isinstance(value, utils.NUMBER), f"{value=}. Must NUMBER"
+        assert isinstance(value, NUMBER), f"{value=}. Must NUMBER"
 
         self.coords.height = value
 
@@ -9214,7 +9226,7 @@ class _Grid_TableWidget_Item(qtW.QTableWidgetItem):
         Initializes a new instance of the _Grid_TableWidget_Item class.
         """
 
-        self.item_id = utils.Get_Unique_Int()
+        self.item_id = Get_Unique_Int()
         super().__init__(label, item_type)
 
     def __lt__(self, other: any) -> bool:
@@ -10480,7 +10492,7 @@ class Grid(_qtpyBase_Control):
 
         item_data = item.data(qtC.Qt.UserRole)
 
-        transformed_value = utils.Transform_Str_To_Value(item.text().strip())
+        transformed_value = Transform_Str_To_Value(item.text().strip())
 
         current_value = item_data.current_value
 
@@ -16172,7 +16184,7 @@ class Video_Player(qtM.QMediaPlayer):
             ):
                 self.setPosition(time_offset)
         except Exception as e:
-            if not utils.Is_Complied():
+            if not Is_Complied():
                 print(f"Seek Error {self.source_state=} {e=}")
 
     def state(self) -> str:

@@ -34,10 +34,16 @@ from sqlite3 import Connection
 from typing import Callable, TextIO, overload
 
 import platformdirs
-
-from file_utils import File
-from sys_consts import SDELIM
-from utils import NUMBER, Get_Unique_Sysid, Is_Complied, strEnum
+try:
+    import sys_consts
+    from file_utils import File
+    from sys_consts import SDELIM
+    from utils import NUMBER, Get_Unique_Sysid, Is_Complied, strEnum
+except ImportError:
+    from .sys_consts import *
+    from .file_utils import File
+    from .sys_consts import SDELIM
+    from .utils import NUMBER, Get_Unique_Sysid, Is_Complied, strEnum
 
 # fmt: on
 

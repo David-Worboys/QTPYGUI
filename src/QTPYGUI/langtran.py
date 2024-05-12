@@ -20,15 +20,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # Tell Black to leave this block alone (realm of isort)
 # fmt: off
 import re
+import platformdirs
 from typing import Optional
 
-import platformdirs
 
-import sqldb
-import sys_consts
-from file_utils import File
-from sys_consts import PROGRAM_NAME, SDELIM
-from utils import Is_Complied, Singleton
+try:
+    from sqldb import SQLDB, App_Settings, ColDef,SQL
+    from sys_consts import APP_LANG_DBK
+    from file_utils import File
+    from sys_consts import PROGRAM_NAME, SDELIM
+    from utils import Is_Complied, Singleton
+except ImportError:
+    from .sqldb import SQLDB, App_Settings, ColDef, SQL
+    from .sys_consts import APP_LANG_DBK
+    from .file_utils import File
+    from .sys_consts import PROGRAM_NAME, SDELIM
+    from .utils import Is_Complied, Singleton
+
 
 # fmt: on
 
@@ -45,8 +53,8 @@ class Lang_Tran(metaclass=Singleton):
         self._db_file: str = "lang_tran"
         self._path = platformdirs.user_data_dir(appname=PROGRAM_NAME)
         self._language_code: str = ""
-        self._DB: Optional[sqldb.SQLDB] = None
-        self._db_settings = sqldb.App_Settings(PROGRAM_NAME)
+        self._DB: Optional[SQLDB] = None
+        self._db_settings = App_Settings(PROGRAM_NAME)
 
     def _config_db(self):
         file_manager = File()
@@ -60,7 +68,7 @@ class Lang_Tran(metaclass=Singleton):
                     f"Failed To Start {PROGRAM_NAME} - Could Not Create <{self._path}>"
                 )
 
-        self.DB = sqldb.SQLDB(
+        self.DB = SQLDB(
             appname=PROGRAM_NAME,
             dbpath=self._path,
             dbfile=self._db_file,
@@ -75,34 +83,34 @@ class Lang_Tran(metaclass=Singleton):
 
         if self._error_code == 1 and not self.DB.table_exists(self._db_file):
             lang_tran_def = (
-                sqldb.ColDef(
+                ColDef(
                     name="id",
                     description="pk_id",
-                    data_type=sqldb.SQL.INTEGER,
+                    data_type=SQL.INTEGER,
                     primary_key=True,
                 ),
-                sqldb.ColDef(
+                ColDef(
                     name="language",
                     description="language",
-                    data_type=sqldb.SQL.VARCHAR,
+                    data_type=SQL.VARCHAR,
                     size=255,
                 ),
-                sqldb.ColDef(
+                ColDef(
                     name="language_code",
                     description="language_code",
-                    data_type=sqldb.SQL.VARCHAR,
+                    data_type=SQL.VARCHAR,
                     size=3,
                 ),
-                sqldb.ColDef(
+                ColDef(
                     name="word",
                     description="word or phrase",
-                    data_type=sqldb.SQL.VARCHAR,
+                    data_type=SQL.VARCHAR,
                     size=255,
                 ),
-                sqldb.ColDef(
+                ColDef(
                     name="base_lang_id",
                     description="base language id",
-                    data_type=sqldb.SQL.INTEGER,
+                    data_type=SQL.INTEGER,
                 ),
             )
 
@@ -120,7 +128,7 @@ class Lang_Tran(metaclass=Singleton):
 
         """
         language_codes = []
-        trans_sql = f"{sqldb.SQL.SELECT} language_code {sqldb.SQL.FROM} lang_tran"
+        trans_sql = f"{SQL.SELECT} language_code {SQL.FROM} lang_tran"
 
         result = self.DB.sql_execute(trans_sql, debug=False)
         error = self.DB.get_error_status()
@@ -167,8 +175,8 @@ class Lang_Tran(metaclass=Singleton):
         ):
             return trans_word.strip(delim)
 
-        if self._db_settings.setting_exist(sys_consts.APP_LANG_DBK):
-            self._language_code = self._db_settings.setting_get(sys_consts.APP_LANG_DBK)
+        if self._db_settings.setting_exist(APP_LANG_DBK):
+            self._language_code = self._db_settings.setting_get(APP_LANG_DBK)
 
         ignore_chars = "+="
         split_list = trans_word.split(delim)
@@ -199,9 +207,9 @@ class Lang_Tran(metaclass=Singleton):
                 if word_token != "":
                     word_token = word_token.replace("'", "''")
                     trans_sql = (
-                        f"{sqldb.SQL.SELECT} id, word {sqldb.SQL.FROM} lang_tran"
-                        f" {sqldb.SQL.WHERE} word = '{word_token}'"
-                        f" {sqldb.SQL.AND} language_code {sqldb.SQL.IS_NULL}"
+                        f"{SQL.SELECT} id, word {SQL.FROM} lang_tran"
+                        f" {SQL.WHERE} word = '{word_token}'"
+                        f" {SQL.AND} language_code {SQL.IS_NULL}"
                     )
 
                     result = self.DB.sql_execute(trans_sql, debug=False)
@@ -224,9 +232,9 @@ class Lang_Tran(metaclass=Singleton):
                             )
                         ):
                             sql = (
-                                f"{sqldb.SQL.INSERTINTO} lang_tran (language_code,"
+                                f"{SQL.INSERTINTO} lang_tran (language_code,"
                                 " word)"
-                                f" {sqldb.SQL.VALUES} (NULL,'{word_token.strip()}')"
+                                f" {SQL.VALUES} (NULL,'{word_token.strip()}')"
                             )
                             result = self.DB.sql_execute(sql, debug=False)
                             error = self.DB.get_error_status()
@@ -239,9 +247,9 @@ class Lang_Tran(metaclass=Singleton):
                             trans_string = f"{'' if trans_string == '' else trans_string + ' '}{word_token}"
                     else:
                         trans_sql = (
-                            f"{sqldb.SQL.SELECT} id, word {sqldb.SQL.FROM} lang_tran"
-                            f" {sqldb.SQL.WHERE} base_lang_id = '{base_lang_id}'"
-                            f" {sqldb.SQL.AND} language_code = '{self._language_code}'"
+                            f"{SQL.SELECT} id, word {SQL.FROM} lang_tran"
+                            f" {SQL.WHERE} base_lang_id = '{base_lang_id}'"
+                            f" {SQL.AND} language_code = '{self._language_code}'"
                         )
 
                         result = self.DB.sql_execute(trans_sql, debug=False)

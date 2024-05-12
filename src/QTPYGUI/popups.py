@@ -36,19 +36,30 @@ from pathvalidate import ValidationError, validate_filepath
 from PySide6 import QtCore as qtC
 from PySide6 import QtGui as qtG
 
-import file_utils
-import sqldb
-import sys_consts
-from file_utils import App_Path
+try:
+    from sqldb import App_Settings, SQLDB, SQL
+    import sys_consts
+    from file_utils import App_Path,File
 
-from qtpygui import (Action, Align, Button, Col_Def, Combo_Data, Combo_Item,
-                     ComboBox, Command_Button_Container, Cursor, FolderView,
-                     Font, Frame, Frame_Style, Grid, Grid_Col_Value,
-                     GridContainer, HBoxContainer, Image, Label, LineEdit,
-                     PopContainer, RadioButton, Spacer, Sys_Events, Sys_Icon,
-                     TextEdit, VBoxContainer, Widget_Frame, sys_cursor, Align_Text)
-from sys_consts import PROGRAM_NAME, SDELIM
-from utils import Countries, Text_To_File_Name
+    from qtpygui import (Action, Align, Button, Col_Def, Combo_Data, Combo_Item,
+                         ComboBox, Command_Button_Container, Cursor, FolderView,
+                         Font, Frame, Frame_Style, Grid, Grid_Col_Value,
+                         GridContainer, HBoxContainer, Image, Label, LineEdit,
+                         PopContainer, RadioButton, Spacer, Sys_Events, Sys_Icon,
+                         TextEdit, VBoxContainer, Widget_Frame, sys_cursor, Align_Text)
+    from sys_consts import PROGRAM_NAME, SDELIM
+    from utils import Countries, Text_To_File_Name
+except ImportError:
+    from .sqldb import App_Settings, SQLDB, SQL
+    from .file_utils import App_Path,File
+    from .qtpygui import (Action, Align, Button, Col_Def, Combo_Data, Combo_Item,
+                                 ComboBox, Command_Button_Container, Cursor, FolderView,
+                                 Font, Frame, Frame_Style, Grid, Grid_Col_Value,
+                                 GridContainer, HBoxContainer, Image, Label, LineEdit,
+                                 PopContainer, RadioButton, Spacer, Sys_Events, Sys_Icon,
+                                 TextEdit, VBoxContainer, Widget_Frame, sys_cursor, Align_Text)
+    from .sys_consts import PROGRAM_NAME, SDELIM
+    from .utils import Countries, Text_To_File_Name
 
 # fmt: on
 
@@ -1033,7 +1044,7 @@ class Langtran_Popup(PopContainer):
     tag: str = "langtran_popup"
 
     # Private instance variable
-    _db_settings: sqldb.App_Settings | None = None
+    _db_settings: App_Settings | None = None
     _db_file: str = "lang_tran"
     _path = platformdirs.user_data_dir(appname=PROGRAM_NAME)
 
@@ -1041,8 +1052,8 @@ class Langtran_Popup(PopContainer):
         """Sets-up the form"""
 
         self.container = self.layout()
-        self._db_settings = sqldb.App_Settings(PROGRAM_NAME)
-        self.DB = sqldb.SQLDB(
+        self._db_settings = App_Settings(PROGRAM_NAME)
+        self.DB = SQLDB(
             appname=PROGRAM_NAME,
             dbpath=self._path,
             dbfile=self._db_file,
@@ -1162,7 +1173,7 @@ class Langtran_Popup(PopContainer):
         assert isinstance(event, Action), f"{event=}. Must be Action"
 
         db_path: str = platformdirs.user_documents_dir()
-        file_handler = file_utils.File()
+        file_handler = File()
         db_path = file_handler.file_join(dir_path=db_path, file_name="langtran")
 
         if not file_handler.file_exists(db_path):
@@ -1258,7 +1269,7 @@ class Langtran_Popup(PopContainer):
         assert isinstance(event, Action), f"{event=}. Must be Action"
 
         db_path: str = platformdirs.user_documents_dir()
-        file_handler = file_utils.File()
+        file_handler = File()
         db_path = file_handler.file_join(dir_path=db_path, file_name="langtran")
 
         if not file_handler.file_exists(db_path):
@@ -1429,8 +1440,8 @@ class Langtran_Popup(PopContainer):
 
         # Populate the phrase table with base phrases and, if any, translated phrases from the app selected country
         trans_sql = (
-            f"{sqldb.SQL.SELECT} id, word {sqldb.SQL.FROM} lang_tran"
-            f" {sqldb.SQL.WHERE} language_code {sqldb.SQL.IS_NULL}"
+            f"{SQL.SELECT} id, word {SQL.FROM} lang_tran"
+            f" {SQL.WHERE} language_code {SQL.IS_NULL}"
         )
 
         result = self.DB.sql_execute(trans_sql, debug=False)
@@ -1455,7 +1466,7 @@ class Langtran_Popup(PopContainer):
                         tag="copy_text",
                         width=1,
                         height=1,
-                        icon=file_utils.App_Path("text.svg"),
+                        icon=App_Path("text.svg"),
                         tooltip="Copy Text To Clipboard",
                         callback=self.event_handler,
                     ),
@@ -1501,9 +1512,9 @@ class Langtran_Popup(PopContainer):
         trans_table = {}
 
         trans_sql = (
-            f"{sqldb.SQL.SELECT} base_lang_id, id, word"
-            f" {sqldb.SQL.FROM} lang_tran"
-            f" {sqldb.SQL.WHERE} language_code ="
+            f"{SQL.SELECT} base_lang_id, id, word"
+            f" {SQL.FROM} lang_tran"
+            f" {SQL.WHERE} language_code ="
             f" '{self._get_language_code(event)}'"
         )
         result = self.DB.sql_execute(trans_sql, debug=False)
@@ -1612,11 +1623,11 @@ class Langtran_Popup(PopContainer):
 
                 if trans_phrase.strip():
                     trans_sql = (
-                        f"{sqldb.SQL.SELECT} id, word"
-                        f" {sqldb.SQL.FROM} lang_tran"
-                        f" {sqldb.SQL.WHERE} word = '{base_phrase}'"
-                        f" {sqldb.SQL.AND} language_code"
-                        f" {sqldb.SQL.IS_NULL}"
+                        f"{SQL.SELECT} id, word"
+                        f" {SQL.FROM} lang_tran"
+                        f" {SQL.WHERE} word = '{base_phrase}'"
+                        f" {SQL.AND} language_code"
+                        f" {SQL.IS_NULL}"
                     )
 
                     result = self.DB.sql_execute(trans_sql, debug=False)
@@ -1626,11 +1637,11 @@ class Langtran_Popup(PopContainer):
                         base_lang_id = result[0][0]
 
                         trans_sql = (
-                            f"{sqldb.SQL.SELECT} id, word"
-                            f" {sqldb.SQL.FROM} lang_tran"
-                            f" {sqldb.SQL.WHERE} base_lang_id ="
+                            f"{SQL.SELECT} id, word"
+                            f" {SQL.FROM} lang_tran"
+                            f" {SQL.WHERE} base_lang_id ="
                             f" '{base_lang_id}'"
-                            f" {sqldb.SQL.AND} language_code ="
+                            f" {SQL.AND} language_code ="
                             f" '{language_code}'"
                         )
 
@@ -1641,19 +1652,19 @@ class Langtran_Popup(PopContainer):
                             trans_phrase = trans_phrase.replace("'", "''")
                             if result:  # Have a translated phrase (update)
                                 trans_sql = (
-                                    f"{sqldb.SQL.UPDATE} lang_tran"
-                                    f" {sqldb.SQL.SET} word ="
+                                    f"{SQL.UPDATE} lang_tran"
+                                    f" {SQL.SET} word ="
                                     f" '{trans_phrase}'"
-                                    f" {sqldb.SQL.WHERE} base_lang_id ="
+                                    f" {SQL.WHERE} base_lang_id ="
                                     f" '{base_lang_id}'"
-                                    f" {sqldb.SQL.AND} language_code ="
+                                    f" {SQL.AND} language_code ="
                                     f" '{language_code}'"
                                 )
                             else:  # insert
                                 trans_sql = (
-                                    f"{sqldb.SQL.INSERTINTO} lang_tran"
+                                    f"{SQL.INSERTINTO} lang_tran"
                                     " (base_lang_id,word,language_code)"
-                                    f" {sqldb.SQL.VALUES} ('{base_lang_id}','{trans_phrase}','{language_code}')"
+                                    f" {SQL.VALUES} ('{base_lang_id}','{trans_phrase}','{language_code}')"
                                 )
 
                             result = self.DB.sql_execute(trans_sql, debug=False)
