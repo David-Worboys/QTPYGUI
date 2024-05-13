@@ -54,30 +54,11 @@ Documentation = "https://github.com/David-Worboys/QTPYGUI/README.md"
 Repository = "https://github.com/David-Worboys/QTPYGUI"
 Issues = "https://github.com/David-Worboys/QTPYGUI/issues"
 
-#[tool.setuptools.packages]
-#
-#[tool.setuptools.packages.find]
-#here = ["src"]
-#include = ["pkg*"]  # alternatively: `exclude = ["additional*"]`
-#namespaces = false
-
 [tool.setuptools]
 include-package-data = true
 
 [tool.setuptools.package-data]
 QTPYGUI = ["*.svg","IBM-Plex-Mono/*.ttf"]
-
-
-#[tool.setuptools.package-data]
-
-
-#[tool.setuptools.package-data]
-#mypkg = ["*.svg","IBM-Plex-Mono"]
-#[tool.setuptools.packages.find]
-#where = ["src"]
-
-#[tool.setuptools.package-data]
-#"*" = ["*.svg","*.py","*.txt"]
 
 [tool.build.keywords]
 pypi = true
@@ -107,6 +88,3 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Operating System :: Unix"
 ]
-
-[build]
-wheel = "python -m build--wheel   --verbose"
