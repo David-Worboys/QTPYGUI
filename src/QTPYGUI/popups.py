@@ -38,7 +38,6 @@ from PySide6 import QtGui as qtG
 
 try:
     from sqldb import App_Settings, SQLDB, SQL
-    import sys_consts
     from file_utils import App_Path,File
 
     from qtpygui import (Action, Align, Button, Col_Def, Combo_Data, Combo_Item,
@@ -47,7 +46,7 @@ try:
                          GridContainer, HBoxContainer, Image, Label, LineEdit,
                          PopContainer, RadioButton, Spacer, Sys_Events, Sys_Icon,
                          TextEdit, VBoxContainer, Widget_Frame, sys_cursor, Align_Text)
-    from sys_consts import PROGRAM_NAME, SDELIM
+    from sys_consts import PROGRAM_NAME, SDELIM, APP_COUNTRY_DBK
     from utils import Countries, Text_To_File_Name
 except ImportError:
     from .sqldb import App_Settings, SQLDB, SQL
@@ -58,7 +57,7 @@ except ImportError:
                                  GridContainer, HBoxContainer, Image, Label, LineEdit,
                                  PopContainer, RadioButton, Spacer, Sys_Events, Sys_Icon,
                                  TextEdit, VBoxContainer, Widget_Frame, sys_cursor, Align_Text)
-    from .sys_consts import PROGRAM_NAME, SDELIM
+    from .sys_consts import PROGRAM_NAME, SDELIM, APP_COUNTRY_DBK
     from .utils import Countries, Text_To_File_Name
 
 # fmt: on
@@ -1415,10 +1414,10 @@ class Langtran_Popup(PopContainer):
 
         # Default country combo to the country specified in the application-selected country
         if self._db_settings.setting_exist(
-            setting_name=sys_consts.APP_COUNTRY_DBK,
+            setting_name=APP_COUNTRY_DBK,
         ):
             app_country = self._db_settings.setting_get(
-                setting_name=sys_consts.APP_COUNTRY_DBK,
+                setting_name=APP_COUNTRY_DBK,
             )
 
             if app_country:
