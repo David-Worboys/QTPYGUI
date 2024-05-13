@@ -55,14 +55,27 @@ def App_Path(file_name: str = "", trailing_slash=False) -> str:
         getattr(sys, "frozen", False)
         and hasattr(sys, "_MEIPASS")
         or globals().get("__compiled__", False)
-    ):  # Compiled ot Pyinstaller handling
-        if globals().get("__compiled__", False) and globals().get("__spec__", False):
-            application_path = globals()["__spec__"].origin
-            application_path = os.path.dirname(application_path)
-        elif globals().get("__compiled__", False):
-            application_path = os.getcwd()
-        else:
+    ):  # Nuitka Compiled or Pyinstaller handling
+        package_path = ""
+
+        if "__compiled__" in globals():  # Nuitka compile
+            if (
+                "__builtins__" in globals()
+                and "__nuitka_binary_dir" in globals()["__builtins__"]
+            ):
+                application_path = globals()["__builtins__"]["__nuitka_binary_dir"]
+                package_path = os.path.dirname(globals()["__spec__"].origin)
+            else:
+                for key in globals().keys():
+                    print(f"DBG {key=} {globals()[key]=}")
+
+                raise RuntimeError(
+                    "Nuitka compile but no __nuitka_binary_dir in globals()"
+                )
+        elif hasattr(sys, "_MEIPASS"):  # Pyinstaller compile
             application_path: str = sys._MEIPASS  # type: ignore
+        else:  # What the ... ?
+            application_path = os.getcwd()
 
         if file_name.strip() == "":
             return (
@@ -70,16 +83,11 @@ def App_Path(file_name: str = "", trailing_slash=False) -> str:
                 if trailing_slash
                 else f"{application_path}"
             )
-        # folder above is Nuitka related
-        if application_path.strip() == "":
-            application_path_above = ""
-        else:
-            application_path_above = os.sep.join(application_path.split(os.sep)[:-1])
 
-        path_name_above = (
-            f"{os.path.join(application_path_above, file_name)}{os.pathsep}"
+        package_path_name = (
+            f"{os.path.join(package_path, file_name)}{os.pathsep}"
             if trailing_slash
-            else f"{os.path.join(application_path_above, file_name)}"
+            else f"{os.path.join(package_path, file_name)}"
         )
 
         path_name = (
@@ -88,12 +96,14 @@ def App_Path(file_name: str = "", trailing_slash=False) -> str:
             else f"{os.path.join(application_path, file_name)}"
         )
 
-        # If the path does not exist, try folder above- Nuitka related
+        # Try binary root folder- Nuitka related
         if not (os.path.isdir(path_name) or os.path.isfile(path_name)):
-            if not (os.path.isdir(path_name_above) or os.path.isfile(path_name_above)):
-                raise RuntimeError(f"App_Path C {path_name_above=} Does Not Exist!")
+            if not (
+                os.path.isdir(package_path_name) or os.path.isfile(package_path_name)
+            ):  # Try the package folder
+                raise RuntimeError(f"App_Path C {package_path_name=} Does Not Exist!")
 
-            path_name = path_name_above
+            path_name = package_path_name
 
         return path_name
 
