@@ -93,8 +93,7 @@ https://github.com/David-Worboys/Black-DVD-Archiver
 First up, QTPYGUI is pronounced "Cutey Pie GUI" which follows the "QT Groups"
 own pronunciation and appeals to my, admitably lame, sense of humour.
 ### Prerequities
-1. Pyside6
-2. Python version >= 3.8 
+1. Python version >= 3.8 
    - If Nuitka is used for application distribution, then Python versions 3.12 
    and above are not currently supported.
 ### Installation
@@ -104,7 +103,7 @@ the virtual environment manager of your choice
 2. pip install QTPYGUI
 
 ### Boot Camp
-First up, check out the examples in https://github.com/David-Worboys/QTPYGUI/tree/master/Examples .
+First up, check out the examples in https://github.com/David-Worboys/QTPYGUI/tree/master/examples .
 There is one example per python source file, and I will be adding more as time 
 progresses.
 
@@ -153,7 +152,7 @@ if __name__ == "__main__":
 ```
 1. This defines the structure of the application main.py file
 
-2. https://github.com/David-Worboys/QTPYGUI/blob/master/Examples/example_01.py
+2. https://github.com/David-Worboys/QTPYGUI/blob/master/examples/example_01.py
 shows this in action.
 
 3. The python classes that utilise a GUI are defined as below:
@@ -201,7 +200,7 @@ qtg.HBoxContainer(tag="button_example").add_row(
                 ),
 )                
 ```
-- This will layout two Buttons Horizontally. If a FormContainer or a VBoxContainer
+- This will lay out two Buttons Horizontally. If a FormContainer or a VBoxContainer
 was used, the buttons would be laid out vertically.
 
 - **Note the use of the tag, text and callback arguments as these are fundamental
@@ -236,7 +235,7 @@ then the container "tag" and the button "tag" make a unique pair.
 "label" — The "label" argument places a label to the left of the control, it is
 optional
 
-"callback" — Is the name of the method that will process the envents generated
+"callback" — Is the name of the method that will process the events generated
 by the GUI control. By convention, I declare this as the "event_handler" method. 
 
 - If a callback method is not provided, then the control cannot send events to it
@@ -367,8 +366,7 @@ To compile ```hello_world.py``` the reader will need to install Nuitka
 
 ```pip install Nuitka```
 
-and run this command, after amending the ```--include-data-dir=``` path to the 
-readers own installed path :
+and run this command:
 ```
 python -m nuitka                                                                            \
 --show-anti-bloat-changes                                                                   \
@@ -1426,7 +1424,7 @@ display, on a form. This control is unusual in that it only displays a limited s
 h, H, L, o, P, r, u, U, Y, colon, degree sign (which is specified as single 
 quote in the string) and space.
 
-Refer to the [Calculator](examples/example_02_calculator.py) for a simple program example
+Refer to the [Calculator](https://github.com/David-Worboys/QTPYGUI/blob/master/examples/example_02_calculator.py) for a simple program example
 
 The "tag" and "text"  are generally the only arguments used, and "tag" is only 
 needed if you plan on referencing the label in your code. 
@@ -1617,7 +1615,7 @@ A menu is built up of [menu elements](#menu_element) and creating a menu is stra
 2. Add The top row menu elements with the element_add method and the parent_tag = ""
 3. Add submenu elements with the parent tag pointing to the tag of the parent menu element
 4. Repeat Step 3 as often as needed to make up the menu structure.
-5. If a seperator is needed set menu element text to "---" which is the constant MENU_SEPERATOR <br>
+5. If a seperator is needed, set menu element text to "---" which is the constant MENU_SEPERATOR <br>
 or set menu element seperator=True
 
 The code below illustrates this process
@@ -1796,7 +1794,7 @@ size correctly.
 | callback     | The event handler method to call when the PrgressBar is does something    | Callable    | ❌            |
 | horizontal   | True a horizontal ProgressBath, Otherwise a vertical ProgressBar          | bool (True) | ✓            |
 | label        | The label to the left of the ProgressBar that indicates what is is for    | str         | ✓            |
- | range_min    | The minimum range of a ProgressBar >=0                                    | int (0)     | ✓            |
+| range_min    | The minimum range of a ProgressBar >=0                                    | int (0)     | ✓            |
 | range_max    | The maximum range of a ProgressBar >= 0                                   | int (100)   | ✓            |
 | tag          | The system name of the ProgressBar (required for updates)                 | str         | ❌            |
 | width        | Characters if [pixel_unit](#_qtpybase_control) is False, Otherwise pixels | int (10)    | ✓            ||
@@ -2107,9 +2105,9 @@ control is used to flick a setting on and off.
  
 | **Property** | **Description**                             | **Type**     | **Optional** |
 |--------------|---------------------------------------------|--------------|--------------|
-| checked      | True, Switch is on, Otherwise Switch is off | bool (False) |  ✓            |
-| label        | Sets a text label to the left               | str ("")     |  ✓            |
-| text         | Sets a text label to the right              | str ("")     |  ✓            |
+| checked      | True, Switch is on, Otherwise Switch is off | bool (False) | ✓            |
+| label        | Sets a text label to the left               | str ("")     | ✓            |
+| text         | Sets a text label to the right              | str ("")     | ✓            |
 
 
  
@@ -2238,7 +2236,7 @@ tab = qtg.Tab(
 
 - 3 Repeat Step 2 until done
 
-Putting it all together, this is how to declare a Tab with one page ([Example 04](examples/example_04_tab_control.py))
+Putting it all together, this is how to declare a Tab with one page ([Example 04](https://github.com/David-Worboys/QTPYGUI/blob/master/examples/example_04_tab_control.py))
  
 ```
         def tab_definition() -> qtg.Tab:
@@ -2823,7 +2821,7 @@ of two rectangles
 | a_rect_id    | Rectangle A Id           | str               |
 | a_coords     | Rectangle A Co-ordinates | [Coords](#coords) |
 | b_rect_id    | Rectangle B Id           | str               |
-| b_coords     | Rectangle B Co-Ordinates | [Coords](#coords)            |
+| b_coords     | Rectangle B Co-Ordinates | [Coords](#coords) |
 
 ### Rect_Changed
 Rect_Changed is a helper class used by [Image](#image) to represent a changed rectangle
