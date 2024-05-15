@@ -382,7 +382,7 @@ python -m nuitka                                                                
 --prefer-source-code                                                                        \
 --enable-plugin=pyside6                                                                     \
 --include-qt-plugins=sensible                                                               \
---include-data-dir=/home/david/PycharmProjects/QTPYGUI/IBM-Plex-Mono=./IBM-Plex-Mono        \
+--include-package-data=QTPYGUI                                                              \
 hello_world.py
 ```
 This will produce a ```hello_world.bin``` file on Linux, double-click on it and 

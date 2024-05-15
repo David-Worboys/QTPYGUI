@@ -17,14 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-# Needed now that library files are in src
-import sys
-
-sys.path.insert(0, "../src/QTPYGUI")
-
 from typing import Final
 
-import popups, qtpygui as qtg
+import sys
+
+try:
+    import QTPYGUI.qtpygui as qtg
+    import QTPYGUI.popups as popups
+except ImportError:
+    sys.path.insert(0, "../src/QTPYGUI")
+
+    import qtpygui as qtg
+    import popups
 
 MAX_DIGITS: Final[int] = 8
 

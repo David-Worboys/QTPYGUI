@@ -17,13 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-# Needed now that library files are in src
 import sys
 
-sys.path.insert(0, "../src/QTPYGUI")
+try:
+    import QTPYGUI.qtpygui as qtg
+    import QTPYGUI.popups as popups
+except ImportError:
+    sys.path.insert(0, "../src/QTPYGUI")
 
-import qtpygui as qtg
-import popups
+    import qtpygui as qtg
+    import popups
 
 
 class Example_01:

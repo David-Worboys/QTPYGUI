@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "QTPYGUI"
-version = "1.0.0-beta02"
+version = "1.0.0-beta03"
 authors = [
   { name = "David Worboys", email = "davidaworboys@gmail.com"},
 ]
@@ -75,7 +75,7 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://github.com/David-Worboys/QTPYGUI"
-Documentation = "https://github.com/David-Worboys/QTPYGUI/README.md"
+Documentation = "https://github.com/David-Worboys/QTPYGUI/blob/master/README.md"
 Repository = "https://github.com/David-Worboys/QTPYGUI"
 Issues = "https://github.com/David-Worboys/QTPYGUI/issues"
 

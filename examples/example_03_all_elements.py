@@ -20,12 +20,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # Note, these are fully loaded examples and most of the arguments will not be needed in a real program.
 # Refer to README.md for the user manual
 
-# Needed now that library files are in src
 import sys
 
-sys.path.insert(0, "../src/QTPYGUI")
+try:
+    import QTPYGUI.qtpygui as qtg
+    import QTPYGUI.popups as popups
+except ImportError:
+    sys.path.insert(0, "../src/QTPYGUI")
 
-import popups, qtpygui as qtg
+    import qtpygui as qtg
+    import popups
 
 
 class Example_03:
