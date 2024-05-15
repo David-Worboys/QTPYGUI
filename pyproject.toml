@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "QTPYGUI"
-version = "1.0.0-beta01"
+version = "1.0.0-beta02"
 authors = [
   { name = "David Worboys", email = "davidaworboys@gmail.com"},
 ]
@@ -14,6 +14,31 @@ description = "A Simple Python Declarative User Interface Wrapper Around Pyside6
 readme = "README.md"
 requires-python = ">= 3.8"
 license.file = "LICENSE.md"
+dependencies = [
+    "appdirs >= 1.4.4",
+"attrs >= 23.2.0",
+"certifi >= 2024.2.2",
+"charset-normalizer >= 3.3.2",
+"fs >= 2.4.16",
+"idna >= 3.7",
+"Naked >= 0.1.32",
+"netifaces >= 0.11.0",
+"numpy >= 1.26.4",
+"pathvalidate >= 3.2.0",
+"platformdirs >= 4.2.0",
+"pycryptodome >= 3.20.0",
+"PySide6 >= 6.7.0",
+"PySide6_Addons >= 6.7.0",
+"PySide6_Essentials >= 6.7.0",
+"python-dateutil >= 2.9.0.post0",
+"PyYAML >= 6.0.1",
+"requests >= 2.31.0",
+"shellescape >= 3.8.1",
+"shiboken6 >= 6.7.0",
+"six >= 1.16.0",
+"titlecase >= 2.4.1",
+"urllib3 >= 2.2.1"
+]
 
 [tool.build]
 url = "https://github.com/David-Worboys/QTPYGUI"
@@ -21,7 +46,7 @@ long_description = "README.md"
 long_description_content_type = "text/markdown"
 build-number = "0"
 filename = "{name}-{version}-{build-number}-py3-none-any.whl"
-dependecies = [
+dependencies = [
     "appdirs >= 1.4.4",
 "attrs >= 23.2.0",
 "certifi >= 2024.2.2",

@@ -101,18 +101,7 @@ own pronunciation and appeals to my, admitably lame, sense of humour.
 1. Create your Python project folder and set up your Python project using 
 the virtual environment manager of your choice
 
-2. Follow the installation instructions at https://pypi.org/project/PySide6/ or 
-just enter:
-
-    `pip install PySide6`
-
-3. Until I get a PyPy installation configured, go to https://github.com/David-Worboys/QTPYGUI 
-and download all the python source code (.py) files and the requirements.txt 
-file into your Python project folder.
-
-4. Now install all QTPYGUI dependencies in your Python project folder
-
-   `pip install -r requirements.txt`
+2. pip install QTPYGUI
 
 ### Boot Camp
 First up, check out the examples in https://github.com/David-Worboys/QTPYGUI/tree/master/Examples .
@@ -135,7 +124,7 @@ to happen
 3. The basic structure of a QTPY GUI Program is as follows:
 
 ```
-import qtpygui as qtg
+import QTPYGUI.qtpygui as qtg
 
 Class Example_App
     def __init__(self):
@@ -169,7 +158,7 @@ shows this in action.
 
 3. The python classes that utilise a GUI are defined as below:
 ```
-import qtpygui as qtg
+import QTPYGUI.qtpygui as qtg
 
 Class Example_Class:
     def event_handler(self, event: qtg.Action):
@@ -300,7 +289,7 @@ As is traditional, a "hello world" program needs to be written first, so let's
 get to it!
 
 ```
-import qtpygui as qtg
+import QTPYGUI.qtpygui as qtg
 
 class Hello_World:
     def __init__(self):
