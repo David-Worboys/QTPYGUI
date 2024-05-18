@@ -5194,7 +5194,9 @@ class _Container(_qtpyBase_Control):
 
         if (
             isinstance(self, _Container)
-            and self.height > widget_group.layout().totalMinimumSize().height()
+            and self.height
+            > widget_group.layout().totalMinimumSize().height()
+            // char_pixel_size.height
         ):
             self._height = round(
                 (char_pixel_size.height * self.height) + self.tune_vsize
