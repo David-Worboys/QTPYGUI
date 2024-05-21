@@ -6,11 +6,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "QTPYGUI"
-version = "1.0.0-beta03"
+version = "1.0.2"
 authors = [
   { name = "David Worboys", email = "davidaworboys@gmail.com"},
 ]
 description = "A Simple Python Declarative User Interface Wrapper Around Pyside6"
+keywords = ["pypi", "cicd", "pyside6","ui","gui","qt","qtpygui","declarative","wrapper","user-interface","qt-bindings",
+    "python-qt","gui-framework","ui-library","pyside6-wrapper","pyside"]
 readme = "README.md"
 requires-python = ">= 3.8"
 license.file = "LICENSE.md"
@@ -32,13 +34,24 @@ dependencies = [
 "PySide6_Essentials >= 6.7.0",
 "python-dateutil >= 2.9.0.post0",
 "PyYAML >= 6.0.1",
-"requests >= 2.31.0",
+"requests >= 2.32.1",
 "shellescape >= 3.8.1",
 "shiboken6 >= 6.7.0",
 "six >= 1.16.0",
 "titlecase >= 2.4.1",
 "urllib3 >= 2.2.1"
 ]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: POSIX :: Linux",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
+]
+
 
 [tool.build]
 url = "https://github.com/David-Worboys/QTPYGUI"
@@ -64,7 +77,7 @@ dependencies = [
 "PySide6_Essentials >= 6.7.0",
 "python-dateutil >= 2.9.0.post0",
 "PyYAML >= 6.0.1",
-"requests >= 2.31.0",
+"requests >= 2.32.1",
 "shellescape >= 3.8.1",
 "shiboken6 >= 6.7.0",
 "six >= 1.16.0",
@@ -84,24 +97,6 @@ include-package-data = true
 
 [tool.setuptools.package-data]
 QTPYGUI = ["*.svg","IBM-Plex-Mono/*.ttf"]
-
-[tool.build.keywords]
-pypi = true
-cicd= true
-python= true
-pyside6= true
-ui= true
-gui= true
-qt= true
-qtpygui= true
-declarative= true
-wrapper= true
-user-interface= true
-qt-bindings= true
-python-qt= true
-gui-framework= true
-ui-library= true
-pyside6-wrapper= true
 
 [tool.build.classifiers]
 classifiers = [

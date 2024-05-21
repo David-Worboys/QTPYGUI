@@ -216,12 +216,13 @@ informative_text = (
                     f' center;">License: {sys_consts.LICENCE}</p>'
 )
 ```
-and run OPMS again, select 'Help' from the menu bar and the 'About' option and 
-this windows opens:
+Copy 'logo.jpg' into the project dicrectry, modify 'informative_text' and run 
+OPMS again. Select 'Help' from the menu bar and the 'About' option, and this 
+windows opens:
 
 ![](./userguide_images/about_2.png)
 
-Which looks so much better!
+Which to the author at least, looks so much better!
 
 ## OPMS Startup Configuration
 Applications need to do a number of housekeeping tasks at startup, e.g., amongst
@@ -229,15 +230,24 @@ other tasks, they need to establish database connections, ensure configuration
 directories and files are created and correct, log a user on and load a user's 
 configuration.
 
-In the OPMS class 'event_handler' method the APPPOSTINIT event is caught, and the
-startup activities are perfomed in a new method - 'startup_handler'. 
+QTPYGUI has a SQLite module, sqldb, to help with this task and to maintain application
+settings for suitable smaller applications like OPMS
+
+In the OPMS class 'event_handler' method, the 'APPPOSTINIT' event is caught, and
+the startup activities are performed in a new method - the 'startup_handler'. 
 ```
 match event.event:
      case qtg.Sys_Events.APPPOSTINIT:
          self.startup_handler()
 ```
 
-It is good practice to separate data from the user interface and, as OPMS will 
+### The 'startup_handler'
+The 'startup_handler' will need to do the initial setup of the application before
+configuring the database. This involves creating application directories in the 
+appropriate system directories
+
+### Database Handling
+It is good practice to separate data from the user presentation and, as OPMS will 
 use a database, a database.py file needs to be created to handle database 
 configuration and query operations.
 

@@ -16,10 +16,10 @@ PySide6_Addons==6.7.0
 PySide6_Essentials==6.7.0
 python-dateutil==2.9.0.post0
 PyYAML==6.0.1
-requests==2.31.0
+requests==2.32.1
 shellescape==3.8.1
 shiboken6==6.7.0
 six==1.16.0
 titlecase==2.4.1
-twine==5.0.0
+twine==5.1.0
 urllib3==2.2.1

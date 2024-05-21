@@ -1,5 +1,5 @@
 """
-System wide constants for dvd archiver.
+System wide constants for QTPYGUI.
 
 Copyright (C) 2022  David Worboys (-:alumnus Moyhu Primary School et al.:-)
 
