@@ -21,7 +21,7 @@ import dataclasses
 
 
 @dataclasses.dataclass(slots=True)
-class database_setup():
+class database_setup:
     """Performs database configuration operations"""
 
     def configure_database(self) -> int:

@@ -246,11 +246,79 @@ The 'startup_handler' will need to do the initial setup of the application befor
 configuring the database. This involves creating application directories in the 
 appropriate system directories
 
-### Database Handling
+#### Database Handling
 It is good practice to separate data from the user presentation and, as OPMS will 
-use a database, a database.py file needs to be created to handle database 
+use a database, a 'database.py' file needs to be created to handle database 
 configuration and query operations.
 
+#### System Settings - A Custom Popup Window
+A popup window is also needed to configure the system for use. This is found in
+'sys_settings.py'.
+
+The System Settings popup window introduces a new concept, how to construct a 
+custom popup window for use in the application. To this end, QTPYQUI has a 
+'PopContainer' class and the 'sys_settings' class is a descendant of that.
+
+THe code excerpt below illustrates how to define a custom popup window. Naturally,
+the 'sys_settings' class has a layout and event_handler method as that is the 
+standard QTPYGUI class layout for a window.
+
+
+```
+import dataclasses
+import QTPYGUI.qtpygui as qtg
+
+
+@dataclasses.dataclass
+class sys_settings(qtg.PopContainer):
+    """Performs system settings"""
+    def __post_init__(self):
+        self.container = self.layout()
+
+        super().__post_init__()  # This statement must be last
+```
+
+The 'layout' method uses a 'Command_Button_Container' that makes it simple to
+put 'Ok','Cancel', and 'Apply' buttons in a window. Set the appropriate callback
+and the corresponding button appears.  In this case, only an''Ok' and 'Cancel' 
+button is required.
+
+```
+    def layout(self) -> qtg.VBoxContainer:
+        """Defines the layout of the system settings popup window
+        Returns
+            VBoxContainer: The system settings popup window layout container
+        """
+        layout = qtg.VBoxContainer()
+        layout.add_row(
+            qtg.Command_Button_Container(
+                ok_callback=self.event_handler, cancel_callback=self.event_handler
+            )
+        )
+
+        return layout
+```
+ And the 'event_handler' method catches the 'Clicked' event when a button is 
+ activated by the user
+
+```
+    def event_handler(self, event: qtg.Action):
+        """Master control event processing of the popup window
+
+        Args:
+            event (Action): event raising this control event
+        """
+        match event.event:
+            case qtg.Sys_Events.CLICKED:
+                match event.tag:
+                    case "cancel":
+                        super().close()
+                    case "ok":
+                        super().close()
+```
+At this point, all the System Settings window consists of is an 'Ok' and 'Cancel'
+button that will close the window when clicked on. The required controls for the
+System_Settings window will now be added.
 
 
 

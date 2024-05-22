@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import QTPYGUI.qtpygui as qtg
 import QTPYGUI.popups as popups
 import sys_consts
+import sys_settings
 import database
 
 
@@ -78,15 +79,28 @@ class OPMS:
 
     def startup_handler(self):
         """Handles OPMS startup activities"""
+        app_settings = qtg.App_Settings(sys_consts.PROGRAM_NAME)
 
-        result = database.database_setup().configure_database()
-
-        if result == -1:
+        if app_settings.error_code == -1 or app_settings.db_path_get == "":
             popups.PopError(
                 title="Startup Error",
-                message="Could not configure database.\n Shutting Down",
+                message=f"Could not load application settings - {app_settings.error_message}.\n Shutting Down",
             ).show()
             self.opms.app_exit()
+
+        # New Config - Open System Settings and Set DB Folder Password
+        if app_settings.new_cfg:
+            result = database.database_setup().configure_database()
+
+            if result == -1:
+                popups.PopError(
+                    title="Startup Error",
+                    message="Could not configure database.\n Shutting Down",
+                ).show()
+                self.opms.app_exit()
+
+            # Open config window
+            sys_settings.sys_settings().show()
 
     def layout(self) -> qtg.VBoxContainer:
         """The layout of the OPMS main window
