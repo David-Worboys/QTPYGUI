@@ -327,6 +327,53 @@ def Get_Window_ID(
 
 
 @dataclasses.dataclass(slots=True)
+class CSV_File_Def:
+    """
+    Definition of CSV file
+
+    file_name (str) : Name of CSV file (can contain the path)
+    select_text (str) : Text to select in combo-box after load
+    text_index (int) : col in file to load into display (default: {1})
+    line_start (int) : line in file to start loading from (default: {1})
+    data_index (int) : col in file to load into user data (default: {1})
+    ignore_header (bool) : Set True if the CSV file has a header row (default: {True})
+    delimiter (str) : CSV field separator (default: {","})
+    """
+
+    file_name: str
+    select_text: str = ""
+    text_index: int = 1
+    line_start: int = 1
+    data_index: int = 1
+    ignore_header: bool = True
+    delimiter: str = ","
+
+    def __post_init__(self) -> None:
+        """
+        Validate the CSV_File_Def object
+        """
+        assert (
+            isinstance(self.file_name, str) and self.file_name.strip() != ""
+        ), f"{self.file_name=}. Must be a non-empty string"
+        assert isinstance(self.select_text, str), f"f{self.select_text=}. Must be str"
+        assert (
+            isinstance(self.text_index, int) and self.text_index > 0
+        ), f"{self.text_index=}. Must be int > 0"
+        assert (
+            isinstance(self.line_start, int) and self.line_start > 0
+        ), f"{self.line_start=}. Must be int > 0"
+        assert (
+            isinstance(self.data_index, int) and self.data_index > 0
+        ), f"{self.data_index=}. Must be int > 0"
+        assert isinstance(
+            self.ignore_header, bool
+        ), f"{self.ignore_header=}. Must be bool"
+        assert (
+            isinstance(self.delimiter, str) and len(self.delimiter) == 1
+        ), f"{self.delimiter=} must be a single char"
+
+
+@dataclasses.dataclass(slots=True)
 class Grid_Item:
     """Grid class to store information about a grid item."""
 
@@ -7320,6 +7367,7 @@ class ComboBox(_qtpyBase_Control):
     num_visible_items: int = 15
     display_na: bool = True
     parent_tag: str = ""
+    csv_file_def: Optional[CSV_File_Def] = None
 
     @dataclasses.dataclass
     class _USER_DATA:
@@ -7353,6 +7401,10 @@ class ComboBox(_qtpyBase_Control):
         assert isinstance(
             self.items, (str, list, tuple)
         ), f"f{self.items=}. Must be a str, list or tuple eg.List[COMBO_ITEM,...]"
+
+        assert self.csv_file_def is None or isinstance(
+            self.csv_file_def, CSV_File_Def
+        ), f"{self.csv_file_def=}. Must be CSV_File_Def or None"
 
         if isinstance(self.items, (list, tuple)):
             item: Combo_Item
@@ -7444,6 +7496,13 @@ class ComboBox(_qtpyBase_Control):
                     self.pixel_char_size(char_height=1, char_width=max_len).width
                 )
 
+        if self.csv_file_def is not None:
+            with sys_cursor(Cursor.hourglass):
+                result, message = self.load_csv_file(self.csv_file_def)
+
+                if result == -1:
+                    print(f"Load Error {message=}")
+
         self.enable_set(enabled)
         self._widget.setMaxVisibleItems(self.num_visible_items)
 
@@ -7514,87 +7573,64 @@ class ComboBox(_qtpyBase_Control):
 
     def load_csv_file(
         self,
-        file_name: str,
-        select_text: str = "",
-        text_index: int = 1,
-        line_start: int = 1,
-        data_index: int = 1,
-        ignore_header: bool = True,
-        delimiter: str = ",",
-    ) -> int:
+        csv_file_def: CSV_File_Def,
+    ) -> tuple[int, str]:
         """
         Loads a CSV file into the combobox
 
         Args:
-            file_name (str) : Name of CSV file (can contain the path)
-            select_text (str) : Text to select in combo-box after load
-            text_index (int) : col in file to load into display (default: {1})
-            line_start (int) : line in file to start loading from (default: {1})
-            data_index (int) : col in file to load into user data (default: {1})
-            ignore_header (bool) : Set True if the CSV file has a header row (default: {True})
-            delimiter (str) : CSV field separator (default: {","})
+            csv_file_def (CSV_File_Def): The CSV file definition
 
         Returns:
-            int: Length of maximum item if load OK, Otherwise -1
+            tuple[int,str]: Length of maximum item if load OK, Otherwise -1 and error message
         """
+        assert isinstance(
+            csv_file_def, CSV_File_Def
+        ), f"{csv_file_def=}. Must be {CSV_File_Def}"
 
-        assert (
-            isinstance(file_name, str) and file_name.strip() != ""
-        ), f"{file_name=}. Must be a non-empty string"
-        assert isinstance(select_text, str), f"f{select_text=}. Must be str"
-        assert (
-            isinstance(text_index, int) and text_index > 0
-        ), f"{text_index=}. Must be int > 0"
-        assert (
-            isinstance(line_start, int) and line_start > 0
-        ), f"{line_start=}. Must be int > 0"
-        assert (
-            isinstance(data_index, int) and data_index > 0
-        ), f"{data_index=}. Must be int > 0"
-        assert isinstance(ignore_header, bool), f"{ignore_header=}. Must be bool"
-        assert (
-            isinstance(delimiter, str) and len(delimiter) == 1
-        ), f"{delimiter=} must be a single char"
-
-        if select_text == "":
+        if csv_file_def.select_text == "":
             select_text = self.text
 
-        if not os.path.isfile(file_name) or not os.access(file_name, os.R_OK):
-            return -1
+        if not os.path.isfile(csv_file_def.file_name) or not os.access(
+            csv_file_def.file_name, os.R_OK
+        ):
+            return -1, f"{csv_file_def.file_name=}. Does not exist or is not readable"
 
         line_list = []
 
         try:
-            with open(file_name, "r") as csv_file:
+            with open(csv_file_def.file_name, "r") as csv_file:
                 for line_no, line in enumerate(csv_file.readlines()):
-                    if line_no == 0 and ignore_header:
+                    if line_no == 0 and csv_file_def.ignore_header:
                         continue
-                    elif line_no + 1 < line_start:
+                    elif line_no + 1 < csv_file_def.line_start:
                         continue
 
-                    line_split = line.strip().split(delimiter)
+                    line_split = line.strip().split(csv_file_def.delimiter)
                     col_count = len(line_split)
 
-                    if col_count < (text_index - 1) or col_count < (data_index - 1):
+                    if col_count < (csv_file_def.text_index - 1) or col_count < (
+                        csv_file_def.data_index - 1
+                    ):
                         continue
 
                     line_list.append(
                         Combo_Item(
-                            display=line_split[text_index - 1],
-                            data=line_split[data_index - 1],
+                            display=line_split[csv_file_def.text_index - 1],
+                            data=line_split[csv_file_def.data_index - 1],
                             icon=None,
                             user_data=None,
                         )
                     )
-
             max_len = self.load_items(line_list)
 
             if select_text.strip() != "":
                 self.select_text(select_text)
 
-            return max_len
+            return max_len, ""
         except Exception as e:
-            return -1
+            print(f"DBG {e=}")
+            return -1, f"Error - {e}"
 
     @property
     def count_items(self) -> int:
