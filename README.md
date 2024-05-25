@@ -771,11 +771,12 @@ properties also apply and some are used in the "fully loaded" declaration below
 | enabled           | Enables/Disables the combobox                                                                                        | bool (True)                                 | ✓            |
 | height            | The height of the combobox (in characters if pixel_unit is False,Otherwise pixels)                                   | int > 0 (10)                                | ✓            |
 | italic            | Sets the combobox text italic if True otherwise not                                                                  | bool (False)                                | ✓            |
-| items             | Items to add to the dropdown list                                                                                    | list or tuple [Combo_Item](#combo_item)     | ✓            |
+| items             | Items to add to the ComboBox when it is instantied                                                                   | list or tuple [Combo_Item](#combo_item)     | ✓            |
 | label             | Displays text to the left of the combobox                                                                            | str ("")                                    | ✓            |
 | label_align       | Alignment of the text displayed in the label                                                                         | [Align_Text](#align_text) (Align_Text.LEFT) | ✓            |
 | label_font        | The font definition for the label                                                                                    | [Font](#font)                               | ✓            |
 | label_width       | Sets the label width (in characters if pixel_unit is<br> False,Otherwise pixels)                                     | int > 0 (0)                                 | ✓            |
+| csv_file_def      | Defines the csv file that will be loaded into the ComboBox when it is instantiated                                   | [CSV_File_Def](#csv_file_def) (None)        | ✓            |
 | num_visible_items | Number of items displayed in the dropdown list                                                                       | int >= 1 (15)                               | ✓            |
 | pixel_unit        | Use pixels for width/height, pixels if True, Otherwise characters                                                    | bool (False)                                | ✓            |
 | tag               | The application name of the combobox                                                                                 | str (System Generated)                      | ✓            |
@@ -850,14 +851,8 @@ ComboBox(
 |                      | combo_index    | int                                  | Row index in the combobox where the icon is to be placed                                                                                                                                                | ❌            |
 |                      | icon           | str [File Name], QIcon,QPixmap       | A QPixmap, QIcon or the icon file name                                                                                                                                                                  | ❌            |
 | is_combo_child       |                | bool                                 | <br><b>Returns:</b><br> True if the Combobox is child of another combo box. False if not.<br>                                                                                                           |              |
-| load_csv_file        |                | int                                  | <br><b>Returns:</b><br> Length of maximum item if load OK, Otherwise -1<br>                                                                                                                             |              |
-|                      | data_index     | int (1)                              | The column in the file to load into user data                                                                                                                                                           | ✓            |
-|                      | delimiter      | str (",")                            | CSV file field separator                                                                                                                                                                                | ✓            |
-|                      | file_name      | str                                  | The path to the CSV file                                                                                                                                                                                | ❌            |
-|                      | ignore_header  | bool (true)                          | Set True if the CSV file has a header row                                                                                                                                                               | ✓            |
-|                      | line_start     | int (1)                              | The line in the file to start loading data from                                                                                                                                                         | ✓            |
-|                      | select_text    | str (")                              | The text to select after load                                                                                                                                                                           | ✓            |
-|                      | text_index     | int (1)                              | The column in the CSV file to load into display                                                                                                                                                         | ✓            |
+| load_csv_file        |                | tuple[int,str]                       | <br><b>Returns:</b><br> Length of maximum item if load OK, Otherwise -1 and error message<br>                                                                                                           |              |
+|                      | csv_file_def   | [CSV_File_Def](#csv_file_def)        | The CSV file definition                                                                                                                                                                                 | ❌            |
 | load_items           |                | int                                  | <br><b>Returns:</b><br> int<br>                                                                                                                                                                         |              |
 |                      | auto_na        | bool (True)                          | True puts na_string (Not Available) in combobox, Otherwise not                                                                                                                                          | ✓            |
 |                      | clear_items    | bool (True)                          | Clears existing items from the combobox                                                                                                                                                                 | ✓            |
@@ -1707,11 +1702,11 @@ menu.element_add(
 )
 ```
  
-| **Method**      | **Arguments** | **Type**                      | **Description**                                                             | **Optional** |
-|-----------------|---------------|-------------------------------|-----------------------------------------------------------------------------|--------------|
-| element_add     |               | None                          |                                                                             |              |
-|                 | menu_element  | [Menu_Element](#menu_element) | Menu Element instance                                                       | ❌             |
-|                 | parent_tag    | str                           | Menu element tag of the parent menu element. "" is the top level parent_tag | ❌             |
+| **Method**  | **Arguments** | **Type**                      | **Description**                                                             | **Optional** |
+|-------------|---------------|-------------------------------|-----------------------------------------------------------------------------|--------------|
+| element_add |               | None                          |                                                                             |              |
+|             | menu_element  | [Menu_Element](#menu_element) | Menu Element instance                                                       | ❌            |
+|             | parent_tag    | str                           | Menu element tag of the parent menu element. "" is the top level parent_tag | ❌            |
 
 #### Menu_Element
 A Menu_Element is a menu control element added to the [Menu](#menu) via the 
@@ -2546,9 +2541,8 @@ Timeedit(
 
 
 
-<br>**Properties**
-<br> A Timeedit control has the following properties, but can also use a subset of 
-[_qtpyBase_Control](#_qtpybase_control) properties, which are not shown in the "fully loaded" example below
+<br>**Methods**
+<br>A subset of the [_qtpyBase_Control](#_qtpybase_control) methods also apply to a TextEdit instance
  
 | **Method** | **Arguments** | **Type**                          | **Description**                                                                                                                                                                                                                          | **Optional** |
 |------------|---------------|-----------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
@@ -2568,6 +2562,72 @@ Timeedit(
 |            | min           | int (-1)                          | Minute value                                                                                                                                                                                                                             | ✓            |
 |            | msec          | int (-1)                          | Millisecond value                                                                                                                                                                                                                        | ✓            |
 |            | sec           | int (-1)                          | Second value                                                                                                                                                                                                                             | ✓            |
+
+### Treeview
+
+Calling Treeview in a layout will generate a Treeview control on a form.  
+
+
+<br>**Properties**
+
+| **Property**   | **Description**                                                 | **Type**                         | **Optional** |
+|----------------|-----------------------------------------------------------------|----------------------------------|--------------|
+| headers        | Set this if a Treeview requires headers                         | list[str] \| tuple[str, ...]] () | ✓            |
+| header_widths  | The header item widths, defaults to 15 if not set               | tuple[int, ...] \| list[int]] () | ✓            |
+| header_font    | The font of the header text                                     | [Font](#font)                    | ✓            |
+| height         | Height of Treeview in chars                                     | int (15)                         | ✓            |
+| multiselect    | True select multiple items, Otherwise select only a single item | bool (False)                     | ✓            |
+| toplevel_items | A tuple or list of toplevel items                               | list[str] \|tuple[str, ...]  ()  | ✓            |
+| width          | Width of Treeview in chars                                      | int (40)                         | ✓            |
+
+<br>A fully loaded Treeview declaration:
+<br><br>**Note: Only "tag", "toplevel_items" (To preload the Treeview control) and "callback" are usually needed**
+```
+Treeview(
+        tag="treeview",
+        label="Treeview",
+        callback=self.event_handler,
+        width=15,
+        height=5,
+        toplevel_items=["Test 1", "Test 2"],
+    )
+```
+
+<br><br>
+In the event_handler method child nodes can be added as needed:
+```
+    def event_handler(self, event: qtg.Action):
+        """Handles  form events
+        Args:
+            event (qtg.Action): The triggering event
+        """
+        assert isinstance(event, qtg.Action), f"{event=}. Must be Action"
+        
+        match event.event:
+            case qtg.Sys_Events.APPPOSTINIT:
+                treeview = event.widget_get(container_tag="row_5",tag="treeview")
+                treeview.child_add(treeview_path="Test 1", items="Test 3")
+                treeview.child_add(
+                    treeview_path=["Test 1", "Test 3"], items="Test 4"
+                )
+```
+
+<br>**Methods**
+<br>A subset of the [_qtpyBase_Control](#_qtpybase_control) methods also apply to a Treeview instance
+ 
+| **Method**         | **Arguments** | **Type** | **Description**                                                                             | **Optional** |
+|--------------------|---------------|----------|---------------------------------------------------------------------------------------------|--------------|
+| child_add          |               | int      | <br><b>Returns:</b><br> 1 Succeeded, -1 Failed<br>                                          |              |
+| child_checked      |               | None     | <br><b>Returns:</b><br> 1 Succeeded, -1 Failed<br>                                          |              |
+|                    | checked       | bool     | True - Checked, False - Unchecked                                                           |              |
+| toplevel_add       |               | None     |                                                                                             |              |
+| toplevel_items_get |               | None     | <br><b>Returns:</b><br> A list of strings.<br>                                              |              |
+| value_get          |               | None     | <br><b>Returns:</b><br> Current Tree view node value tuple (node text, node user value)<br> |              |
+| value_set          |               | None     |                                                                                             |              |
+|                    | col           | int      | The column to set. Default is 0.                                                            |              |
+|                    | value         | str      | The value to set.                                                                           |              |
+| widget_set         |               | None     |                                                                                             |              |
+|                    | col           | int      | The column number to place the widget in                                                    |              |
 
 ### QTPYGUI Enumerated Types/Helper Class Reference
 
@@ -2724,6 +2784,19 @@ Coords is a helper class used by [Image](#image) helper classes to represent co-
 | overlaps   |               | bool        | True if another set of Coords overlaps this set of Coords, Otherwise False |              |
 |            | other_cords   | Coords      | The other set of coordinates to check for overlap                          | ❌    |
 |            | overlap_ratio | float (0.3) | The ratio to determine overlapping. 0 - No overlap to 1 - Complete overlap | ✓|
+
+### CSV_File_Def
+CSV_File_Def is a helper class used by the [Combobox](#combobox) to load a csv file.
+
+ | **Property**  | **Description**                                 | **Type**    | **Optional** |
+ |---------------|-------------------------------------------------|-------------|--------------|
+ | data_index    | The column in the file to load into user data   | int (1)     | ✓            |
+ | delimiter     | CSV file field separator                        | str (",")   | ✓            |
+ | file_name     | The path to the CSV file                        | str         | ❌            |
+ | ignore_header | Set True if the CSV file has a header row       | bool (true) | ✓            |
+ | line_start    | The line in the file to start loading data from | int (1)     | ✓            |
+ | select_text   | The text to select after load                   | str (")     | ✓            |
+ | text_index    | The column in the CSV file to load into display | int (1)     | ✓            |
 
 
 ### Date_Tuple

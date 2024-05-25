@@ -28,13 +28,13 @@ try:
     from sqldb import SQLDB, App_Settings, ColDef,SQL
     from sys_consts import APP_LANG_DBK
     from file_utils import File
-    from sys_consts import PROGRAM_NAME, SDELIM
+    from sys_consts import SDELIM
     from utils import Is_Complied, Singleton
 except ImportError:
     from .sqldb import SQLDB, App_Settings, ColDef, SQL
     from .sys_consts import APP_LANG_DBK
     from .file_utils import File
-    from .sys_consts import PROGRAM_NAME, SDELIM
+    from .sys_consts import SDELIM
     from .utils import Is_Complied, Singleton
 
 
@@ -47,14 +47,20 @@ class Lang_Tran(metaclass=Singleton):
         - 2022-05 Rewritten by David Worboys to use sqllite storage.
     """
 
-    def __init__(self):
+    def __init__(self, program_name: str):
+        assert (
+            isinstance(program_name, str) and program_name.strip() != ""
+        ), f"{program_name=}. Must be a non-empty str"
+
+        self._program_name = program_name
+
         self._error_code: int = 0
         self._error_msg: str = ""
         self._db_file: str = "lang_tran"
-        self._path = platformdirs.user_data_dir(appname=PROGRAM_NAME)
+        self._path = platformdirs.user_data_dir(appname=self._program_name)
         self._language_code: str = ""
         self._DB: Optional[SQLDB] = None
-        self._db_settings = App_Settings(PROGRAM_NAME)
+        self._db_settings = App_Settings(self._program_name)
 
     def _config_db(self):
         file_manager = File()
@@ -65,11 +71,11 @@ class Lang_Tran(metaclass=Singleton):
 
             if not file_manager.path_exists(self._path):
                 raise RuntimeError(
-                    f"Failed To Start {PROGRAM_NAME} - Could Not Create <{self._path}>"
+                    f"Failed To Start {self._program_name} - Could Not Create <{self._path}>"
                 )
 
         self.DB = SQLDB(
-            appname=PROGRAM_NAME,
+            appname=self._program_name,
             dbpath=self._path,
             dbfile=self._db_file,
             suffix=".db",
@@ -116,7 +122,7 @@ class Lang_Tran(metaclass=Singleton):
 
             if self.DB.table_create("lang_tran", lang_tran_def, drop_table=True) == -1:
                 raise RuntimeError(
-                    f"Failed To Configure {PROGRAM_NAME} - Could Not Create Table"
+                    f"Failed To Configure {self._program_name} - Could Not Create Table"
                     f" <{self._db_file}>"
                 )
 

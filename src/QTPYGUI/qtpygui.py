@@ -41,7 +41,7 @@ from collections import deque, namedtuple
 from contextlib import contextmanager
 from dataclasses import field
 from enum import Enum, IntEnum
-from typing import (Callable, ClassVar, Final, Literal, NoReturn, Optional, Union,
+from typing import (Callable, Final, Literal, NoReturn, Optional, Union,
                     cast, overload)
 
 import PySide6.QtCore as qtC
@@ -1198,7 +1198,7 @@ class _qtpyBase:
     """Private Base Class For All Qtpy classes"""
 
     parent: object
-    _lang_tran: ClassVar[Lang_Tran] = Lang_Tran()
+    _lang_tran: Union[Lang_Tran, None] = None
 
     def __init__(self, parent: object):
         """Configures the base class for all qtpy classes.
@@ -1212,6 +1212,9 @@ class _qtpyBase:
             raise RuntimeError(f"{parent=} is not an instance of _qtpyBase")
 
         self._parent = parent
+
+        if g_application is not None:
+            self._lang_tran: Lang_Tran = Lang_Tran(g_application.program_name)
 
     def dump(self) -> None:
         """Prints all the attributes of an object"""
@@ -1228,6 +1231,9 @@ class _qtpyBase:
 
         Returns:
             Lang_Tran: The Lang_Tran object"""
+
+        if self._lang_tran is None:
+            self._lang_tran = Lang_Tran(g_application.program_name)
 
         return self._lang_tran
 
@@ -3716,6 +3722,9 @@ class _qtpyBase_Control(_qtpyBase):
         """
         assert isinstance(text, str), f"{text=}. Must be str"
 
+        if self._lang_tran is None:
+            self._lang_tran = Lang_Tran(g_application.program_name)
+
         if self.translate or force_translate:
             return self._lang_tran.translate(text, SDELIM)
         else:
@@ -3898,6 +3907,7 @@ class QtPyApp(_qtpyBase):
         height: int = 1080,
         width: int = 1920,
         app_font: Font = Font(font_name="IBM Plex Mono", size=DEFAULT_FONT_SIZE),
+        program_name: str = "",  # display name and program name might be different
     ) -> None:
         """
         Checks that the parameters are of the correct type and then sets some private instance variables.
@@ -3913,6 +3923,7 @@ class QtPyApp(_qtpyBase):
             height (int): int = 1080,. Defaults to 1080
             width (int): int = 1920,. Defaults to 1920
             app_font (Font): Font = Font(font_name="IBM Plex Mono", size=DEFAULT_FONT_SIZE),
+            program_name (str): The name of the program. Defaults to display name
         """
 
         # Stop Annoying QT Badwindow debug error messages - that are not supposed to be errors
@@ -3951,6 +3962,14 @@ class QtPyApp(_qtpyBase):
         assert isinstance(height, int) and height > 0, f"{height=}. Must be > 0"
         assert isinstance(width, int) and width > 0, f"{width=}. Must be > 0"
         assert isinstance(app_font, Font), f"{app_font=}. Must be Font"
+        assert isinstance(display_name, str), f"{display_name=}. Must be str"
+
+        if program_name.strip() == "":
+            self._program_name = (
+                display_name if display_name.strip() != "" else "QTPYGUI"
+            )
+        else:
+            self._program_name = program_name
 
         # Load preferred default font - IBM-Plex-Mono
         if qtC.QFileInfo(
@@ -4198,6 +4217,15 @@ class QtPyApp(_qtpyBase):
                 max_height = font_metrics.boundingRect(character).height()
 
         return Char_Pixel_Size(height=max_height, width=max_width)
+
+    @property
+    def program_name(self) -> str:
+        """Returns the name of the program
+
+        Returns:
+            str : The name of the program
+        """
+        return self._program_name
 
     def run(self, layout: "_Container", windows_ui: bool = False) -> NoReturn:
         """Creates a main window, sets the title & icon, and then shows the window
@@ -4493,6 +4521,9 @@ class Action(_qtpyBase):
         Returns:
             str: The translated text.
         """
+        if self._lang_tran is None:
+            self._lang_tran = Lang_Tran(g_application.program_name)
+
         return self._lang_tran.translate(text, SDELIM)
 
     def value_get(self, container_tag: str, tag: str) -> any:
@@ -7505,6 +7536,9 @@ class ComboBox(_qtpyBase_Control):
 
         self.enable_set(enabled)
         self._widget.setMaxVisibleItems(self.num_visible_items)
+        self._widget.view().setVerticalScrollBarPolicy(
+            qtC.Qt.ScrollBarPolicy.ScrollBarAsNeeded
+        )
 
         return widget
 
@@ -7629,7 +7663,6 @@ class ComboBox(_qtpyBase_Control):
 
             return max_len, ""
         except Exception as e:
-            print(f"DBG {e=}")
             return -1, f"Error - {e}"
 
     @property
@@ -7734,12 +7767,16 @@ class ComboBox(_qtpyBase_Control):
                     item.icon, (type(None), str, qtG.QIcon, qtG.QPixmap)
                 ), f"{item.icon=}. Must be None| str | QIcon | QPixmap"
 
-                display = self.trans_str(item.display)
+                display = item.display.replace(SDELIM, "")
+
+                # remove quotes
+                if display.startswith('"') and display.endswith('"'):
+                    display = display[1:-1]
 
                 user_data = self._USER_DATA(data=item.data, user_data=item.user_data)
 
                 if len(item.display) > max_len:
-                    max_len = len(self.trans_str(item.display))
+                    max_len = len(item.display)
                 if item.icon is None:
                     self._widget.addItem(display, userData=user_data)
                 else:
@@ -15262,7 +15299,7 @@ class Treeview(_qtpyBase_Control):
     headers: Union[list[str], tuple[str, ...]] = ()
     header_widths: Union[tuple[int, ...], list[int]] = ()  # Column widths in char
     header_font: Font = field(default_factory=Font)
-    header_width_default = 15
+    header_width_default: int = 15
     toplevel_items: Union[list[str], tuple[str, ...]] = ()
     _parent_list: list = None
 
@@ -15429,27 +15466,33 @@ class Treeview(_qtpyBase_Control):
 
         event: Action = cast(Action, args[0])
 
-        if hasattr(args, "len") and len(args) > 1:
-            if len(args[1]) == 0:
-                pass
-            elif len(args) == 1:
-                selected_index = args[1][0]
-                item_data = selected_index.data(qtC.Qt.UserRole)
+        if len(args) > 1:
+            if len(args) == 1:
+                widget_item: qtW.QTreeWidgetItem = args[1]
+                item_data = widget_item.data(qtC.Qt.UserRole)
 
-                items.append(selected_index.data(qtC.Qt.DisplayRole))
+                items.append(widget_item.data(qtC.Qt.DisplayRole))
                 items.append(item_data)
             elif len(args) == 2:
-                selected_index = args[1][0]
-                col = args[1][1]
+                model_index: qtC.QModelIndex = args[1]
+                col = model_index.column()
 
-                item_data = selected_index.data(col, qtC.Qt.UserRole)
+                item_data = model_index.data(qtC.Qt.UserRole)
 
-                items.append(selected_index.data(col, qtC.Qt.DisplayRole))
+                items.append(model_index.data(qtC.Qt.DisplayRole))
+                items.append(item_data)
+            elif len(args) == 3:
+                widget_item: qtW.QTreeWidgetItem = args[1]
+                col = args[0]
+
+                item_data = widget_item.data(col, qtC.Qt.UserRole)
+
+                items.append(widget_item.data(col, qtC.Qt.DisplayRole))
                 items.append(item_data)
             else:
                 raise AssertionError(f"Unknown argument {len(args[1])} in {args[1]=}")
 
-            items = tuple(items)
+        items = tuple(items)
 
         self._value = items
 
