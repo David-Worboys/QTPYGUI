@@ -31,7 +31,7 @@ from decimal import Decimal
 from enum import unique
 from pathlib import Path
 from sqlite3 import Connection
-from typing import Callable, TextIO, overload
+from typing import Callable, TextIO, overload, cast
 
 import platformdirs
 try:
@@ -661,7 +661,20 @@ class App_Settings:
         Returns:
             bool: True if new configuration, False if existing configuration
         """
-        return self._new_cfg
+        if self.setting_exist("First_Run"):
+            return cast(bool, self.setting_get("First_Run"))
+        return False
+
+    @new_cfg.setter
+    def new_cfg(self, value: bool):
+        """Used to determine if this instance is a new App cfg installation
+
+        Args:
+            value (bool): True if new configuration, False if existing configuration
+        """
+        assert isinstance(value, bool), f"{value=}. Must be bool"
+
+        self.setting_set("First_Run", value)
 
     @property
     def unique_sysid_get(self) -> str:

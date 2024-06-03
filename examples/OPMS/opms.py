@@ -28,7 +28,7 @@ import database
 class OPMS:
     def __init__(self):
         self.opms = qtg.QtPyApp(
-            display_name="OPMS",
+            display_name=sys_consts.PROGRAM_NAME,
             callback=self.event_handler,
             height=100,
             width=100,
@@ -39,9 +39,9 @@ class OPMS:
         Args:
             event (qtg.Action): The triggering event
         """
-        print(
-            f"DBG {event.event=} {event.action=} {event.container_tag=} {event.tag} {event.value}"
-        )
+        # print(
+        #    f"DBG {event.event=} {event.action=} {event.container_tag=} {event.tag} {event.value}"
+        # )
         assert isinstance(event, qtg.Action), f"{event=}. Must be Action"
 
         match event.event:
@@ -76,10 +76,13 @@ class OPMS:
                         ).show()
                     case "app_exit":
                         self.opms.app_exit()
+                    case "settings":
+                        sys_settings.sys_settings(title="Settings").show()
 
     def startup_handler(self):
         """Handles OPMS startup activities"""
         app_settings = qtg.App_Settings(sys_consts.PROGRAM_NAME)
+        print(f"A {app_settings.new_cfg=}")
 
         if app_settings.error_code == -1 or app_settings.db_path_get == "":
             popups.PopError(
@@ -88,19 +91,22 @@ class OPMS:
             ).show()
             self.opms.app_exit()
 
+        print(f"B {app_settings.new_cfg=}")
         # New Config - Open System Settings and Set DB Folder Password
         if app_settings.new_cfg:
-            result = database.database_setup().configure_database()
+            result = database.App_Database(program_name=sys_consts.PROGRAM_NAME)
+            print(f"DBG ZZ {result=}")
 
-            if result == -1:
+            if result.error_code == -1:
                 popups.PopError(
                     title="Startup Error",
-                    message="Could not configure database.\n Shutting Down",
+                    message=f"Could not configure database - {result.error_message}.\n Shutting Down",
                 ).show()
                 self.opms.app_exit()
 
             # Open config window
-            sys_settings.sys_settings().show()
+            sys_settings.sys_settings(title="System Settings").show()
+            app_settings.new_cfg = False
 
     def layout(self) -> qtg.VBoxContainer:
         """The layout of the OPMS main window
@@ -132,6 +138,13 @@ class OPMS:
             )
 
             # File menu elements - note tag file
+            menu.element_add(
+                parent_tag="file",
+                menu_element=qtg.Menu_Element(
+                    text="&Settings", tag="settings", callback=self.event_handler
+                ),
+            )
+
             menu.element_add(
                 parent_tag="file",
                 menu_element=qtg.Menu_Element(

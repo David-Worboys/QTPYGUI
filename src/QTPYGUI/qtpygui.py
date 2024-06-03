@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # Tell Black to leave this block alone (realm of isort)
 # fmt: off
 import copy
+import csv
 import dataclasses
 import datetime
 import functools
@@ -338,6 +339,13 @@ class CSV_File_Def:
     data_index (int) : col in file to load into user data (default: {1})
     ignore_header (bool) : Set True if the CSV file has a header row (default: {True})
     delimiter (str) : CSV field separator (default: {","})
+    filter (list[tuple[int,str]]) : List of filters to apply (default: {[]})
+    ignore_errors (bool) : Set True to ignore errors (default: {False})
+
+    Note:
+        filter is a list of tuples of (column_index, filter_string) where the
+        column index is the index of the column in the CSV file which must equal
+        the filter_string
     """
 
     file_name: str
@@ -347,6 +355,8 @@ class CSV_File_Def:
     data_index: int = 1
     ignore_header: bool = True
     delimiter: str = ","
+    filter: list[tuple[int, str]] = dataclasses.field(default_factory=list)
+    ignore_errors: bool = False
 
     def __post_init__(self) -> None:
         """
@@ -355,22 +365,38 @@ class CSV_File_Def:
         assert (
             isinstance(self.file_name, str) and self.file_name.strip() != ""
         ), f"{self.file_name=}. Must be a non-empty string"
+
         assert isinstance(self.select_text, str), f"f{self.select_text=}. Must be str"
+
         assert (
             isinstance(self.text_index, int) and self.text_index > 0
         ), f"{self.text_index=}. Must be int > 0"
+
         assert (
             isinstance(self.line_start, int) and self.line_start > 0
         ), f"{self.line_start=}. Must be int > 0"
+
         assert (
             isinstance(self.data_index, int) and self.data_index > 0
         ), f"{self.data_index=}. Must be int > 0"
+
         assert isinstance(
             self.ignore_header, bool
         ), f"{self.ignore_header=}. Must be bool"
+
         assert (
             isinstance(self.delimiter, str) and len(self.delimiter) == 1
         ), f"{self.delimiter=} must be a single char"
+
+        assert isinstance(self.filter, list), f"{self.filter=}. Must be list"
+        for item in self.filter:
+            assert isinstance(item, tuple) and len(item) == 2
+            assert isinstance(item[0], int) and item[0] > 0
+            assert isinstance(item[1], str)
+
+        assert isinstance(
+            self.ignore_errors, bool
+        ), f"{self.ignore_errors=}. Must be bool"
 
 
 @dataclasses.dataclass(slots=True)
@@ -7399,6 +7425,7 @@ class ComboBox(_qtpyBase_Control):
     display_na: bool = True
     parent_tag: str = ""
     csv_file_def: Optional[CSV_File_Def] = None
+    editable: bool = False
 
     @dataclasses.dataclass
     class _USER_DATA:
@@ -7540,6 +7567,11 @@ class ComboBox(_qtpyBase_Control):
             qtC.Qt.ScrollBarPolicy.ScrollBarAsNeeded
         )
 
+        if self.editable:
+            self._widget.setEditable(True)
+        else:
+            self._widget.setEditable(False)
+
         return widget
 
     def display_width_set(self, display_width: int) -> None:
@@ -7633,7 +7665,11 @@ class ComboBox(_qtpyBase_Control):
         line_list = []
 
         try:
-            with open(csv_file_def.file_name, "r") as csv_file:
+            with open(
+                csv_file_def.file_name,
+                "r",
+                errors="ignore" if csv_file_def.ignore_errors else "strict",
+            ) as csv_file:
                 for line_no, line in enumerate(csv_file.readlines()):
                     if line_no == 0 and csv_file_def.ignore_header:
                         continue
@@ -7643,19 +7679,48 @@ class ComboBox(_qtpyBase_Control):
                     line_split = line.strip().split(csv_file_def.delimiter)
                     col_count = len(line_split)
 
+                    if (
+                        col_count < csv_file_def.text_index
+                        or col_count < csv_file_def.data_index
+                    ):
+                        continue
+
                     if col_count < (csv_file_def.text_index - 1) or col_count < (
                         csv_file_def.data_index - 1
                     ):
                         continue
 
-                    line_list.append(
-                        Combo_Item(
-                            display=line_split[csv_file_def.text_index - 1],
-                            data=line_split[csv_file_def.data_index - 1],
-                            icon=None,
-                            user_data=None,
+                    if len(csv_file_def.filter) > 0:
+                        found = False
+
+                        for filter_col, filter_str in csv_file_def.filter:
+                            if col_count < filter_col:
+                                break
+
+                            if line_split[filter_col - 1].strip() == filter_str.strip():
+                                found = True
+                            else:
+                                found = False
+                                break
+
+                        if found:
+                            line_list.append(
+                                Combo_Item(
+                                    display=line_split[csv_file_def.text_index - 1],
+                                    data=line_split[csv_file_def.data_index - 1],
+                                    icon=None,
+                                    user_data=None,
+                                )
+                            )
+                    else:
+                        line_list.append(
+                            Combo_Item(
+                                display=line_split[csv_file_def.text_index - 1],
+                                data=line_split[csv_file_def.data_index - 1],
+                                icon=None,
+                                user_data=None,
+                            )
                         )
-                    )
             max_len = self.load_items(line_list)
 
             if select_text.strip() != "":
@@ -12693,11 +12758,17 @@ class LineEdit(_qtpyBase_Control):
         """
         self._widget: _Line_Edit
 
+        password_entry = False
+
         if self.height == -1:
             self.height = LINEEDIT_SIZE.height
 
         if self.width == -1:
             self.width = LINEEDIT_SIZE.width
+
+        if self.input_mask.startswith("@") or self.input_mask.startswith("*"):
+            password_entry = True
+            self.width -= 1  # Account for the starting password display char
 
         widget = super()._create_widget(
             parent_app=parent_app, parent=parent, container_tag=container_tag
@@ -12708,15 +12779,11 @@ class LineEdit(_qtpyBase_Control):
 
         if self.input_mask is not None and self.input_mask.strip() != "":
             # Handle Password Masking
-            if self.input_mask.startswith("@") or self.input_mask.startswith("*"):
+            if password_entry:
                 password_display = self.input_mask[0:1]
                 self.input_mask = self.input_mask[1:]
 
-                assert (
-                    password_display == "@"
-                    or password_display == "*"
-                    or password_display.strip() == ""
-                ), (
+                assert password_display == "@" or password_display == "*", (
                     f"password_display char <{password_display}> must be first char of"
                     " mask."
                     + "Valid Chars Are '*': Echo mask chars only, '@' Echo char and"
@@ -12731,7 +12798,7 @@ class LineEdit(_qtpyBase_Control):
         if self.input_mask is not None and self.input_mask.strip() != "":
             self.input_mask_set(self.input_mask)
 
-        if len(self.text.strip()) > 0:
+        if not password_entry and len(self.text.strip()) > 0:
             self._widget.setPlaceholderText(self.text)
 
         self._widget.setMaxLength(self.char_length)
