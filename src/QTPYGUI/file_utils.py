@@ -18,8 +18,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-# Tell Black to leave this block alone (realm of isort)
-# fmt: off
 import dataclasses
 import enum
 import os
@@ -28,8 +26,6 @@ import shutil
 import sys
 
 import titlecase
-
-# fmt: on
 
 
 @dataclasses.dataclass(slots=True)
@@ -238,9 +234,9 @@ class File:
         if excluded_words is None:
             excluded_words = []
 
-        assert (
-            isinstance(name, str) and name.strip() != ""
-        ), f"{name=}. Must be a non-empty str"
+        assert isinstance(name, str) and name.strip() != "", (
+            f"{name=}. Must be a non-empty str"
+        )
         assert all(isinstance(word, str) for word in excluded_words)
 
         words = []
@@ -286,12 +282,12 @@ class File:
                 - arg2: An error message, or an empty string if successful.
         """
 
-        assert (
-            isinstance(source, str) and source.strip()
-        ), f"Invalid source path: {source}"
-        assert (
-            isinstance(destination_path, str) and destination_path.strip()
-        ), f"Invalid destination path: {destination_path}"
+        assert isinstance(source, str) and source.strip(), (
+            f"Invalid source path: {source}"
+        )
+        assert isinstance(destination_path, str) and destination_path.strip(), (
+            f"Invalid destination path: {destination_path}"
+        )
 
         if not os.path.exists(source):
             return -1, f"File not found: {source}"
@@ -324,12 +320,12 @@ class File:
             - arg1 1: ok, -1: fail
             - arg2: error message or "" if ok
         """
-        assert (
-            isinstance(src_folder, str) and src_folder.strip() != ""
-        ), f"{src_folder=}. Must be a non-empty str"
-        assert (
-            isinstance(dest_folder, str) and dest_folder.strip() != ""
-        ), f"{dest_folder=}. Must be a non-empty str"
+        assert isinstance(src_folder, str) and src_folder.strip() != "", (
+            f"{src_folder=}. Must be a non-empty str"
+        )
+        assert isinstance(dest_folder, str) and dest_folder.strip() != "", (
+            f"{dest_folder=}. Must be a non-empty str"
+        )
 
         if not os.path.isdir(src_folder):
             return -1, f"{src_folder} Is Not A Valid Directory Path."
@@ -383,9 +379,9 @@ class File:
         Returns:
             bool: True if file exists, False if not
         """
-        assert (
-            isinstance(directory_path, str) and directory_path.strip() != ""
-        ), f"{directory_path=} must be a non-empty str"
+        assert isinstance(directory_path, str) and directory_path.strip() != "", (
+            f"{directory_path=} must be a non-empty str"
+        )
         assert isinstance(file_name, str), f"{file_name=} must be a str"
         assert isinstance(file_extension, str), f"{file_extension=} must be a str"
 
@@ -416,12 +412,12 @@ class File:
         Returns:
             A string representing the full file path constructed from the directory, filename, and extension.
         """
-        assert (
-            isinstance(dir_path, str) and dir_path.strip() != ""
-        ), f"{dir_path=}. Must be a non-empty str"
-        assert (
-            isinstance(file_name, str) and dir_path.strip() != ""
-        ), f"{file_name=}. Must be a non-empty str"
+        assert isinstance(dir_path, str) and dir_path.strip() != "", (
+            f"{dir_path=}. Must be a non-empty str"
+        )
+        assert isinstance(file_name, str) and dir_path.strip() != "", (
+            f"{file_name=}. Must be a non-empty str"
+        )
         assert isinstance(ext, str), f"{ext=}. Must be a str"
 
         if ext and not ext.startswith("."):
@@ -442,9 +438,9 @@ class File:
         Returns:
             bool: True if the file name is valid, False otherwise.
         """
-        assert (
-            isinstance(file_name, str) and file_name.strip() != ""
-        ), f"{file_name=}. Must be a non-empty str"
+        assert isinstance(file_name, str) and file_name.strip() != "", (
+            f"{file_name=}. Must be a non-empty str"
+        )
 
         # Check if the file name is empty or too long
         if not file_name or len(file_name) > os.pathconf("/", "PC_NAME_MAX"):
@@ -481,15 +477,15 @@ class File:
         Returns:
             File_Result: A dataclass containing a list of files, the path, and any errors encountered.
         """
-        assert (
-            isinstance(path, str) and path.strip() != ""
-        ), f"{path=}. Must be a non-empty str"
-        assert isinstance(
-            extensions, (list, tuple)
-        ), f"{extensions=}. Must be a list or tuple of str"
-        assert all(
-            isinstance(extension, str) for extension in extensions
-        ), f"{extensions=}.All elements must be str"
+        assert isinstance(path, str) and path.strip() != "", (
+            f"{path=}. Must be a non-empty str"
+        )
+        assert isinstance(extensions, (list, tuple)), (
+            f"{extensions=}. Must be a list or tuple of str"
+        )
+        assert all(isinstance(extension, str) for extension in extensions), (
+            f"{extensions=}.All elements must be str"
+        )
 
         file_extensions = [extension.lower() for extension in extensions]
 
@@ -539,9 +535,9 @@ class File:
         Returns:
             int : 1 if successful, -1 if failed to create directory
         """
-        assert (
-            isinstance(file_path, str) and file_path.strip() != ""
-        ), f"{file_path=} must be a non-empty str"
+        assert isinstance(file_path, str) and file_path.strip() != "", (
+            f"{file_path=} must be a non-empty str"
+        )
 
         try:
             os.makedirs(file_path)
@@ -559,9 +555,9 @@ class File:
         Returns:
             bool: True - The file path exists, False - it does not
         """
-        assert (
-            isinstance(file_path, str) and file_path.strip() != ""
-        ), f"{file_path=} must be a non-empty str"
+        assert isinstance(file_path, str) and file_path.strip() != "", (
+            f"{file_path=} must be a non-empty str"
+        )
 
         try:
             path = pathlib.Path(file_path)
@@ -583,9 +579,9 @@ class File:
         Returns:
             bool : True - Can write to file path, False - Cannot Write to file path
         """
-        assert (
-            isinstance(file_path, str) and file_path.strip() != ""
-        ), f"{file_path=}. Must be a non-empty str"
+        assert isinstance(file_path, str) and file_path.strip() != "", (
+            f"{file_path=}. Must be a non-empty str"
+        )
 
         if os.access(file_path, os.W_OK):
             return True
@@ -600,12 +596,12 @@ class File:
         Returns:
             Returns 1 if the file was successfully renamed, and -1 if an error occurred.
         """
-        assert (
-            isinstance(old_file_path, str) and old_file_path.strip() != ""
-        ), f"{old_file_path=}. Must be a non-empty str"
-        assert (
-            isinstance(new_file_path, str) and new_file_path.strip() != ""
-        ), f"{new_file_path=}. Must be a non-empty str"
+        assert isinstance(old_file_path, str) and old_file_path.strip() != "", (
+            f"{old_file_path=}. Must be a non-empty str"
+        )
+        assert isinstance(new_file_path, str) and new_file_path.strip() != "", (
+            f"{new_file_path=}. Must be a non-empty str"
+        )
 
         old_path, old_name, old_extension = self.split_file_path(old_file_path)
         new_path, _, _ = self.split_file_path(new_file_path)
@@ -631,9 +627,9 @@ class File:
             tuple[str,str] : First element is the file path, second element is the file name.
             - Both are empty strings if something goes wrong
         """
-        assert (
-            isinstance(file_path_name, str) and file_path_name.strip() != ""
-        ), f"{file_path_name=}. Must be a non-empty str"
+        assert isinstance(file_path_name, str) and file_path_name.strip() != "", (
+            f"{file_path_name=}. Must be a non-empty str"
+        )
 
         if os.path.isdir(file_path_name):
             return file_path_name, ""
@@ -660,9 +656,9 @@ class File:
         Returns:
             tuple: A tuple of three strings - directory path, file name , and file extension.
         """
-        assert (
-            isinstance(file_path_name, str) and file_path_name.strip() != ""
-        ), f"{file_path_name=}. Must be a non-empty str"
+        assert isinstance(file_path_name, str) and file_path_name.strip() != "", (
+            f"{file_path_name=}. Must be a non-empty str"
+        )
 
         if not no_path_check and os.path.isdir(file_path_name):
             return file_path_name, "", ""
@@ -693,9 +689,9 @@ class File:
             - arg2: error message or "" if ok
         """
 
-        assert (
-            isinstance(file_path, str) and file_path.strip() != ""
-        ), f"{file_path=}. Must be a non-empty str"
+        assert isinstance(file_path, str) and file_path.strip() != "", (
+            f"{file_path=}. Must be a non-empty str"
+        )
 
         if not os.path.exists(file_path):
             return -1, f"{file_path} Does Not Exist."
@@ -729,12 +725,12 @@ class File:
         Returns:
             int: 1 if the file was successfully removed, -1 otherwise.
         """
-        assert (
-            isinstance(file_path, str) and file_path.strip() != ""
-        ), f"{file_path=} must be a non-empty string."
-        assert (
-            isinstance(file_path, str) and file_path.strip() != ""
-        ), f"{file_path=} must be a non-empty string."
+        assert isinstance(file_path, str) and file_path.strip() != "", (
+            f"{file_path=} must be a non-empty string."
+        )
+        assert isinstance(file_path, str) and file_path.strip() != "", (
+            f"{file_path=} must be a non-empty string."
+        )
 
         try:
             path = pathlib.Path(file_path)
@@ -772,9 +768,9 @@ class File:
         assert isinstance(str_list, list) and all(
             isinstance(item, str) for item in str_list
         ), f"{str_list=} must be a list of str"
-        assert (
-            isinstance(text_file, str) and text_file.strip() != ""
-        ), f"{text_file=} must be a non-empty str"
+        assert isinstance(text_file, str) and text_file.strip() != "", (
+            f"{text_file=} must be a non-empty str"
+        )
 
         try:
             with open(text_file, "w") as f:

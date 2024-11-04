@@ -17,28 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-# Tell Black to leave this block alone (realm of isort)
-# fmt: off
 import re
 import platformdirs
-from typing import Optional
-
+from typing import Optional, Final
 
 try:
-    from sqldb import SQLDB, App_Settings, ColDef,SQL
-    from sys_consts import APP_LANG_DBK
+    from sqldb import SQLDB, App_Settings, ColDef, SQL
     from file_utils import File
-    from sys_consts import SDELIM
     from utils import Is_Complied, Singleton
 except ImportError:
     from .sqldb import SQLDB, App_Settings, ColDef, SQL
-    from .sys_consts import APP_LANG_DBK
     from .file_utils import File
-    from .sys_consts import SDELIM
     from .utils import Is_Complied, Singleton
-
-
-# fmt: on
 
 
 class Lang_Tran(metaclass=Singleton):
@@ -47,10 +37,15 @@ class Lang_Tran(metaclass=Singleton):
         - 2022-05 Rewritten by David Worboys to use sqllite storage.
     """
 
+    APP_LANG_DB_KEY: Final[str] = "app_lang_db_key"
+    SDELIM: Final[str] = (
+        "||"  # Delimiter used to cut out sections of the string that do not need translating
+    )
+
     def __init__(self, program_name: str):
-        assert (
-            isinstance(program_name, str) and program_name.strip() != ""
-        ), f"{program_name=}. Must be a non-empty str"
+        assert isinstance(program_name, str) and program_name.strip() != "", (
+            f"{program_name=}. Must be a non-empty str"
+        )
 
         self._program_name = program_name
 
@@ -146,7 +141,7 @@ class Lang_Tran(metaclass=Singleton):
 
         return language_codes
 
-    def translate(self, trans_word: str, delim: str = SDELIM) -> str:
+    def translate(self, trans_word: str, delim: str = "") -> str:
         """This method translates the word to the selected foreign language word or returns the original word if
         there is no translation.
         The delimiter <delim>  is used to cut out sections of the string that do not need translating.
@@ -165,9 +160,12 @@ class Lang_Tran(metaclass=Singleton):
         debug = False
 
         assert isinstance(trans_word, str), f"{trans_word=}. Must be str"
-        assert (
-            isinstance(delim, str) and delim.strip() != ""
-        ), f"{delim=}. Must be a non-empty str"
+        assert isinstance(delim, str) and delim.strip() != "", (
+            f"{delim=}. Must be a non-empty str"
+        )
+
+        if delim.strip() == "":
+            delim = self.SDELIM
 
         # Do not want to translate some single chars,char sequences. Bit brutal.
         if (
@@ -181,8 +179,8 @@ class Lang_Tran(metaclass=Singleton):
         ):
             return trans_word.strip(delim)
 
-        if self._db_settings.setting_exist(APP_LANG_DBK):
-            self._language_code = self._db_settings.setting_get(APP_LANG_DBK)
+        if self._db_settings.setting_exist(self.APP_LANG_DB_KEY):
+            self._language_code = self._db_settings.setting_get(self.APP_LANG_DB_KEY)
 
         ignore_chars = "+="
         split_list = trans_word.split(delim)

@@ -19,18 +19,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-# Tell Black to leave this block alone (realm of isort)
-# fmt: off
 import dataclasses
 import os
 import pathlib
 import shelve
 import types
 from dataclasses import field
-from typing import Callable, Optional, Union, cast
+from typing import Callable, Optional, Union, cast, Final
 
 import fs
 import platformdirs
+
 # import translators # 2023-09-30 # David Worboys removed auto translation because of connection and stability issues
 from pathvalidate import ValidationError, validate_filepath
 from PySide6 import QtCore as qtC
@@ -38,29 +37,77 @@ from PySide6 import QtGui as qtG
 
 try:
     from sqldb import App_Settings, SQLDB, SQL
-    from file_utils import App_Path,File
+    from file_utils import App_Path, File
 
-    from qtpygui import (Action, Align, Button, Col_Def, Combo_Data, Combo_Item,
-                         ComboBox, Command_Button_Container, Cursor, FolderView,
-                         Font, Frame, Frame_Style, Grid, Grid_Col_Value,
-                         GridContainer, HBoxContainer, Image, Label, LineEdit,
-                         PopContainer, RadioButton, Spacer, Sys_Events, Sys_Icon,
-                         TextEdit, VBoxContainer, Widget_Frame, sys_cursor, Align_Text)
-    from sys_consts import PROGRAM_NAME, SDELIM, APP_COUNTRY_DBK
+    from qtpygui import (
+        Action,
+        Align,
+        Button,
+        Col_Def,
+        Combo_Data,
+        Combo_Item,
+        ComboBox,
+        Command_Button_Container,
+        Cursor,
+        FolderView,
+        Font,
+        Frame,
+        Frame_Style,
+        Grid,
+        Grid_Col_Value,
+        GridContainer,
+        HBoxContainer,
+        Image,
+        Label,
+        LineEdit,
+        PopContainer,
+        RadioButton,
+        Spacer,
+        Sys_Events,
+        Sys_Icon,
+        TextEdit,
+        VBoxContainer,
+        Widget_Frame,
+        sys_cursor,
+        Align_Text,
+    )
     from utils import Countries, Text_To_File_Name
 except ImportError:
     from .sqldb import App_Settings, SQLDB, SQL
-    from .file_utils import App_Path,File
-    from .qtpygui import (Action, Align, Button, Col_Def, Combo_Data, Combo_Item,
-                                 ComboBox, Command_Button_Container, Cursor, FolderView,
-                                 Font, Frame, Frame_Style, Grid, Grid_Col_Value,
-                                 GridContainer, HBoxContainer, Image, Label, LineEdit,
-                                 PopContainer, RadioButton, Spacer, Sys_Events, Sys_Icon,
-                                 TextEdit, VBoxContainer, Widget_Frame, sys_cursor, Align_Text)
-    from .sys_consts import PROGRAM_NAME, SDELIM, APP_COUNTRY_DBK
+    from .file_utils import App_Path, File
+    from .qtpygui import (
+        Action,
+        Align,
+        Button,
+        Col_Def,
+        Combo_Data,
+        Combo_Item,
+        ComboBox,
+        Command_Button_Container,
+        Cursor,
+        FolderView,
+        Font,
+        Frame,
+        Frame_Style,
+        Grid,
+        Grid_Col_Value,
+        GridContainer,
+        HBoxContainer,
+        Image,
+        Label,
+        LineEdit,
+        PopContainer,
+        RadioButton,
+        Spacer,
+        Sys_Events,
+        Sys_Icon,
+        TextEdit,
+        VBoxContainer,
+        Widget_Frame,
+        sys_cursor,
+        Align_Text,
+    )
     from .utils import Countries, Text_To_File_Name
-
-# fmt: on
 
 
 @dataclasses.dataclass
@@ -87,12 +134,12 @@ class PopAbout(PopContainer):
         super().__post_init__()
 
         assert isinstance(self.app_text, str), f"{self.app_text=}. Must be str"
-        assert isinstance(
-            self.informative_text, str
-        ), f"{self.informative_text=}. Must be str"
-        assert isinstance(
-            self.informative_font, Font
-        ), f"{self.informative_font=}. Must be Font"
+        assert isinstance(self.informative_text, str), (
+            f"{self.informative_text=}. Must be str"
+        )
+        assert isinstance(self.informative_font, Font), (
+            f"{self.informative_font=}. Must be Font"
+        )
         assert isinstance(self.border, Widget_Frame), f"{self.border=}. Must be Frame"
 
         container = VBoxContainer(
@@ -181,9 +228,9 @@ class PopFolderGet(PopContainer):
         super().__post_init__()
 
         assert isinstance(self.root_dir, str), f"{self.root_dir=}. Must be of type str"
-        assert isinstance(
-            self.create_folder, bool
-        ), f"{self.create_folder=}. Must be bool"
+        assert isinstance(self.create_folder, bool), (
+            f"{self.create_folder=}. Must be bool"
+        )
         assert isinstance(self.folder_edit, bool), f"{self.folder_edit=}. Must be bool"
 
         if self.root_dir.strip() == "":
@@ -222,7 +269,7 @@ class PopFolderGet(PopContainer):
         folder_container = HBoxContainer(tag="folder_edit")
         folder_container.add_row(
             LineEdit(
-                text=f"{SDELIM}{self.root_dir}{SDELIM}",
+                text=f"{self.sdelim}{self.root_dir}{self.sdelim}",
                 callback=self.event_handler,
                 tag="folder",
                 width=50,
@@ -320,7 +367,7 @@ class PopFolderGet(PopContainer):
                             event.value_set(
                                 container_tag="folder_edit",
                                 tag="folder",
-                                value=f"{SDELIM}{folders}{SDELIM}",
+                                value=f"{self.sdelim}{folders}{self.sdelim}",
                             )
 
                     case "create_folder":
@@ -358,7 +405,7 @@ class PopFolderGet(PopContainer):
                             event.value_set(
                                 container_tag="folder_edit",
                                 tag="folder",
-                                value=f"{SDELIM}{parent_dir}{SDELIM}",
+                                value=f"{self.sdelim}{parent_dir}{self.sdelim}",
                             )
             case int(Sys_Events.DOUBLECLICKED):
                 if event.tag == "dir_view":
@@ -383,7 +430,7 @@ class PopFolderGet(PopContainer):
                     event.value_set(
                         container_tag="folder_edit",
                         tag="folder",
-                        value=f"{SDELIM}{folders}{SDELIM}",
+                        value=f"{self.sdelim}{folders}{self.sdelim}",
                     )
 
             case int(Sys_Events.FOCUSIN):
@@ -414,7 +461,7 @@ class PopFolderGet(PopContainer):
                             PopError(
                                 title="Folder Object Not Supported...",
                                 message=(
-                                    f"{SDELIM}<{event.value}>{SDELIM} Object Is Not"
+                                    f"{self.sdelim}<{event.value}>{self.sdelim} Object Is Not"
                                     " Supported!"
                                 ),
                             ).show()
@@ -422,7 +469,7 @@ class PopFolderGet(PopContainer):
                         PopError(
                             title="Folder Does Not Exist...",
                             message=(
-                                f"{SDELIM}<{event.value}>{SDELIM} Is Not A Valid"
+                                f"{self.sdelim}<{event.value}>{self.sdelim} Is Not A Valid"
                                 " Folder!"
                             ),
                         ).show()
@@ -461,7 +508,7 @@ class PopFolderGet(PopContainer):
                             title="Folder Already Exists...",
                             message=(
                                 "Folder or File"
-                                f" {SDELIM}<{folder_name}>{SDELIM} Already Exists!"
+                                f" {self.sdelim}<{folder_name}>{self.sdelim} Already Exists!"
                             ),
                         ).show()
                     else:
@@ -475,24 +522,24 @@ class PopFolderGet(PopContainer):
                                 title="Failed To Create Folder...",
                                 message=(
                                     "No Write Access To Folder"
-                                    f" {SDELIM}<{current_folder}>{SDELIM}"
+                                    f" {self.sdelim}<{current_folder}>{self.sdelim}"
                                 ),
                             ).show()
                 except OSError as e:
                     PopError(
                         title="Failed To Create Folder...",
                         message=(
-                            f"Could Not Create Folder {SDELIM}<{folder_name}>{SDELIM}"
+                            f"Could Not Create Folder {self.sdelim}<{folder_name}>{self.sdelim}"
                         )
-                        + f" {SDELIM}{current_folder}{SDELIM}  {SDELIM}{e}{SDELIM}",
+                        + f" {self.sdelim}{current_folder}{self.sdelim}  {self.sdelim}{e}{self.sdelim}",
                     ).show()
 
             except ValidationError as e:
                 PopError(
                     title="Folder Name Not Valid...",
                     message=(
-                        f"Folder Name {SDELIM}<{folder_name}>{SDELIM} Is Not Valid"
-                        f" {SDELIM}{e.description}{SDELIM}"
+                        f"Folder Name {self.sdelim}<{folder_name}>{self.sdelim} Is Not Valid"
+                        f" {self.sdelim}{e.description}{self.sdelim}"
                     ),
                 ).show()
 
@@ -512,24 +559,24 @@ class PopMessage(PopContainer):
 
         super().__post_init__()
 
-        assert (
-            isinstance(self.message, str) and self.message.strip() != ""
-        ), f"{self.message=}. Must be str"
+        assert isinstance(self.message, str) and self.message.strip() != "", (
+            f"{self.message=}. Must be str"
+        )
 
         assert isinstance(self.default_button, str), f"{self.default_button=}. Must str"
-        assert (
-            isinstance(self.width, int) and self.width > 0
-        ), f"{self.width=}. Must be int > 0"
-        assert (
-            isinstance(self.height, int) and self.height > 0
-        ), f"{self.height=}. Must be int > 0"
+        assert isinstance(self.width, int) and self.width > 0, (
+            f"{self.width=}. Must be int > 0"
+        )
+        assert isinstance(self.height, int) and self.height > 0, (
+            f"{self.height=}. Must be int > 0"
+        )
 
         text_height = self.height
         text_width = self.width
 
         if "<" in self.message and ">" in self.message:
-            self.message = self.message.replace("<", SDELIM)
-            self.message = self.message.replace(">", SDELIM)
+            self.message = self.message.replace("<", self.sdelim)
+            self.message = self.message.replace(">", self.sdelim)
 
         # Make text fit
         if "\n" in self.message:
@@ -601,9 +648,9 @@ class PopMessage(PopContainer):
             )
         else:
             for button in self.buttons:
-                assert isinstance(
-                    button, Button
-                ), f"{button=}. Must be an instance of Button"
+                assert isinstance(button, Button), (
+                    f"{button=}. Must be an instance of Button"
+                )
 
                 button_container.add_row(
                     Button(
@@ -744,9 +791,9 @@ class PopOKCancelApply(PopOKCancel):
             )
         super().__post_init__()
 
-        assert isinstance(
-            self.apply_callback, Callable
-        ), f"{self.apply_callback=}. Must be function | method | lambda"
+        assert isinstance(self.apply_callback, Callable), (
+            f"{self.apply_callback=}. Must be function | method | lambda"
+        )
 
     def event_handler(self, event: Action):
         """Processes the control events and performs appropriate actions. Sets the _result attribute. Overridden in
@@ -798,12 +845,12 @@ class PopOptions(PopContainer):
         an OK and Cancel button
         """
         super().__post_init__()
-        assert isinstance(
-            self.options, (dict)
-        ), f"{self.options=}. Must be a dict dict[text:tag]"
-        assert (
-            len(self.options) > 0
-        ), f"{self.options=}. Must be a dict with at least one item in it"
+        assert isinstance(self.options, (dict)), (
+            f"{self.options=}. Must be a dict dict[text:tag]"
+        )
+        assert len(self.options) > 0, (
+            f"{self.options=}. Must be a dict with at least one item in it"
+        )
         assert isinstance(self.message, str), f"{self.message=}. Mut be str"
 
         self.original_option: str = ""
@@ -835,7 +882,7 @@ class PopOptions(PopContainer):
 
             option_container.add_row(
                 RadioButton(
-                    text=f"{SDELIM}{option}{SDELIM}",
+                    text=f"{self.sdelim}{option}{self.sdelim}",
                     callback=self.event_handler,
                     tag=tag,
                     checked=True if index == 0 else False,
@@ -1040,20 +1087,26 @@ class PopWarn(PopYesNo):
 class Langtran_Popup(PopContainer):
     """Allow users to provide translations - should be in langtran.py but got circular import error"""
 
+    APP_COUNTRY_DBK: Final[str] = "app_country"
+
     tag: str = "langtran_popup"
 
     # Private instance variable
     _db_settings: App_Settings | None = None
     _db_file: str = "lang_tran"
-    _path = platformdirs.user_data_dir(appname=PROGRAM_NAME)
+    _path: str = ""  # Set in __post_init__
 
     def __post_init__(self) -> None:
         """Sets-up the form"""
+        PopContainer.__post_init__(self)  # Need this to get the parent_app instance set
+        program_name = self.parent_app.program_name
+        self._path = platformdirs.user_data_dir(appname=program_name)
+        print(f"DBG {program_name=} {self._path=}")
 
         self.container = self.layout()
-        self._db_settings = App_Settings(PROGRAM_NAME)
+        self._db_settings = App_Settings(program_name)
         self.DB = SQLDB(
-            appname=PROGRAM_NAME,
+            appname=program_name,
             dbpath=self._path,
             dbfile=self._db_file,
             suffix=".db",
@@ -1253,8 +1306,8 @@ class Langtran_Popup(PopContainer):
                 PopError(
                     title="Failed To Import...",
                     message=(
-                        f"Failed To Import {SDELIM}{file} -"
-                        f" {e if e is not None else ''}{SDELIM}"
+                        f"Failed To Import {self.sdelim}{file} -"
+                        f" {e if e is not None else ''}{self.sdelim}"
                     ),
                 ).show()
                 return None
@@ -1322,13 +1375,13 @@ class Langtran_Popup(PopContainer):
         except Exception as e:
             PopError(
                 title="Failed To Export...",
-                message=f"Failed to export {SDELIM}{project_file_name} - {e}{SDELIM}",
+                message=f"Failed to export {self.sdelim}{project_file_name} - {e}{self.sdelim}",
             ).show()
             return None
 
         PopMessage(
             title="Exported...",
-            message=f"Exported {SDELIM}{project_file_name}{SDELIM}",
+            message=f"Exported {self.sdelim}{project_file_name}{self.sdelim}",
         ).show()
         return None
 
@@ -1414,10 +1467,10 @@ class Langtran_Popup(PopContainer):
 
         # Default country combo to the country specified in the application-selected country
         if self._db_settings.setting_exist(
-            setting_name=APP_COUNTRY_DBK,
+            setting_name=self.APP_COUNTRY_DBK,
         ):
             app_country = self._db_settings.setting_get(
-                setting_name=APP_COUNTRY_DBK,
+                setting_name=self.APP_COUNTRY_DBK,
             )
 
             if app_country:
@@ -1587,7 +1640,7 @@ class Langtran_Popup(PopContainer):
                 except Exception as e:
                     PopError(
                         title="Language Translation Failed...",
-                        message=f"Language Translation Failed!{SDELIM}\n {e} {SDELIM}",
+                        message=f"Language Translation Failed!{self.sdelim}\n {e} {self.sdelim}",
                     ).show()
 
     def _save_handler(self, event: Action) -> int:
@@ -1672,7 +1725,7 @@ class Langtran_Popup(PopContainer):
                         if error.code == -1:
                             PopError(
                                 title="Database Error...",
-                                message=f"{SDELIM}{error.message}{SDELIM}",
+                                message=f"{self.sdelim}{error.message}{self.sdelim}",
                             ).show()
                             return -1
 
@@ -1680,7 +1733,7 @@ class Langtran_Popup(PopContainer):
                 error = self.DB.get_error_status()
                 PopError(
                     title="Database Error...",
-                    message=f"{SDELIM}{error.message}{SDELIM}",
+                    message=f"{self.sdelim}{error.message}{self.sdelim}",
                 ).show()
                 return -1
             else:

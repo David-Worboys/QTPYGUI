@@ -17,8 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-# Tell Black to leave this block alone (realm of isort)
-# fmt: off
 import collections
 import dataclasses
 import datetime
@@ -36,15 +34,22 @@ import time
 import uuid
 from base64 import b64decode, b64encode
 from enum import Enum, IntEnum
-from typing import (Any, Generator, Generic, Literal, NamedTuple, Type,
-                    TypeVar, Union, cast)
+from typing import (
+    Any,
+    Generator,
+    Generic,
+    Literal,
+    NamedTuple,
+    Type,
+    TypeVar,
+    Union,
+    cast,
+)
 
 import dateutil.parser as dateparse
 import netifaces
 from Crypto.Cipher import AES
 from PySide6 import QtCore, QtWidgets
-
-# fmt: on
 
 NUMBER = TypeVar("NUMBER", int, float)
 TFILE_ERROR = TypeVar("TFILE_ERROR", bound="FILE_ERROR")
@@ -87,18 +92,18 @@ class Coords:
     height: Generic[NUMBER]
 
     def __post_init__(self):
-        assert (
-            isinstance(self.top, (int | float)) and self.top >= 0
-        ), f"{self.top=}. Must be float >=0"
-        assert (
-            isinstance(self.left, (int | float)) and self.left >= 0
-        ), f"{self.left=}. Must be float >=0"
-        assert (
-            isinstance(self.width, (int | float)) and self.width >= 0
-        ), f"{self.width=}. Must be float >=0"
-        assert (
-            isinstance(self.height, (int | float)) and self.height >= 0
-        ), f"{self.height=}. Must be float >=0"
+        assert isinstance(self.top, (int | float)) and self.top >= 0, (
+            f"{self.top=}. Must be float >=0"
+        )
+        assert isinstance(self.left, (int | float)) and self.left >= 0, (
+            f"{self.left=}. Must be float >=0"
+        )
+        assert isinstance(self.width, (int | float)) and self.width >= 0, (
+            f"{self.width=}. Must be float >=0"
+        )
+        assert isinstance(self.height, (int | float)) and self.height >= 0, (
+            f"{self.height=}. Must be float >=0"
+        )
 
     @property
     def area(self) -> NUMBER:
@@ -138,9 +143,9 @@ class Coords:
             bool : True if overlaps, False if not
         """
         assert isinstance(other_cords, Coords), f"{other_cords=}. Must be Coords"
-        assert (
-            isinstance(overlap_ratio, float) and 0 <= overlap_ratio <= 1
-        ), f" 0<= {overlap_ratio=} <= 1. Must be float in this range"
+        assert isinstance(overlap_ratio, float) and 0 <= overlap_ratio <= 1, (
+            f" 0<= {overlap_ratio=} <= 1. Must be float in this range"
+        )
 
         return (
             intersection_over_union(coords_a=self, coords_b=other_cords)
@@ -220,9 +225,9 @@ def Find_Common_Words(word_list: list[str]) -> list[str]:
 
     """
     assert isinstance(word_list, list), f"{word_list=}. Must be a list or str "
-    assert all(
-        isinstance(word, str) for word in word_list
-    ), f"{word_list=}. Must be a list of str"
+    assert all(isinstance(word, str) for word in word_list), (
+        f"{word_list=}. Must be a list of str"
+    )
 
     common_words: list[str] = []
 
@@ -258,9 +263,9 @@ def Data_Type_Decode(data_type: int, value: str) -> any:  # TODO Remove QT depen
     Returns         : Value cast as the selected datatype
     """
     assert isinstance(value, str), "value must be a str"
-    assert isinstance(
-        data_type, (DATA_TYPE, int)
-    ), "data_type is enumerated data_type or an int index into data_type"
+    assert isinstance(data_type, (DATA_TYPE, int)), (
+        "data_type is enumerated data_type or an int index into data_type"
+    )
 
     match data_type:
         case DATA_TYPE.BOOL:  # bool
@@ -366,9 +371,9 @@ def Dump_QtObject(qtObject: QtCore.QObject | QtWidgets.QWidget):
         qtObject (QtCore.QObject | QtWidgets.QWidget): The object to dump
 
     """
-    assert isinstance(
-        qtObject, QtCore.QObject
-    ), f"qtobject <{qtObject}> must be of type QObject"
+    assert isinstance(qtObject, QtCore.QObject), (
+        f"qtobject <{qtObject}> must be of type QObject"
+    )
 
     try:
         parent: QtCore.QObject = qtObject.parentWidget()  # type: ignore
@@ -417,9 +422,9 @@ def Pack_Rational(
         "<",
         ">",
     ), f"{endian_symbol}=. Must be a one char str - < | >"
-    assert isinstance(
-        rationals, (list, tuple)
-    ), f"{rationals=}. Must be a array | list of tuples"
+    assert isinstance(rationals, (list, tuple)), (
+        f"{rationals=}. Must be a array | list of tuples"
+    )
     assert isinstance(word_width, int) and word_width in (
         1,
         2,
@@ -433,15 +438,15 @@ def Pack_Rational(
     out_bytes = b""
 
     for number_pair in rationals:
-        assert (
-            isinstance(number_pair, tuple) and len(number_pair) == 2
-        ), f"{number_pair=}. Must be a tuple of 2 ints - nominator, denominator"
-        assert isinstance(
-            number_pair[0], int
-        ), f"Nominator {number_pair[0]=} must be an int"
-        assert isinstance(
-            number_pair[1], int
-        ), f"Denominator {number_pair[1]=} must be an int"
+        assert isinstance(number_pair, tuple) and len(number_pair) == 2, (
+            f"{number_pair=}. Must be a tuple of 2 ints - nominator, denominator"
+        )
+        assert isinstance(number_pair[0], int), (
+            f"Nominator {number_pair[0]=} must be an int"
+        )
+        assert isinstance(number_pair[1], int), (
+            f"Denominator {number_pair[1]=} must be an int"
+        )
 
         numerator: int = number_pair[0]
         denominator: int = number_pair[1]
@@ -569,9 +574,9 @@ def Find_All(search_string: str, pattern: str) -> Generator[int, Any, None]:
 
 def Get_File_Hash(file_path: str) -> str:
     """Get the hash of a file."""
-    assert (
-        isinstance(file_path, str) and file_path.strip() != ""
-    ), f"{file_path=}. Must be non-empty str"
+    assert isinstance(file_path, str) and file_path.strip() != "", (
+        f"{file_path=}. Must be non-empty str"
+    )
 
     # Check if file exists
     if os.path.isfile(file_path):
@@ -736,9 +741,9 @@ class Crypt:
 
         salt (str): The salt that AES will use to encrypt and decrypt strings (must be 16 chars long)
         """
-        assert (
-            isinstance(salt, str) and len(salt.strip()) == 16
-        ), f"salt <{salt}> must be a non-empty str 16 chars long"
+        assert isinstance(salt, str) and len(salt.strip()) == 16, (
+            f"salt <{salt}> must be a non-empty str 16 chars long"
+        )
 
         random.seed(salt)
         str_key_len = len(salt)
@@ -773,9 +778,9 @@ class Crypt:
         return (str) : The encrypted str
 
         """
-        assert (
-            isinstance(str_to_enc, str) and str_to_enc.strip() != ""
-        ), f"str_to_enc <{str_to_enc}> must be a num-empty string"
+        assert isinstance(str_to_enc, str) and str_to_enc.strip() != "", (
+            f"str_to_enc <{str_to_enc}> must be a num-empty string"
+        )
 
         assert isinstance(str_key, str) and (
             len(str_key) % 16 == 0 or len(str_key) % 24 == 0 or len(str_key) % 32 == 0
@@ -832,9 +837,9 @@ class Crypt:
         return (str): The decrypted string
 
         """
-        assert (
-            isinstance(enc_str, str) and enc_str.strip() != ""
-        ), f"enc_str <{enc_str}> must be a num-empty string"
+        assert isinstance(enc_str, str) and enc_str.strip() != "", (
+            f"enc_str <{enc_str}> must be a num-empty string"
+        )
 
         assert isinstance(str_key, str) and (
             len(str_key) % 16 == 0 or len(str_key) % 24 == 0 or len(str_key) % 32 == 0
@@ -899,26 +904,26 @@ class Country:
     def __post_init__(self):
         """Check instance vars are legal"""
 
-        assert (
-            isinstance(self.name, str) and self.name.strip() != ""
-        ), f"{self.name=}. Must be a str"
-        assert (
-            isinstance(self.alpha2, str) and len(self.alpha2) == 2
-        ), f"{self.alpha2=}. Must be a str 2 char long"
-        assert (
-            isinstance(self.alpha3, str) and len(self.alpha3) == 3
-        ), f"{self.alpha3=}. Must be a str 3 char long"
+        assert isinstance(self.name, str) and self.name.strip() != "", (
+            f"{self.name=}. Must be a str"
+        )
+        assert isinstance(self.alpha2, str) and len(self.alpha2) == 2, (
+            f"{self.alpha2=}. Must be a str 2 char long"
+        )
+        assert isinstance(self.alpha3, str) and len(self.alpha3) == 3, (
+            f"{self.alpha3=}. Must be a str 3 char long"
+        )
         assert (
             isinstance(self.numeric, str)
             and self.numeric.strip() != ""
             and self.numeric.isdigit()
         ), f"{self.numeric=}. Must be a numeric str"
-        assert (
-            isinstance(self.flag, str) and self.flag.strip() != ""
-        ), f"{self.flag=}. Must be a str ({self.name=})"
-        assert (
-            isinstance(self.language, str) and self.language.strip() != ""
-        ), f"{self.language=}. Must be a str ({self.name=})"
+        assert isinstance(self.flag, str) and self.flag.strip() != "", (
+            f"{self.flag=}. Must be a str ({self.name=})"
+        )
+        assert isinstance(self.language, str) and self.language.strip() != "", (
+            f"{self.language=}. Must be a str ({self.name=})"
+        )
 
         if not self.qt_date_mask.strip():  # Just a default date where I do not have one
             self.qt_date_mask = "yyyy-MM-dd"
@@ -1922,9 +1927,9 @@ def is_str_float(num: str) -> bool:
     Returns:
         bool: True id number is a float, False if not
     """
-    assert (
-        isinstance(num, str) and num.strip() != ""
-    ), f"{num=}. Must be a non-empty str"
+    assert isinstance(num, str) and num.strip() != "", (
+        f"{num=}. Must be a non-empty str"
+    )
 
     if "." not in num:
         return False
@@ -2195,9 +2200,9 @@ def soundex(text_string: str, census_type: int = 2) -> str:
     Returns:
         object:
     """
-    assert isinstance(census_type, int) and (
-        census_type in (0, 1, 2)
-    ), f"{census_type=}. Must be int: 0 - pre 1920 US, 1 - post 1930 US 2 - Enhanced"
+    assert isinstance(census_type, int) and (census_type in (0, 1, 2)), (
+        f"{census_type=}. Must be int: 0 - pre 1920 US, 1 - post 1930 US 2 - Enhanced"
+    )
 
     code_it = False
     soundex_index = 0
@@ -2344,9 +2349,9 @@ def Text_To_File_Name(text: str) -> str:
         A cleaned up version of a string that can be used as a file name
 
     """
-    assert (
-        isinstance(text, str) and text.strip() != ""
-    ), f"{text=} must be a non-empty string"
+    assert isinstance(text, str) and text.strip() != "", (
+        f"{text=} must be a non-empty string"
+    )
 
     # Remove any characters that are not allowed in file names
     cleaned_text = re.sub(r'[<>:"/\\|?*]', "", text)

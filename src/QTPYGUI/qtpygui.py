@@ -20,19 +20,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # TODO Split file into multiple files - well this is bigger than Ben Hur now, needs its own git project,
 # doco, examples etc. Code needs review as well...sigh, where to find the time!
 
-# Tell Black to leave this block alone (realm of isort)
-# fmt: off
 import copy
-import csv
 import dataclasses
 import datetime
 import functools
 import math
-import os
-import pathlib
 import platform
 import random
-import re
 import string
 import sys
 import time
@@ -42,36 +36,48 @@ from collections import deque, namedtuple
 from contextlib import contextmanager
 from dataclasses import field
 from enum import Enum, IntEnum
-from typing import (Callable, Final, Literal, NoReturn, Optional, Union,
-                    cast, overload)
+from typing import Callable, Final, Literal, NoReturn, Optional, Union, cast, overload
 
 import PySide6.QtCore as qtC
 import PySide6.QtGui as qtG
 import PySide6.QtMultimedia as qtM
 import PySide6.QtWidgets as qtW
 import numpy as np
-import shiboken6  # type: ignore
+import shiboken6
 from attrs import define
 
 try:
     import file_utils
     import langtran
-    import sys_consts
     from file_utils import App_Path
     from langtran import Lang_Tran
-    from sys_consts import SDELIM
-    from utils import Coords, Is_Complied, amper_length, country_date_formatmask,NUMBER, Transform_Str_To_Value, Get_Unique_Int
+    from utils import (
+        Coords,
+        Is_Complied,
+        amper_length,
+        country_date_formatmask,
+        NUMBER,
+        Transform_Str_To_Value,
+        Get_Unique_Int,
+        strEnum,
+    )
 except ImportError:
     from .file_utils import *
     from .langtran import *
-    from .sys_consts import *
     from .file_utils import App_Path
     from .langtran import Lang_Tran
-    from .sys_consts import SDELIM
-    from .utils import Coords, Is_Complied, amper_length, country_date_formatmask,NUMBER, Transform_Str_To_Value, Get_Unique_Int
+    from .utils import (
+        Coords,
+        Is_Complied,
+        amper_length,
+        country_date_formatmask,
+        NUMBER,
+        Transform_Str_To_Value,
+        Get_Unique_Int,
+        strEnum,
+    )
 
 
-# fmt: on
 sys.setrecursionlimit(
     2**20
 )  # Set to a really hih number as in very rare circumstances, a reasonable recursion limit was not sufficient
@@ -87,6 +93,11 @@ MIRROR_VERTICAL: Final[int] = -662
 MIRROR_ROTATE_270: Final[int] = -663  # Mirror Horizontal And Rotate 270 CW
 MIRROR_ROTATE_90: Final[int] = -664  # Mirror Horizontal And Rotate 90 CW
 USE_LAMBDA: Final[bool] = False
+SDELIM: Final[
+    str
+] = (  # Used to delimit strings - particularly non-translatable sections of strings
+    "||"
+)
 
 
 def Command_Button_Container(
@@ -117,19 +128,19 @@ def Command_Button_Container(
 
     # Assert that the callbacks are callable
     assert ok_callback is None or callable(ok_callback), "Invalid  callback"
-    assert cancel_callback is None or callable(
-        cancel_callback
-    ), "Invalid Cancel callback"
+    assert cancel_callback is None or callable(cancel_callback), (
+        "Invalid Cancel callback"
+    )
     assert apply_callback is None or callable(apply_callback), "Invalid Apply callback"
-    assert (
-        isinstance(button_width, int) and button_width >= 7
-    ), f"{button_width=}. Must be int > 7"
-    assert (
-        isinstance(margin_left, int) and margin_left == -1 or margin_left >= 0
-    ), f"{margin_left=}. Must be int == -1 or >= 0"
-    assert (
-        isinstance(margin_right, int) and margin_right == -1 or margin_right >= 0
-    ), f"{margin_right=}. Must be int == -1 or >= 0"
+    assert isinstance(button_width, int) and button_width >= 7, (
+        f"{button_width=}. Must be int > 7"
+    )
+    assert isinstance(margin_left, int) and margin_left == -1 or margin_left >= 0, (
+        f"{margin_left=}. Must be int == -1 or >= 0"
+    )
+    assert isinstance(margin_right, int) and margin_right == -1 or margin_right >= 0, (
+        f"{margin_right=}. Must be int == -1 or >= 0"
+    )
 
     platform_name = platform.system()
 
@@ -238,12 +249,12 @@ def Question_Button_Container(
     """
     assert callable(yes_callback), "Invalid 'yes' callback."
     assert callable(no_callback), "Invalid 'no' callback."
-    assert (
-        isinstance(margin_left, int) and margin_left == -1 or margin_left >= 0
-    ), f"{margin_left=}. Must be int == -1 or >= 0"
-    assert (
-        isinstance(margin_right, int) and margin_right == -1 or margin_right >= 0
-    ), f"{margin_right=}. Must be int == -1 or >= 0"
+    assert isinstance(margin_left, int) and margin_left == -1 or margin_left >= 0, (
+        f"{margin_left=}. Must be int == -1 or >= 0"
+    )
+    assert isinstance(margin_right, int) and margin_right == -1 or margin_right >= 0, (
+        f"{margin_right=}. Must be int == -1 or >= 0"
+    )
 
     button_container = HBoxContainer(
         align=Align.RIGHT,
@@ -289,12 +300,12 @@ def Get_Window_ID(
         int: The winId of the target widget.
 
     """
-    assert isinstance(
-        parent_app, QtPyApp
-    ), f"{parent_app=}. {type(parent_app)=}. Must be a QtPyApp object"
-    assert parent is None or isinstance(
-        parent, (qtW.QWidget, qtW.QFrame)
-    ), f"{parent=}. {type(parent)=}. Must be a None, QWidget or QFrame object"
+    assert isinstance(parent_app, QtPyApp), (
+        f"{parent_app=}. {type(parent_app)=}. Must be a QtPyApp object"
+    )
+    assert parent is None or isinstance(parent, (qtW.QWidget, qtW.QFrame)), (
+        f"{parent=}. {type(parent)=}. Must be a None, QWidget or QFrame object"
+    )
     assert self_item is None or isinstance(
         self_item, (_Dialog, _Container, _qtpyBase_Control, _qtpySDI_Frame)
     ), (
@@ -362,31 +373,31 @@ class CSV_File_Def:
         """
         Validate the CSV_File_Def object
         """
-        assert (
-            isinstance(self.file_name, str) and self.file_name.strip() != ""
-        ), f"{self.file_name=}. Must be a non-empty string"
+        assert isinstance(self.file_name, str) and self.file_name.strip() != "", (
+            f"{self.file_name=}. Must be a non-empty string"
+        )
 
         assert isinstance(self.select_text, str), f"f{self.select_text=}. Must be str"
 
-        assert (
-            isinstance(self.text_index, int) and self.text_index > 0
-        ), f"{self.text_index=}. Must be int > 0"
+        assert isinstance(self.text_index, int) and self.text_index > 0, (
+            f"{self.text_index=}. Must be int > 0"
+        )
 
-        assert (
-            isinstance(self.line_start, int) and self.line_start > 0
-        ), f"{self.line_start=}. Must be int > 0"
+        assert isinstance(self.line_start, int) and self.line_start > 0, (
+            f"{self.line_start=}. Must be int > 0"
+        )
 
-        assert (
-            isinstance(self.data_index, int) and self.data_index > 0
-        ), f"{self.data_index=}. Must be int > 0"
+        assert isinstance(self.data_index, int) and self.data_index > 0, (
+            f"{self.data_index=}. Must be int > 0"
+        )
 
-        assert isinstance(
-            self.ignore_header, bool
-        ), f"{self.ignore_header=}. Must be bool"
+        assert isinstance(self.ignore_header, bool), (
+            f"{self.ignore_header=}. Must be bool"
+        )
 
-        assert (
-            isinstance(self.delimiter, str) and len(self.delimiter) == 1
-        ), f"{self.delimiter=} must be a single char"
+        assert isinstance(self.delimiter, str) and len(self.delimiter) == 1, (
+            f"{self.delimiter=} must be a single char"
+        )
 
         assert isinstance(self.filter, list), f"{self.filter=}. Must be list"
         for item in self.filter:
@@ -394,9 +405,9 @@ class CSV_File_Def:
             assert isinstance(item[0], int) and item[0] > 0
             assert isinstance(item[1], str)
 
-        assert isinstance(
-            self.ignore_errors, bool
-        ), f"{self.ignore_errors=}. Must be bool"
+        assert isinstance(self.ignore_errors, bool), (
+            f"{self.ignore_errors=}. Must be bool"
+        )
 
 
 @dataclasses.dataclass(slots=True)
@@ -420,6 +431,17 @@ class Grid_Item:
         assert isinstance(
             self.user_data, (bool, int, float, str, dict, list, type(None))
         )
+
+
+class Special_Path(strEnum):
+    """Contains enums for strings that represent special paths on the user's computer"""
+
+    DESKTOP: Final[str] = platformdirs.user_desktop_dir()
+    DOCUMENTS: Final[str] = platformdirs.user_documents_dir()
+    DOWNLOADS: Final[str] = platformdirs.user_downloads_dir()
+    MUSIC: Final[str] = platformdirs.user_music_dir()
+    PICTURES: Final[str] = platformdirs.user_pictures_dir()
+    VIDEOS: Final[str] = platformdirs.user_videos_dir()
 
 
 # An enumeration of all the application events that can be handled by the GUI.
@@ -520,12 +542,12 @@ class Char_Pixel_Size:
 
     def _post_init(self):
         # Checking the arguments passed to the constructor are of the correct type.
-        assert (
-            isinstance(self.height, int) and self.height >= 0
-        ), f"{self.height=}. Must be int >= 0"
-        assert (
-            isinstance(self.width, int) and self.width >= 0
-        ), f"{self.width=}. Must be int >= 0"
+        assert isinstance(self.height, int) and self.height >= 0, (
+            f"{self.height=}. Must be int >= 0"
+        )
+        assert isinstance(self.width, int) and self.width >= 0, (
+            f"{self.width=}. Must be int >= 0"
+        )
 
 
 @dataclasses.dataclass(slots=True)
@@ -537,12 +559,12 @@ class Size:
 
     def _post_init(self):
         # Checking the arguments passed to the constructor are of the correct type.
-        assert (
-            isinstance(self.height, int) and self.height >= 0
-        ), f"{self.height=}. Must be int >= 0"
-        assert (
-            isinstance(self.width, int) and self.width >= 0
-        ), f"{self.width=}. Must be int >= 0"
+        assert isinstance(self.height, int) and self.height >= 0, (
+            f"{self.height=}. Must be int >= 0"
+        )
+        assert isinstance(self.width, int) and self.width >= 0, (
+            f"{self.width=}. Must be int >= 0"
+        )
 
 
 @dataclasses.dataclass(slots=True)
@@ -559,9 +581,9 @@ class Col_Def:
         # Checking the arguments passed to the constructor are of the correct type.
         assert isinstance(self.label, str), f"{self.label=}. Must be a str"
         assert isinstance(self.tag, str), f"{self.tag=}. Must be a str"
-        assert (
-            isinstance(self.width, int) and self.width > 0
-        ), f"{self.width=}. Must be a int"
+        assert isinstance(self.width, int) and self.width > 0, (
+            f"{self.width=}. Must be a int"
+        )
         assert isinstance(self.editable, bool), f"{self.editable=}. Must be bool"
         assert isinstance(self.checkable, bool), f"{self.checkable=}. Must be bool"
 
@@ -578,9 +600,9 @@ class Combo_Data:
 
     def _post_init(self):
         # Checking the arguments passed to the constructor are of the correct type.
-        assert (
-            isinstance(self.index, int) and self.index >= 0
-        ), f"{self.index=}. Must be int >= 0"
+        assert isinstance(self.index, int) and self.index >= 0, (
+            f"{self.index=}. Must be int >= 0"
+        )
         assert isinstance(self.display, str), f"{self.display=}. Must be str"
         assert (
             isinstance(self.data, (str, int, float, bytes, bool)) or self.data is None
@@ -627,12 +649,12 @@ class Rect_Cords:
 
     def _post_init(self):
         # Checking the arguments passed to the constructor are of the correct type.
-        assert (
-            isinstance(self.rect_id, str) and self.rect_id.strip() != ""
-        ), f"{self.rect_id=}. Must be a non-empty string"
-        assert isinstance(
-            self.coords, Coords
-        ), f"{self.coords=}. Must be a Coords instance"
+        assert isinstance(self.rect_id, str) and self.rect_id.strip() != "", (
+            f"{self.rect_id=}. Must be a non-empty string"
+        )
+        assert isinstance(self.coords, Coords), (
+            f"{self.coords=}. Must be a Coords instance"
+        )
 
     @property
     def top(self) -> NUMBER:
@@ -650,7 +672,7 @@ class Rect_Cords:
         Args:
             value (NUMBER): int or float
         """
-        assert isinstance(value, NUMBER), f"{value=}. Must NUMBER"
+        assert isinstance(value, (int, float)), f"{value=}. Must be NUMBER"
 
         self.coords.top = value
 
@@ -670,7 +692,7 @@ class Rect_Cords:
         Args:
             value (NUMBER): int or float
         """
-        assert isinstance(value, NUMBER), f"{value=}. Must NUMBER"
+        assert isinstance(value, (int, float)), f"{value=}. Must NUMBER"
 
         self.coords.left = value
 
@@ -690,7 +712,7 @@ class Rect_Cords:
         Args:
             value (NUMBER): int or float
         """
-        assert isinstance(value, NUMBER), f"{value=}. Must NUMBER"
+        assert isinstance(value, (int, float)), f"{value=}. Must NUMBER"
 
         self.coords.width = value
 
@@ -710,7 +732,7 @@ class Rect_Cords:
         Args:
             value (NUMBER): int or float
         """
-        assert isinstance(value, NUMBER), f"{value=}. Must NUMBER"
+        assert isinstance(value, (int, float)), f"{value=}. Must NUMBER"
 
         self.coords.height = value
 
@@ -724,12 +746,12 @@ class Rect_Changed:
 
     def _post_init(self):
         # Checking the arguments passed to the constructor are of the correct type.
-        assert (
-            isinstance(self.rect_id, str) and self.rect_id.strip() != ""
-        ), f"{self.rect_id=}. Must be a non-empty string"
-        assert isinstance(
-            self.coords, Coords
-        ), f"{self.coords=}. Must be a an of type Coords"
+        assert isinstance(self.rect_id, str) and self.rect_id.strip() != "", (
+            f"{self.rect_id=}. Must be a non-empty string"
+        )
+        assert isinstance(self.coords, Coords), (
+            f"{self.coords=}. Must be a an of type Coords"
+        )
 
 
 @dataclasses.dataclass(slots=True)
@@ -743,13 +765,13 @@ class Overlap_Rect:
 
     def __post_init__(self):
         # Checking the arguments passed to the constructor are of the correct type.
-        assert (
-            isinstance(self.a_rect_id, str) and self.a_rect_id.strip() != ""
-        ), f"{self.a_rect_id}. Must be a non-empty str"
+        assert isinstance(self.a_rect_id, str) and self.a_rect_id.strip() != "", (
+            f"{self.a_rect_id}. Must be a non-empty str"
+        )
         assert isinstance(self.a_coords, Coords), f"{self.a_coords=}. Must be Coords"
-        assert (
-            isinstance(self.b_rect_id, str) and self.b_rect_id.strip() != ""
-        ), f"{self.b_rect_id}. Must be a non-empty str"
+        assert isinstance(self.b_rect_id, str) and self.b_rect_id.strip() != "", (
+            f"{self.b_rect_id}. Must be a non-empty str"
+        )
         assert isinstance(self.b_coords, Coords), f"{self.b_coords=}. Must be Coords"
 
 
@@ -1079,9 +1101,9 @@ class tags:
         assert (
             isinstance(self.container_tag, str) and self.container_tag.strip() != ""
         ), f"{self.container_tag=}. Must be a non-empty str"
-        assert (
-            isinstance(self.tag, str) and self.tag.strip() != ""
-        ), f"{self.tag=}. Must be a non-empty str"
+        assert isinstance(self.tag, str) and self.tag.strip() != "", (
+            f"{self.tag=}. Must be a non-empty str"
+        )
         assert isinstance(self.valid, bool), f"{self.valid=}. Must bool"
 
 
@@ -1170,12 +1192,12 @@ class widget_def:
     def _post_init(self):
         """Checking the arguments passed to the constructor are of the correct type."""
 
-        assert isinstance(
-            self.widget, _qtpyBase_Control
-        ), f"{self.widget=}. Must be type _qtpyBase_Control"
-        assert isinstance(
-            self.gui_widget, qtW.QWidget
-        ), f"{self.gui_widget=}. Must be type qtW.QWidget"
+        assert isinstance(self.widget, _qtpyBase_Control), (
+            f"{self.widget=}. Must be type _qtpyBase_Control"
+        )
+        assert isinstance(self.gui_widget, qtW.QWidget), (
+            f"{self.gui_widget=}. Must be type qtW.QWidget"
+        )
 
 
 @dataclasses.dataclass(slots=True)
@@ -1189,12 +1211,12 @@ class Date_Tuple:
     def _post_init(self) -> None:
         """Checking the arguments passed to the constructor are of the correct type"""
 
-        assert (
-            isinstance(self.year, int) and self.year > 0
-        ), f"{self.year=}. Must be an int > 0"
-        assert (
-            isinstance(self.month, int) and 1 >= self.month <= 12
-        ), f"{self.month=}. Must be an int between 1 and 12"
+        assert isinstance(self.year, int) and self.year > 0, (
+            f"{self.year=}. Must be an int > 0"
+        )
+        assert isinstance(self.month, int) and 1 >= self.month <= 12, (
+            f"{self.month=}. Must be an int between 1 and 12"
+        )
         assert (
             isinstance(self.day, int) and 1 >= self.day <= 28
             if self.month == 2
@@ -1294,9 +1316,9 @@ class Colors:
         """
         colour_max = len(TEXT_COLORS) - 1
 
-        assert (
-            isinstance(num_cols, int) and 0 <= num_cols <= colour_max
-        ), f"{num_cols=}. Must be int >= 0 and <= {colour_max}"
+        assert isinstance(num_cols, int) and 0 <= num_cols <= colour_max, (
+            f"{num_cols=}. Must be int >= 0 and <= {colour_max}"
+        )
 
         colour_list = []
 
@@ -1361,9 +1383,9 @@ class Colors:
             case str():
                 return self._process_colour_string(color)
             case tuple() | list():
-                assert (
-                    len(color) == 3
-                ), "only rgb(99,99,99), 3 numeric arguments supported"
+                assert len(color) == 3, (
+                    "only rgb(99,99,99), 3 numeric arguments supported"
+                )
 
                 text = "rgb("
 
@@ -1549,20 +1571,20 @@ class Widget_Frame(_qtpyBase):
         Checks that the values of the attributes `frame_style`, `frame`, `line_width`, and `midline_width` are of the
         correct type and that the values of `line_width` and `midline_width` are greater than or equal to zero
         """
-        assert isinstance(
-            self.frame_style, Frame_Style
-        ), f"frame_style <{self.frame_style}> must be of type FRAMESTYLE"
-        assert isinstance(
-            self.frame, Frame
-        ), f"frame <{self.frame}> must be of type FRAME"
+        assert isinstance(self.frame_style, Frame_Style), (
+            f"frame_style <{self.frame_style}> must be of type FRAMESTYLE"
+        )
+        assert isinstance(self.frame, Frame), (
+            f"frame <{self.frame}> must be of type FRAME"
+        )
 
-        assert (
-            isinstance(self.line_width, int) and self.line_width >= 0
-        ), f"line_width <{self.line_width}> must be int >= 0"
+        assert isinstance(self.line_width, int) and self.line_width >= 0, (
+            f"line_width <{self.line_width}> must be int >= 0"
+        )
 
-        assert (
-            isinstance(self.midline_width, int) and self.midline_width >= 0
-        ), f"line_width <{self.midline_width}> must be int >= 0"
+        assert isinstance(self.midline_width, int) and self.midline_width >= 0, (
+            f"line_width <{self.midline_width}> must be int >= 0"
+        )
 
 
 class Validator(_qtpyBase, qtG.QValidator):
@@ -1575,13 +1597,13 @@ class Validator(_qtpyBase, qtG.QValidator):
         ],
         parent: qtW.QWidget,
     ):
-        assert callable(
-            validate_callback
-        ), f"{validate_callback=}. Must be a function | method | lambda"
+        assert callable(validate_callback), (
+            f"{validate_callback=}. Must be a function | method | lambda"
+        )
 
-        assert isinstance(
-            parent, qtW.QWidget
-        ), f"{parent=}. Must be an instance of a QWidget"
+        assert isinstance(parent, qtW.QWidget), (
+            f"{parent=}. Must be an instance of a QWidget"
+        )
 
         _qtpyBase.__init__(self, parent)
         qtG.QValidator.__init__(self, parent)
@@ -1645,33 +1667,33 @@ class Font(_qtpyBase):
         Checks that the values of the attributes `are of the correct type
         """
         assert isinstance(self.font_name, str), f"{self.font_name=}. Must be a str"
-        assert (
-            isinstance(self.size, int) and self.size > 0
-        ), f"{self.size=}. Must be int > 0"
+        assert isinstance(self.size, int) and self.size > 0, (
+            f"{self.size=}. Must be int > 0"
+        )
 
-        assert isinstance(
-            self.weight, Font_Weight
-        ), f"{self.weight=}. Is not a valid Font_Weight"
+        assert isinstance(self.weight, Font_Weight), (
+            f"{self.weight=}. Is not a valid Font_Weight"
+        )
 
-        assert isinstance(
-            self.style, Font_Style
-        ), f"{self.style=}. Is not a valid FONTSTYLE"
+        assert isinstance(self.style, Font_Style), (
+            f"{self.style=}. Is not a valid FONTSTYLE"
+        )
         assert isinstance(self.backcolor, str), f"{self.backcolor=}. Must be str"
         assert isinstance(self.forecolor, str), f"{self.forecolor=}. Must be str"
         assert isinstance(self.selectback, str), f"{self.selectback=}. Must be str"
         assert isinstance(self.selectfore, str), f"{self.selectfore=}. Must be str"
-        assert (
-            self.backcolor in TEXT_COLORS
-        ), f"{self.backcolor=}. Must be a valid color"
-        assert (
-            self.forecolor in TEXT_COLORS()
-        ), f"{self.forecolor=}. Must be a valid color"
-        assert (
-            self.selectback in TEXT_COLORS()
-        ), f"{self.selectback=}. Must be a valid color"
-        assert (
-            self.selectfore in TEXT_COLORS()
-        ), f"{self.selectfore=}. Must be a valid color"
+        assert self.backcolor in TEXT_COLORS, (
+            f"{self.backcolor=}. Must be a valid color"
+        )
+        assert self.forecolor in TEXT_COLORS(), (
+            f"{self.forecolor=}. Must be a valid color"
+        )
+        assert self.selectback in TEXT_COLORS(), (
+            f"{self.selectback=}. Must be a valid color"
+        )
+        assert self.selectfore in TEXT_COLORS(), (
+            f"{self.selectfore=}. Must be a valid color"
+        )
 
 
 # Private Classes
@@ -1730,15 +1752,15 @@ class _qtpyFrame(_qtpyBaseFrame):
 
         super().__init__()
 
-        assert isinstance(
-            self.parent_app, QtPyApp
-        ), f"{self.parent_app=}. Must be an instance of QtPyApp"
+        assert isinstance(self.parent_app, QtPyApp), (
+            f"{self.parent_app=}. Must be an instance of QtPyApp"
+        )
 
         _qtpyBase.__init__(self, parent=self.parent_app)
 
-        assert (
-            isinstance(self.title, str) and self.title.strip() != ""
-        ), f"{self.title=}. Must be a non-empty str"
+        assert isinstance(self.title, str) and self.title.strip() != "", (
+            f"{self.title=}. Must be a non-empty str"
+        )
 
         assert isinstance(self.callback, Callable) or self.callback is None, (
             f"{self.callback=}. Must be None | types.FunctionType, types.LambdaType,"
@@ -1784,9 +1806,9 @@ class _qtpyFrame(_qtpyBaseFrame):
         if self.callback is not None:
             qtpyevent: Sys_Events = Sys_Events.APPCLOSED
 
-            assert (
-                self.callback.__code__.co_argcount <= 2
-            ), "action events have 1 argument - action"
+            assert self.callback.__code__.co_argcount <= 2, (
+                "action events have 1 argument - action"
+            )
 
             window_id = Get_Window_ID(self.parent_app, None, self)
 
@@ -1825,18 +1847,18 @@ class _qtpyFrame(_qtpyBaseFrame):
         sheet_layout (_qtpyBase_Control): _Container callback types.FunctionType | types.MethodType | types.LambdaType:
             This is a method that is called when the sheet is opened.
         """
-        assert isinstance(
-            main_frame, _qtpyFrame
-        ), f"{main_frame=}>. Must be an instance of _qtpyBaseFrame"
+        assert isinstance(main_frame, _qtpyFrame), (
+            f"{main_frame=}>. Must be an instance of _qtpyBaseFrame"
+        )
 
         assert isinstance(sheet_layout, _Container), (
             f"{sheet_layout=}. Must be an instance of VBoxContainer,"
             " HBoxContainer,GridContainer"
         )
 
-        assert callback is None or callable(
-            callback
-        ), f"{callback=} is a <function|method|labda> called when a sheet opens"
+        assert callback is None or callable(callback), (
+            f"{callback=} is a <function|method|labda> called when a sheet opens"
+        )
 
         sheet_layout._create_widget(
             parent_app=self.parent_app,
@@ -1869,20 +1891,20 @@ class _qtpySDI_Frame(_qtpyFrame):
             max_width (int): int = 1920,. Defaults to 1920
             maximized (bool): bool = False,. Defaults to False
         """
-        assert isinstance(
-            parent_app, QtPyApp
-        ), f"{parent_app=}. Must be an instance of QtPyApp"
+        assert isinstance(parent_app, QtPyApp), (
+            f"{parent_app=}. Must be an instance of QtPyApp"
+        )
         assert isinstance(title, str), f"{title=}. Must be str"
-        assert callback is None or isinstance(
-            callback, Callable
-        ), f"{callback=}. Must be None|func|method|lambda"
+        assert callback is None or isinstance(callback, Callable), (
+            f"{callback=}. Must be None|func|method|lambda"
+        )
         assert isinstance(tag, str), f"{tag=}. Must be str"
-        assert (
-            isinstance(max_height, int) and max_height > 0
-        ), f"{max_height=}. Must be int > 0"
-        assert (
-            isinstance(max_width, int) and max_width > 0
-        ), f"{max_height=}. Must be int > 0"
+        assert isinstance(max_height, int) and max_height > 0, (
+            f"{max_height=}. Must be int > 0"
+        )
+        assert isinstance(max_width, int) and max_width > 0, (
+            f"{max_height=}. Must be int > 0"
+        )
         assert isinstance(maximized, bool), f"{maximized=}. Must be bool"
 
         super().__init__(
@@ -2000,15 +2022,15 @@ class _Widget_Registry:
             tag (str): Tag name of Tag
             widget (_qtpyBase_Control): Parent widget that the new widget will be assigned to
         """
-        assert (
-            isinstance(window_id, int) and window_id > 0
-        ), f"{window_id=}. Must be int > 0"
-        assert (
-            isinstance(container_tag, str) and container_tag.strip() != ""
-        ), f"{container_tag=}. Must be a non-empty str"
-        assert (
-            isinstance(tag, str) and tag.strip() != ""
-        ), f"{tag=}. Must be a non-empty str"
+        assert isinstance(window_id, int) and window_id > 0, (
+            f"{window_id=}. Must be int > 0"
+        )
+        assert isinstance(container_tag, str) and container_tag.strip() != "", (
+            f"{container_tag=}. Must be a non-empty str"
+        )
+        assert isinstance(tag, str) and tag.strip() != "", (
+            f"{tag=}. Must be a non-empty str"
+        )
         assert isinstance(
             widget,
             (_qtpyBase, _qtpySDI_Frame),  # QT 6.5.0
@@ -2042,15 +2064,15 @@ class _Widget_Registry:
         Returns:
         """
 
-        assert (
-            isinstance(window_id, int) and window_id >= 0
-        ), f"{window_id=}.Must be int > 0"
-        assert (
-            isinstance(container_tag, str) and container_tag.strip() != ""
-        ), f"{container_tag=}. Must be a non-empty str"
-        assert (
-            isinstance(tag, str) and tag.strip() != ""
-        ), f"{tag=}. Must be a non-empty str"
+        assert isinstance(window_id, int) and window_id >= 0, (
+            f"{window_id=}.Must be int > 0"
+        )
+        assert isinstance(container_tag, str) and container_tag.strip() != "", (
+            f"{container_tag=}. Must be a non-empty str"
+        )
+        assert isinstance(tag, str) and tag.strip() != "", (
+            f"{tag=}. Must be a non-empty str"
+        )
 
         container_tag = f"{window_id}_{container_tag}"
 
@@ -2110,12 +2132,12 @@ class _Widget_Registry:
             AssertionError: If container_tag is not a non-empty string.
         """
 
-        assert (
-            isinstance(window_id, int) and window_id >= 0
-        ), f"{window_id=}.Must be int > 0"
-        assert (
-            isinstance(container_tag, str) and container_tag.strip() != ""
-        ), f"{container_tag=}. Must be a non-empty str."
+        assert isinstance(window_id, int) and window_id >= 0, (
+            f"{window_id=}.Must be int > 0"
+        )
+        assert isinstance(container_tag, str) and container_tag.strip() != "", (
+            f"{container_tag=}. Must be a non-empty str."
+        )
 
         container_tag = f"{window_id}_{container_tag}"
 
@@ -2138,12 +2160,12 @@ class _Widget_Registry:
         Returns:
             Dict (Dict[str, Union[types.FunctionType, types.LambdaType, types.MethodType]]) : Dictionary of container object
         """
-        assert (
-            isinstance(window_id, int) and window_id >= 0
-        ), f"{window_id=}.Must be int > 0"
-        assert (
-            isinstance(container_tag, str) and container_tag.strip() != ""
-        ), f"{container_tag=}>. Must be a non-empty str"
+        assert isinstance(window_id, int) and window_id >= 0, (
+            f"{window_id=}.Must be int > 0"
+        )
+        assert isinstance(container_tag, str) and container_tag.strip() != "", (
+            f"{container_tag=}>. Must be a non-empty str"
+        )
 
         container_tag = f"{window_id}_{container_tag}"
 
@@ -2164,16 +2186,16 @@ class _Widget_Registry:
         Returns:
             A boolean value.
         """
-        assert (
-            isinstance(window_id, int) and window_id >= 0
-        ), f"{window_id=}.Must be int > 0"
-        assert (
-            isinstance(container_tag, str) and container_tag.strip() != ""
-        ), f"{container_tag=}. Must be a non-empty str"
+        assert isinstance(window_id, int) and window_id >= 0, (
+            f"{window_id=}.Must be int > 0"
+        )
+        assert isinstance(container_tag, str) and container_tag.strip() != "", (
+            f"{container_tag=}. Must be a non-empty str"
+        )
 
-        assert (
-            isinstance(tag, str) and tag.strip() != ""
-        ), f"{tag=}. Must be a non-empty str"
+        assert isinstance(tag, str) and tag.strip() != "", (
+            f"{tag=}. Must be a non-empty str"
+        )
 
         container_tag = f"{window_id}_{container_tag}"
 
@@ -2210,21 +2232,21 @@ class _Widget_Registry:
         Returns:
             _qtpyBase_Control : The wanted widget .
         """
-        assert (
-            isinstance(window_id, int) and window_id >= 0
-        ), f"{window_id=}.Must be int > 0"
-        assert (
-            isinstance(container_tag, str) and container_tag.strip() != ""
-        ), f"{container_tag=}. Must be a non-empty str"
-        assert (
-            isinstance(tag, str) and tag.strip() != ""
-        ), f"{tag=}. Must be a non-empty str"
+        assert isinstance(window_id, int) and window_id >= 0, (
+            f"{window_id=}.Must be int > 0"
+        )
+        assert isinstance(container_tag, str) and container_tag.strip() != "", (
+            f"{container_tag=}. Must be a non-empty str"
+        )
+        assert isinstance(tag, str) and tag.strip() != "", (
+            f"{tag=}. Must be a non-empty str"
+        )
 
         container_tag = f"{window_id}_{container_tag}"
 
-        assert (
-            container_tag in self._widget_dict
-        ), f"{container_tag=} is not in widget_dict! {tag=} "
+        assert container_tag in self._widget_dict, (
+            f"{container_tag=} is not in widget_dict! {tag=} "
+        )
 
         if tag in self._widget_dict[container_tag]:
             return self._widget_dict[container_tag][tag].widget
@@ -2290,9 +2312,9 @@ class _Widget_Registry:
             my_widget.print_dict(_widget_items=my_dict, file="output.txt")
         """
 
-        assert isinstance(
-            _widget_items, (type(None), dict)
-        ), f"{_widget_items=}. Must be a Dict or None"
+        assert isinstance(_widget_items, (type(None), dict)), (
+            f"{_widget_items=}. Must be a Dict or None"
+        )
         assert isinstance(_delim, str), f"{_delim=}. Must be a str"
 
         if _widget_items is None:
@@ -2374,19 +2396,19 @@ class _qtpyBase_Control(_qtpyBase):
         assert isinstance(self.text, str), f"{self.text=} <{self.text}> must be str"
         assert isinstance(self.text, str), f"{self.text=} <{self.text}> must be str"
         assert isinstance(self.tag, str), f"{self.tag=} <{self.tag}> must be str"
-        assert isinstance(
-            self.tooltip, str
-        ), f"{self.tooltip=} <{self.tooltip}> must be a str"
+        assert isinstance(self.tooltip, str), (
+            f"{self.tooltip=} <{self.tooltip}> must be a str"
+        )
         assert self.callback is None or callable(self.callback), (
             f"{self.callback=}. Must be a  None | types.FunctionType | types.MethodType"
             " | types.LambdaType "
         )
-        assert (
-            isinstance(self.width, int) and self.width > 0 or self.width == -1
-        ), f"{self.width=}  <{self.width}> must be int > 0 or -1"
-        assert (
-            isinstance(self.height, int) and self.height > 0 or self.height == -1
-        ), f"{self.height=}  <{self.height}> must be int > 0"
+        assert isinstance(self.width, int) and self.width > 0 or self.width == -1, (
+            f"{self.width=}  <{self.width}> must be int > 0 or -1"
+        )
+        assert isinstance(self.height, int) and self.height > 0 or self.height == -1, (
+            f"{self.height=}  <{self.height}> must be int > 0"
+        )
 
         assert isinstance(self.align, Align), f"{self.align=}. Must be of type ALIGN"
 
@@ -2405,24 +2427,24 @@ class _qtpyBase_Control(_qtpyBase):
                     f"{self.txt_align=}. Must be one of Align.( LEFT, CENTER, RIGHT "
                 )
 
-        assert isinstance(
-            self.txt_align, Align_Text
-        ), f"{self.txt_align=}. Must be of type Align_Text"
+        assert isinstance(self.txt_align, Align_Text), (
+            f"{self.txt_align=}. Must be of type Align_Text"
+        )
 
-        assert (
-            isinstance(self.txt_font, Font) or self.txt_font is None
-        ), f"{self.txt_font=} <{self.txt_font}> must be an instance of Font"
+        assert isinstance(self.txt_font, Font) or self.txt_font is None, (
+            f"{self.txt_font=} <{self.txt_font}> must be an instance of Font"
+        )
 
-        assert (
-            isinstance(self.txt_fontsize, int) and self.txt_fontsize > 0
-        ), f"{self.txt_fontsize=} <{self.txt_fontsize}> must be an int"
+        assert isinstance(self.txt_fontsize, int) and self.txt_fontsize > 0, (
+            f"{self.txt_fontsize=} <{self.txt_fontsize}> must be an int"
+        )
 
-        assert isinstance(
-            self.tune_vsize, (float, int)
-        ), f"{self.tune_vsize=} <{self.tune_vsize}> is an int or float"
-        assert isinstance(
-            self.tune_hsize, (float, int)
-        ), f"{self.tune_hsize=} <{self.tune_hsize}> is an int or float"
+        assert isinstance(self.tune_vsize, (float, int)), (
+            f"{self.tune_vsize=} <{self.tune_vsize}> is an int or float"
+        )
+        assert isinstance(self.tune_hsize, (float, int)), (
+            f"{self.tune_hsize=} <{self.tune_hsize}> is an int or float"
+        )
 
         if self.tag.strip() == "":  # Try and default tag to text
             # & is shortcut on controls and MENU_SEPARATOR is not unique
@@ -2443,9 +2465,9 @@ class _qtpyBase_Control(_qtpyBase):
         ), f" {self.icon=}. Must be None | str (file name)| QPixmap | QIcon"
 
         assert isinstance(self.translate, bool), f"{self.translate=}. Must be bool"
-        assert (
-            isinstance(self.frame, Widget_Frame) or self.frame is None
-        ), f"{self.frame=}. Must be Widget_Frame or None"
+        assert isinstance(self.frame, Widget_Frame) or self.frame is None, (
+            f"{self.frame=}. Must be Widget_Frame or None"
+        )
         assert isinstance(self.enabled, bool), f"{self.enabled=}. Must be bool"
 
         assert isinstance(self.label, str), f"{self.label=}. Must be str"
@@ -2466,12 +2488,12 @@ class _qtpyBase_Control(_qtpyBase):
                     f"{self.label_align=}. Must be one of Align.( LEFT, CENTER, RIGHT "
                 )
 
-        assert isinstance(
-            self.label_align, Align_Text
-        ), f"{self.label_align=}. Must be of type Align_Text"
-        assert isinstance(
-            self.label_font, (type(None), Font)
-        ), f"{self.label_font=}. Must be an instance of Font"
+        assert isinstance(self.label_align, Align_Text), (
+            f"{self.label_align=}. Must be of type Align_Text"
+        )
+        assert isinstance(self.label_font, (type(None), Font)), (
+            f"{self.label_font=}. Must be an instance of Font"
+        )
 
         assert isinstance(self.label_width, int) and (
             self.label_width == -1 or self.label_width >= 0
@@ -2482,9 +2504,9 @@ class _qtpyBase_Control(_qtpyBase):
         ):  # Change 29 3 2021 - add strip
             self.label_width = amper_length(self.trans_str(self.label))
 
-        assert isinstance(
-            self.buddy_control, (type(None), _qtpyBase_Control)
-        ), f"{self.buddy_control}. Must be an descendant of _qtpyBase_Control or None"
+        assert isinstance(self.buddy_control, (type(None), _qtpyBase_Control)), (
+            f"{self.buddy_control}. Must be an descendant of _qtpyBase_Control or None"
+        )
         assert self.buddy_callback is None or callable(self.buddy_callback), (
             f"{self.buddy_callback=}. Must be None | types.FunctionType |"
             " types.MethodType | types.LambdaType "
@@ -2496,9 +2518,9 @@ class _qtpyBase_Control(_qtpyBase):
         )
 
         if callable(self.validate_callback):
-            assert (
-                self.validate_callback.__code__.co_argcount <= 3
-            ), "validate_callback must have 3 arguments - container_tag, tag, value"
+            assert self.validate_callback.__code__.co_argcount <= 3, (
+                "validate_callback must have 3 arguments - container_tag, tag, value"
+            )
 
         assert isinstance(self.pixel_unit, bool), f"{self.pixel_unit=}. Must be bool"
 
@@ -2620,9 +2642,9 @@ class _qtpyBase_Control(_qtpyBase):
         Args:
             widget (qtW.QWidget | qtG.QAction): The QT GUI widget.
         """
-        assert isinstance(
-            widget, (qtG.QAction, qtW.QWidget)
-        ), f"{widget=}. Must be type qtW.QAction | QWidget"
+        assert isinstance(widget, (qtG.QAction, qtW.QWidget)), (
+            f"{widget=}. Must be type qtW.QAction | QWidget"
+        )
 
         self._widget = widget
 
@@ -2814,15 +2836,15 @@ class _qtpyBase_Control(_qtpyBase):
         Returns (qtw.QWidget): This will be either a low level gui widget or frame
 
         """
-        assert isinstance(
-            parent_app, QtPyApp
-        ), f"{parent_app=}. Must be an instance of QtPyApp"
-        assert isinstance(
-            parent, qtW.QWidget
-        ), f"{parent=}. Must be an instance of QWidget"
-        assert (
-            isinstance(container_tag, str) and container_tag.strip() != ""
-        ), f"{container_tag=}. Must be a non-empty str"
+        assert isinstance(parent_app, QtPyApp), (
+            f"{parent_app=}. Must be an instance of QtPyApp"
+        )
+        assert isinstance(parent, qtW.QWidget), (
+            f"{parent=}. Must be an instance of QWidget"
+        )
+        assert isinstance(container_tag, str) and container_tag.strip() != "", (
+            f"{container_tag=}. Must be a non-empty str"
+        )
 
         # ===== Helper
 
@@ -3338,26 +3360,26 @@ class _qtpyBase_Control(_qtpyBase):
             Char_Pixel_Size: CHAR_PIXEL_SIZE instance
 
         """
-        assert (
-            isinstance(char_height, int) and char_height > 0
-        ), f"Invalid char_height value: {char_height}. Must be an int > 0"
-        assert (
-            isinstance(char_width, int) and char_width > 0
-        ), f"Invalid char_width value: {char_width}. Must be an int > 0"
-        assert (
-            isinstance(height_fudge, float) and height_fudge >= 1
-        ), f"Invalid height_fudge value: {height_fudge}. Must be a float >= 1"
-        assert (
-            isinstance(width_fudge, float) and width_fudge >= 1
-        ), f"Invalid width_fudge value: {width_fudge}. Must be a float >= 1"
+        assert isinstance(char_height, int) and char_height > 0, (
+            f"Invalid char_height value: {char_height}. Must be an int > 0"
+        )
+        assert isinstance(char_width, int) and char_width > 0, (
+            f"Invalid char_width value: {char_width}. Must be an int > 0"
+        )
+        assert isinstance(height_fudge, float) and height_fudge >= 1, (
+            f"Invalid height_fudge value: {height_fudge}. Must be a float >= 1"
+        )
+        assert isinstance(width_fudge, float) and width_fudge >= 1, (
+            f"Invalid width_fudge value: {width_fudge}. Must be a float >= 1"
+        )
 
         if self.guiwidget_get is None:
             raise AssertionError(f"guiwidget_get is not set: {self.guiwidget_get}")
 
         font = self.guiwidget_get.font()
-        assert isinstance(
-            font, qtG.QFont
-        ), f"Invalid font type: {type(font)}. Must be a QFont instance."
+        assert isinstance(font, qtG.QFont), (
+            f"Invalid font type: {type(font)}. Must be a QFont instance."
+        )
 
         font_metrics = qtG.QFontMetrics(font)
 
@@ -3429,18 +3451,18 @@ class _qtpyBase_Control(_qtpyBase):
             None
         """
         assert isinstance(app_font, Font), f"{app_font=}. Must be an instance of Font "
-        assert isinstance(
-            widget_font, Font
-        ), f"{widget_font=}. Must be an instance of Font"
+        assert isinstance(widget_font, Font), (
+            f"{widget_font=}. Must be an instance of Font"
+        )
 
         if widget is None:
             widget_instance = self._widget
         else:
             widget_instance = widget
 
-        assert isinstance(
-            widget_instance, (qtW.QWidget, qtG.QAction)
-        ), f"{widget_instance=} must be an instance of QWidget"
+        assert isinstance(widget_instance, (qtW.QWidget, qtG.QAction)), (
+            f"{widget_instance=} must be an instance of QWidget"
+        )
 
         colour = Colors()
 
@@ -3576,9 +3598,9 @@ class _qtpyBase_Control(_qtpyBase):
         if self._widget is None:
             raise RuntimeError(f"{self=}. Not created yet!")
 
-        assert isinstance(
-            frame, Widget_Frame
-        ), f"{frame=}. Must ba an instance of Frame"
+        assert isinstance(frame, Widget_Frame), (
+            f"{frame=}. Must ba an instance of Frame"
+        )
 
         if (
             self._widget is not None
@@ -3602,9 +3624,9 @@ class _qtpyBase_Control(_qtpyBase):
         if self._widget is None:
             raise AssertionError(f"{self._widget=}. Not set. Programmer goof")
 
-        assert isinstance(
-            self.icon, (type(None), str, qtG.QPixmap, qtG.QIcon)
-        ), f" {self.icon=}. Must be None | str (file name)| QPixmap | QIcon"
+        assert isinstance(self.icon, (type(None), str, qtG.QPixmap, qtG.QIcon)), (
+            f" {self.icon=}. Must be None | str (file name)| QPixmap | QIcon"
+        )
 
         if icon is not None:
             if isinstance(icon, str):
@@ -3663,18 +3685,18 @@ class _qtpyBase_Control(_qtpyBase):
         assert isinstance(txt_color, str), f"{txt_color=} must be a string"
         assert isinstance(bg_color, str), f"{bg_color=} must be a string"
         assert isinstance(border, str), f"{border=} must be a string"
-        assert border in {"none", ""} or re.match(
-            r"\d+px .+ .+", border
-        ), f"{border=} must be a valid CSS border style"
+        assert border in {"none", ""} or re.match(r"\d+px .+ .+", border), (
+            f"{border=} must be a valid CSS border style"
+        )
 
         color_handler = Colors()
 
-        assert color_handler.color_string_get(
-            txt_color
-        ), f" {txt_color=} Not an HTML color"
-        assert color_handler.color_string_get(
-            bg_color
-        ), f" {bg_color} Not an HTML color"
+        assert color_handler.color_string_get(txt_color), (
+            f" {txt_color=} Not an HTML color"
+        )
+        assert color_handler.color_string_get(bg_color), (
+            f" {bg_color} Not an HTML color"
+        )
 
         # Use HTML formatting to set the style of the tooltip, including its width, text color, background color, and border style
         trans_tip = (
@@ -3767,9 +3789,9 @@ class _qtpyBase_Control(_qtpyBase):
                 self.container_tag, self.tag, self, self.value_get()
             )
 
-            assert isinstance(
-                validate_ok, bool
-            ), f"{validate_ok=}. validate_callback must return bool!"
+            assert isinstance(validate_ok, bool), (
+                f"{validate_ok=}. validate_callback must return bool!"
+            )
 
             return validate_ok
 
@@ -3967,9 +3989,9 @@ class QtPyApp(_qtpyBase):
 
         self.frozen = Is_Complied()
 
-        assert (
-            isinstance(display_name, str) and display_name.strip() != ""
-        ), f"{display_name=}. Must be a non-empty str"
+        assert isinstance(display_name, str) and display_name.strip() != "", (
+            f"{display_name=}. Must be a non-empty str"
+        )
 
         # TODO This check needs beefing up
 
@@ -3978,9 +4000,9 @@ class QtPyApp(_qtpyBase):
             " types.MethodType "
         )
 
-        assert isinstance(
-            icon, (type(None), str, qtG.QPixmap, qtG.QIcon)
-        ), f"{icon=}. Must be None | str (file name) | QPixmap | QIcon"
+        assert isinstance(icon, (type(None), str, qtG.QPixmap, qtG.QIcon)), (
+            f"{icon=}. Must be None | str (file name) | QPixmap | QIcon"
+        )
 
         assert isinstance(mdi_app, bool), f"{mdi_app=}. Must be bool"
         assert isinstance(language, str), f"{language=}. Must be str"
@@ -4071,9 +4093,9 @@ class QtPyApp(_qtpyBase):
         Returns:
             None:
         """
-        assert isinstance(
-            requested_font, Font
-        ), f"{requested_font=}. Must be an instance of FONT"
+        assert isinstance(requested_font, Font), (
+            f"{requested_font=}. Must be an instance of FONT"
+        )
 
         app_font = self._app.font()  # type: ignore  # Default System font in this case
         preferred_font = requested_font.font_name
@@ -4260,9 +4282,9 @@ class QtPyApp(_qtpyBase):
             layout (_Container): The layout container widget.
             window_ui (bool): Attempt to display the UI as Windows XP looked
         """
-        assert isinstance(
-            layout, _Container
-        ), f"{layout=}. Must be a VBoxContainer, HBoxContainer,GridContainer"
+        assert isinstance(layout, _Container), (
+            f"{layout=}. Must be a VBoxContainer, HBoxContainer,GridContainer"
+        )
 
         assert isinstance(windows_ui, bool), f"{windows_ui=}. Must be bool"
 
@@ -4315,9 +4337,9 @@ class QtPyApp(_qtpyBase):
         ):  # Try and load from file
             icon_image = qtG.QPixmap(App_Path(self.icon)).scaledToWidth(256)  # type: ignore
 
-            assert isinstance(
-                icon_image, (qtG.QIcon, qtG.QPixmap)
-            ), f"{self.icon=} did not resolve to a QIcon or a QPixmap"
+            assert isinstance(icon_image, (qtG.QIcon, qtG.QPixmap)), (
+                f"{self.icon=} did not resolve to a QIcon or a QPixmap"
+            )
 
             self._main_frame.setWindowIcon(icon_image)
         elif self.icon is None or (
@@ -4349,12 +4371,12 @@ class QtPyApp(_qtpyBase):
             tag (str): This is the name of the widget.
             widget (_qtpyBase): the widget to add to the container
         """
-        assert (
-            isinstance(window_id, int) and window_id >= 0
-        ), f"{window_id=}. Must be int > 0"
-        assert (
-            isinstance(container_tag, str) and container_tag.strip() != ""
-        ), f"{container_tag=}. Must be str"
+        assert isinstance(window_id, int) and window_id >= 0, (
+            f"{window_id=}. Must be int > 0"
+        )
+        assert isinstance(container_tag, str) and container_tag.strip() != "", (
+            f"{container_tag=}. Must be str"
+        )
         assert isinstance(tag, str) and tag.strip() != "", f"{tag=}. Must be str"
         assert isinstance(
             widget,
@@ -4379,12 +4401,12 @@ class QtPyApp(_qtpyBase):
         Returns:
             A list of _qtpyBase_Control objects.
         """
-        assert (
-            isinstance(window_id, int) and window_id >= 0
-        ), f"{window_id=}. Must be int > 0"
-        assert (
-            isinstance(container_tag, str) and container_tag.strip() != ""
-        ), f"{container_tag=}. Must be str"
+        assert isinstance(window_id, int) and window_id >= 0, (
+            f"{window_id=}. Must be int > 0"
+        )
+        assert isinstance(container_tag, str) and container_tag.strip() != "", (
+            f"{container_tag=}. Must be str"
+        )
 
         return self._widget_registry.widget_gui_controls_get(
             window_id=window_id, container_tag=container_tag
@@ -4398,12 +4420,12 @@ class QtPyApp(_qtpyBase):
             container_tag (str): The tag name of the container widget.
             tag (str): The tag name of the widget to be deleted.
         """
-        assert (
-            isinstance(window_id, int) and window_id >= 0
-        ), f"{window_id=}. Must be int > 0"
-        assert (
-            isinstance(container_tag, str) and container_tag.strip() != ""
-        ), f"{container_tag=}. Must be str"
+        assert isinstance(window_id, int) and window_id >= 0, (
+            f"{window_id=}. Must be int > 0"
+        )
+        assert isinstance(container_tag, str) and container_tag.strip() != "", (
+            f"{container_tag=}. Must be str"
+        )
         assert isinstance(tag, str) and tag.strip() != "", f"{tag=}. Must be str"
 
         self._widget_registry.widget_del(
@@ -4423,12 +4445,12 @@ class QtPyApp(_qtpyBase):
         in the container with the given tag  name
 
         """
-        assert (
-            isinstance(window_id, int) and window_id >= 0
-        ), f"{window_id=}. Must be int > 0"
-        assert (
-            isinstance(container_tag, str) and container_tag.strip() != ""
-        ), f"{container_tag=}. Must be str"
+        assert isinstance(window_id, int) and window_id >= 0, (
+            f"{window_id=}. Must be int > 0"
+        )
+        assert isinstance(container_tag, str) and container_tag.strip() != "", (
+            f"{container_tag=}. Must be str"
+        )
 
         return self._widget_registry.widget_dict_get(
             window_id=window_id, container_tag=container_tag
@@ -4450,12 +4472,12 @@ class QtPyApp(_qtpyBase):
             bool : True if the widget exists, False otherwise.
 
         """
-        assert (
-            isinstance(window_id, int) and window_id >= 0
-        ), f"{window_id=}. Must be int > 0"
-        assert (
-            isinstance(container_tag, str) and container_tag.strip() != ""
-        ), f"{container_tag=}. Must be str"
+        assert isinstance(window_id, int) and window_id >= 0, (
+            f"{window_id=}. Must be int > 0"
+        )
+        assert isinstance(container_tag, str) and container_tag.strip() != "", (
+            f"{container_tag=}. Must be str"
+        )
         assert isinstance(tag, str) and tag.strip() != "", f"{tag=}. Must be str"
 
         return self._widget_registry.widget_exist(
@@ -4505,27 +4527,27 @@ class Action(_qtpyBase):
 
     def __post_init__(self) -> None:
         """Checks the types of the arguments passed to the class and sets instance variable as needed."""
-        assert (
-            isinstance(self.window_id, int) and self.window_id > 0
-        ), f"{self.window_id=}. Must be int > 0"
-        assert isinstance(
-            self.parent_app, QtPyApp
-        ), f"{self.parent_app=}. Must be an instance of QtPyApp"
-        assert isinstance(
-            self.container_tag, (str)
-        ), f"{self.container_tag=}. Must be a str"
+        assert isinstance(self.window_id, int) and self.window_id > 0, (
+            f"{self.window_id=}. Must be int > 0"
+        )
+        assert isinstance(self.parent_app, QtPyApp), (
+            f"{self.parent_app=}. Must be an instance of QtPyApp"
+        )
+        assert isinstance(self.container_tag, (str)), (
+            f"{self.container_tag=}. Must be a str"
+        )
         assert isinstance(self.tag, (str)), f"{self.tag=}. Must be a str"
-        assert isinstance(
-            self.event, Sys_Events
-        ), f"{self.event=}. Must be an entry in SYSEVENTS"
+        assert isinstance(self.event, Sys_Events), (
+            f"{self.event=}. Must be an entry in SYSEVENTS"
+        )
         assert isinstance(self.action, str), f"{self.action=}. Must be str"
         assert isinstance(self.object, (type(None), _Event_Handler)), (
             f"{self.object=} || {type(self.object)}. Must be None or an instance of"
             "_Event_Handler"
         )
-        assert isinstance(
-            self.widget_dict, dict
-        ), f"{self.widget_dict=}. Must be a Dic[str, _qtpyBase_Control]"
+        assert isinstance(self.widget_dict, dict), (
+            f"{self.widget_dict=}. Must be a Dic[str, _qtpyBase_Control]"
+        )
         assert (
             isinstance(self.parent_widget, (_qtpyBase, _qtpySDI_Frame))
             or self.parent_widget is None
@@ -4562,12 +4584,12 @@ class Action(_qtpyBase):
         Returns:
             any : The value of the widget.
         """
-        assert (
-            isinstance(container_tag, str) and container_tag.strip() != ""
-        ), f"{container_tag=}. Must be non-empty str"
-        assert (
-            isinstance(tag, str) and tag.strip() != ""
-        ), f"{tag=}. Must be a non-empty str"
+        assert isinstance(container_tag, str) and container_tag.strip() != "", (
+            f"{container_tag=}. Must be non-empty str"
+        )
+        assert isinstance(tag, str) and tag.strip() != "", (
+            f"{tag=}. Must be a non-empty str"
+        )
 
         widget = self.widget_get(container_tag, tag)
 
@@ -4584,12 +4606,12 @@ class Action(_qtpyBase):
             tag (str): The tag name of the widget you want to set the value of.
             value (any): The value to set the widget to.
         """
-        assert (
-            isinstance(container_tag, str) and container_tag.strip() != ""
-        ), f"{container_tag=}. Must be non-empty str"
-        assert (
-            isinstance(tag, str) and tag.strip() != ""
-        ), f"{tag=}. Must be a non-empty str"
+        assert isinstance(container_tag, str) and container_tag.strip() != "", (
+            f"{container_tag=}. Must be non-empty str"
+        )
+        assert isinstance(tag, str) and tag.strip() != "", (
+            f"{tag=}. Must be a non-empty str"
+        )
 
         widget = self.widget_get(container_tag, tag)
 
@@ -4614,12 +4636,12 @@ class Action(_qtpyBase):
         Returns:
 
         """
-        assert (
-            isinstance(container_tag, str) and container_tag.strip() != ""
-        ), f"{container_tag=}. Must be non-empty str"
-        assert (
-            isinstance(tag, str) and tag.strip() != ""
-        ), f"{tag=}. Must be a non-empty str"
+        assert isinstance(container_tag, str) and container_tag.strip() != "", (
+            f"{container_tag=}. Must be non-empty str"
+        )
+        assert isinstance(tag, str) and tag.strip() != "", (
+            f"{tag=}. Must be a non-empty str"
+        )
 
         return self.parent_app.widget_del(
             window_id=self.window_id, container_tag=container_tag, tag=tag
@@ -4635,12 +4657,12 @@ class Action(_qtpyBase):
         Returns:
             bool : True if the widget exists, False otherwise.
         """
-        assert (
-            isinstance(container_tag, str) and container_tag.strip() != ""
-        ), f"{container_tag=}. Must be non-empty str"
-        assert (
-            isinstance(tag, str) and tag.strip() != ""
-        ), f"{tag=}. Must be a non-empty str"
+        assert isinstance(container_tag, str) and container_tag.strip() != "", (
+            f"{container_tag=}. Must be non-empty str"
+        )
+        assert isinstance(tag, str) and tag.strip() != "", (
+            f"{tag=}. Must be a non-empty str"
+        )
 
         widget = self.parent_app.widget_exist(
             window_id=self.window_id, container_tag=container_tag, tag=tag
@@ -4722,12 +4744,12 @@ class Action(_qtpyBase):
             RuntimeError: If the requested widget does not exist.
         """
 
-        assert (
-            isinstance(container_tag, str) and container_tag.strip() != ""
-        ), f"{container_tag=}. Must be a non-empty str."
-        assert (
-            isinstance(tag, str) and tag.strip() != ""
-        ), f"{tag=}. Must be a non-empty str."
+        assert isinstance(container_tag, str) and container_tag.strip() != "", (
+            f"{container_tag=}. Must be a non-empty str."
+        )
+        assert isinstance(tag, str) and tag.strip() != "", (
+            f"{tag=}. Must be a non-empty str."
+        )
 
         widget = None
 
@@ -4754,12 +4776,12 @@ class _Event_Handler(_qtpyBase):
             parent (None |_qtpyBase): The parent widget. If no parent is given, the parent will be the parent_app.
         """
 
-        assert isinstance(
-            parent_app, QtPyApp
-        ), f"{parent_app=}. Must be an insance of QtPyApp"
-        assert isinstance(
-            parent, (type(None), _qtpyBase_Control)
-        ), f"{parent=}. Must be None or an instance of _qtpyBase_Control"
+        assert isinstance(parent_app, QtPyApp), (
+            f"{parent_app=}. Must be an insance of QtPyApp"
+        )
+        assert isinstance(parent, (type(None), _qtpyBase_Control)), (
+            f"{parent=}. Must be None or an instance of _qtpyBase_Control"
+        )
 
         super().__init__(parent if parent is not None else parent_app)
 
@@ -4960,17 +4982,17 @@ class _Container(_qtpyBase_Control):
             QWidget: The created QtGui Widget populated with controls.
 
         """
-        assert isinstance(
-            parent_app, QtPyApp
-        ), f"{parent_app=} <{parent_app}> must be an instance of QtPyApp"
+        assert isinstance(parent_app, QtPyApp), (
+            f"{parent_app=} <{parent_app}> must be an instance of QtPyApp"
+        )
 
-        assert isinstance(
-            parent, qtW.QWidget
-        ), f"{parent=} <{parent}> must be an instance of qtW.QWidget"
+        assert isinstance(parent, qtW.QWidget), (
+            f"{parent=} <{parent}> must be an instance of qtW.QWidget"
+        )
 
-        assert (
-            isinstance(container_tag, str) and container_tag.strip() != ""
-        ), f"{container_tag=} <{container_tag}> must be a non-empty str"
+        assert isinstance(container_tag, str) and container_tag.strip() != "", (
+            f"{container_tag=} <{container_tag}> must be a non-empty str"
+        )
 
         # ===== Helper
         def _pad_rows(
@@ -5107,9 +5129,9 @@ class _Container(_qtpyBase_Control):
                         )
 
                     if isinstance(col_control, Menu):
-                        assert isinstance(
-                            parent, _qtpyFrame
-                        ), f"{parent=}. Menu parent must be an instance of _qtpyFrame"
+                        assert isinstance(parent, _qtpyFrame), (
+                            f"{parent=}. Menu parent must be an instance of _qtpyFrame"
+                        )
                         parent.setMenuWidget(widget)
                         widget.resize(widget.minimumSizeHint())
                     elif isinstance(layout, qtW.QFormLayout):
@@ -5209,7 +5231,7 @@ class _Container(_qtpyBase_Control):
                 )
             else:
                 widget_group.setStyleSheet(
-                    "QGroupBox" f" {{font-weight:{self.txt_font.weight.value}}} "
+                    f"QGroupBox {{font-weight:{self.txt_font.weight.value}}} "
                 )
 
         widget_group.setContentsMargins(0, 0, 0, 0)
@@ -5466,26 +5488,26 @@ class _Container(_qtpyBase_Control):
                     col = len(self._layout[row + 1])
 
             if zero_based:
-                assert (
-                    isinstance(row, int) and row >= 0
-                ), f"{control=}. row <{row}> is an int >= 0"
-                assert (
-                    isinstance(col, int) and col >= 0
-                ), f"{control=}. col <{col}> is an int >= 0"
+                assert isinstance(row, int) and row >= 0, (
+                    f"{control=}. row <{row}> is an int >= 0"
+                )
+                assert isinstance(col, int) and col >= 0, (
+                    f"{control=}. col <{col}> is an int >= 0"
+                )
             else:
-                assert (
-                    isinstance(row, int) and row > 0
-                ), f"{control=}. row <{row}> is an int > 0"
-                assert (
-                    isinstance(col, int) and col > 0
-                ), f"{control=}. col <{col}> is an int > 0"
+                assert isinstance(row, int) and row > 0, (
+                    f"{control=}. row <{row}> is an int > 0"
+                )
+                assert isinstance(col, int) and col > 0, (
+                    f"{control=}. col <{col}> is an int > 0"
+                )
                 row -= 1
                 col -= 1
 
             row += 1
-            assert isinstance(
-                control, _qtpyBase_Control
-            ), f"{control=}. Must be an instance of _qtpyBase_Control"
+            assert isinstance(control, _qtpyBase_Control), (
+                f"{control=}. Must be an instance of _qtpyBase_Control"
+            )
 
             max_row = len(self._layout)
 
@@ -5538,9 +5560,9 @@ class _Container(_qtpyBase_Control):
         Returns:
             Union[FormContainer, GridContainer, HBoxContainer, VBoxContainer]: The container instance
         """
-        assert isinstance(row, int) and (
-            row > 0 or row == -1
-        ), f"{row=}. Must be an int > 0"
+        assert isinstance(row, int) and (row > 0 or row == -1), (
+            f"{row=}. Must be an int > 0"
+        )
 
         if row == -1:
             row = self.controls_down + 1
@@ -5557,9 +5579,9 @@ class _Container(_qtpyBase_Control):
                     break
 
         for col_index, control in enumerate(controls):
-            assert isinstance(
-                control, _qtpyBase_Control
-            ), f"{control=}. Must be an instance of _qtpyBase_Control"
+            assert isinstance(control, _qtpyBase_Control), (
+                f"{control=}. Must be an instance of _qtpyBase_Control"
+            )
 
             # If the container has a parent app and the control already exists, remove it
             if self._parent_app is not None and self.widget_exist(
@@ -5616,9 +5638,9 @@ class _Container(_qtpyBase_Control):
             max_col_height = 0
             col_width = 0
             for col_item in row_item:
-                assert (
-                    col_item.guiwidget_get is not None
-                ), f"DEV Error {col_item=} Widget not created yet"
+                assert col_item.guiwidget_get is not None, (
+                    f"DEV Error {col_item=} Widget not created yet"
+                )
 
                 if isinstance(col_item.guiwidget_get, _Container):
                     container_height, container_width = self.pixel_width_height()
@@ -5640,9 +5662,9 @@ class _Container(_qtpyBase_Control):
         Args:
             control (_qtpyBase_Control): qtgui control added to the container
         """
-        assert isinstance(
-            control, _qtpyBase_Control
-        ), f"{control=}. Must be an descendant of _qtpyBase_Control"
+        assert isinstance(control, _qtpyBase_Control), (
+            f"{control=}. Must be an descendant of _qtpyBase_Control"
+        )
 
         assert self._widget is not None, f"Container {self.tag=} is not created yet"
 
@@ -5722,12 +5744,12 @@ class _Container(_qtpyBase_Control):
             None
 
         """
-        assert (
-            isinstance(container_tag, str) and container_tag.strip() != ""
-        ), f"{container_tag=}. Must be a non-empty str"
-        assert (
-            isinstance(tag, str) and tag.strip() != ""
-        ), f"{tag=}. Must be a non-empty str"
+        assert isinstance(container_tag, str) and container_tag.strip() != "", (
+            f"{container_tag=}. Must be a non-empty str"
+        )
+        assert isinstance(tag, str) and tag.strip() != "", (
+            f"{tag=}. Must be a non-empty str"
+        )
 
         if self._parent_app is None:
             raise RuntimeError(f"{self._parent_app=}. Not set!")
@@ -5759,9 +5781,9 @@ class _Container(_qtpyBase_Control):
         if self._parent_app is None:
             raise RuntimeError(f"{self._parent_app=}. Not set!")
 
-        assert (
-            isinstance(container_tag, str) and container_tag.strip() != ""
-        ), f"{container_tag=}. Must be str"
+        assert isinstance(container_tag, str) and container_tag.strip() != "", (
+            f"{container_tag=}. Must be str"
+        )
         assert isinstance(tag, str) and tag.strip() != "", f"{tag=}. Must be str"
 
         window_id = Get_Window_ID(self._parent_app, self._parent, self)
@@ -5882,13 +5904,13 @@ class _Container(_qtpyBase_Control):
             _qtpyBase_Control: The control at row.col
 
         """
-        assert isinstance(row, int) and 0 <= row < len(
-            self._layout
-        ), f"{row=} is an int  >= 0 and < {len(self._layout)}"
+        assert isinstance(row, int) and 0 <= row < len(self._layout), (
+            f"{row=} is an int  >= 0 and < {len(self._layout)}"
+        )
 
-        assert isinstance(col, int) and 0 <= col < len(
-            self._layout[row]
-        ), f"{col=} is an int  > 0 and < {len(self._layout[row])}"
+        assert isinstance(col, int) and 0 <= col < len(self._layout[row]), (
+            f"{col=} is an int  > 0 and < {len(self._layout[row])}"
+        )
 
         return self._layout[row][col]
 
@@ -6001,9 +6023,9 @@ class _Container(_qtpyBase_Control):
             enable (bool): True, controls enabled, False, controls disabled, None let the
             widget decide
         """
-        assert (
-            isinstance(enable, bool) or enable is None
-        ), f"{enable=}. Must be bool | None"
+        assert isinstance(enable, bool) or enable is None, (
+            f"{enable=}. Must be bool | None"
+        )
 
         if self._parent_app is None:
             raise AssertionError(f"{self._parent_app=}. Not set!")
@@ -6301,12 +6323,12 @@ class _Container(_qtpyBase_Control):
             ), f"{index=}. Must be -1 or >=0 {index=} <= {deque_len=}"
 
             if index == -1:  # Search for item
-                assert (
-                    isinstance(container_tag, str) and container_tag.strip() != ""
-                ), f"{container_tag=}. Must be a non-empty str"
-                assert (
-                    isinstance(tag, str) and tag.strip() != ""
-                ), f"{tag=}. Must be a non-empty str"
+                assert isinstance(container_tag, str) and container_tag.strip() != "", (
+                    f"{container_tag=}. Must be a non-empty str"
+                )
+                assert isinstance(tag, str) and tag.strip() != "", (
+                    f"{tag=}. Must be a non-empty str"
+                )
 
                 for item_index, item in enumerate(self._scroll_deque):
                     if (
@@ -6434,9 +6456,9 @@ class _Container(_qtpyBase_Control):
         """
         self._snapshots = {}
 
-        assert (
-            isinstance(name, str) and name.strip() != ""
-        ), f"{name=}. Must be a non-empty str"
+        assert isinstance(name, str) and name.strip() != "", (
+            f"{name=}. Must be a non-empty str"
+        )
 
         if name in self._snapshots:
             AssertionError(f"{name=} Already exists!")
@@ -6454,18 +6476,18 @@ class _Container(_qtpyBase_Control):
             bool : True if a value has changed between snapshots
 
         """
-        assert (
-            isinstance(snapshot1, str) and snapshot1.strip() != ""
-        ), f"{snapshot1=}. Must be a non-empty str"
+        assert isinstance(snapshot1, str) and snapshot1.strip() != "", (
+            f"{snapshot1=}. Must be a non-empty str"
+        )
         assert isinstance(snapshot2, str), f"{snapshot2=}. Must be str"
 
         assert snapshot1 in self._snapshots, f"{snapshot1=}, Does not exist!"
 
         if isinstance(snapshot2, str) and snapshot2.strip() != "":
             assert snapshot2 in self._snapshots, f"{snapshot2=}, Does not exist!"
-            assert (
-                snapshot1 != snapshot2
-            ), f"{snapshot1=} must be different to {snapshot2=}"
+            assert snapshot1 != snapshot2, (
+                f"{snapshot1=} must be different to {snapshot2=}"
+            )
             snap2 = self._snapshots[snapshot2]
         else:
             snap2 = self.tags_gather()
@@ -6497,18 +6519,18 @@ class _Container(_qtpyBase_Control):
         """
         modified_values = []
 
-        assert (
-            isinstance(snapshot1, str) and snapshot1.strip() != ""
-        ), f"{snapshot1=}. Must be a non-empty str"
+        assert isinstance(snapshot1, str) and snapshot1.strip() != "", (
+            f"{snapshot1=}. Must be a non-empty str"
+        )
         assert isinstance(snapshot2, str), f"{snapshot2=}. Must be str"
 
         assert snapshot1 in self._snapshots, f"{snapshot1=}, Does not exist!"
 
         if snapshot2.strip() != "":
             assert snapshot2 in self._snapshots, f"{snapshot2=}, Does not exist!"
-            assert (
-                snapshot1 != snapshot2
-            ), f"{snapshot1=} must be different to {snapshot2=}"
+            assert snapshot1 != snapshot2, (
+                f"{snapshot1=} must be different to {snapshot2=}"
+            )
             snap2 = self._snapshots[snapshot2]
         else:
             snap2 = self.tags_gather()
@@ -6587,9 +6609,9 @@ class _Container(_qtpyBase_Control):
             int : The maximum number of controls across in a Container
 
         """
-        assert isinstance(
-            container, _Container
-        ), f"{_Container=}. Must be an instance of _Container type"
+        assert isinstance(container, _Container), (
+            f"{_Container=}. Must be an instance of _Container type"
+        )
         ctrls_across = 0
 
         for row_list in container.control_list_get:
@@ -6670,9 +6692,9 @@ class _Container(_qtpyBase_Control):
             leader (str): String that appears at the beginning of each dumpled line.
         """
         assert isinstance(leader, str), f"{leader=}. Must be a str"
-        assert isinstance(
-            container, (type(None), _Container)
-        ), f"{_Container=}. Must be None or an instance of _Container"
+        assert isinstance(container, (type(None), _Container)), (
+            f"{_Container=}. Must be None or an instance of _Container"
+        )
 
         if container is None:  # Defaults to self
             container = self
@@ -6738,9 +6760,9 @@ class Button(_qtpyBase_Control):
             qtW.QWidget : The button widget
         """
 
-        assert isinstance(
-            self.txt_align, Align_Text
-        ), f"{self.txt_align=}. Must be an instance of Align_Text"
+        assert isinstance(self.txt_align, Align_Text), (
+            f"{self.txt_align=}. Must be an instance of Align_Text"
+        )
 
         assert (
             isinstance(self.auto_repeat_interval, int)
@@ -6830,22 +6852,22 @@ class _Dialog(qtW.QDialog):
         self._parent_app: QtPyApp = parent_app
         self._result: str = ""
 
-        assert isinstance(
-            self.owner, PopContainer
-        ), f"{self.owner=}. Must be instance of PopContainer"
-        assert (
-            isinstance(self.callback, Callable) or self.callback is None
-        ), f"{self.callback=}. Must be func| method| lambda or None"
+        assert isinstance(self.owner, PopContainer), (
+            f"{self.owner=}. Must be instance of PopContainer"
+        )
+        assert isinstance(self.callback, Callable) or self.callback is None, (
+            f"{self.callback=}. Must be func| method| lambda or None"
+        )
         assert (
             isinstance(self.container_tag, str) and self.container_tag.strip() != ""
         ), f"{self.container_tag=}. Must be non-empty str"
-        assert (
-            isinstance(self.tag, str) and self.tag.strip() != ""
-        ), f"{self.tag=}. Must be non-empty str"
+        assert isinstance(self.tag, str) and self.tag.strip() != "", (
+            f"{self.tag=}. Must be non-empty str"
+        )
         assert isinstance(self.title, str), f"{self.title=}. Must be non-empty str"
-        assert isinstance(
-            self._parent_app, QtPyApp
-        ), f"{self._parent_app=}. Must be instance of QtPyApp"
+        assert isinstance(self._parent_app, QtPyApp), (
+            f"{self._parent_app=}. Must be instance of QtPyApp"
+        )
 
     def set_result(self, value: str) -> None:
         """Sets the return value of the PopContainer
@@ -6897,9 +6919,9 @@ class _Dialog(qtW.QDialog):
             else:
                 widget_dict = {}
 
-            assert (
-                self.callback.__code__.co_argcount <= 2
-            ), "open callback has 1 argument - Action"
+            assert self.callback.__code__.co_argcount <= 2, (
+                "open callback has 1 argument - Action"
+            )
 
             if callable(self.callback):
                 result = _Event_Handler(
@@ -6984,6 +7006,7 @@ class PopContainer(_qtpyBase_Control):
     container: Optional[_Container] = None
     dialog: _Dialog = None
     parent_app: QtPyApp = None  # Changed to public 2023/03/05 because of a very occasional focus_out error
+    sdelim: Final[str] = "||"
 
     # private instance variables
     _allow_close: bool = False
@@ -7000,9 +7023,12 @@ class PopContainer(_qtpyBase_Control):
             self.tag = "pop_container_" + str(uuid.uuid1())
 
         assert isinstance(self.title, str), f"{self.title=}. Must be str"
-        assert isinstance(
-            self.container, (type(None), _Container)
-        ), f"{self.container=}. Must be a container instance or None"
+        assert isinstance(self.container, (type(None), _Container)), (
+            f"{self.container=}. Must be a container instance or None"
+        )
+        assert isinstance(self.sdelim, str) and self.sdelim.strip() != "", (
+            f"{self.sdelim=}. Must be str"
+        )
 
         if self.callback is None:
             self.callback = self.event_handler
@@ -7037,9 +7063,9 @@ class PopContainer(_qtpyBase_Control):
         ):  # Try and load from file
             icon_image = qtG.QPixmap(App_Path(self.parent_app.icon)).scaledToWidth(256)  # type: ignore
 
-            assert isinstance(
-                icon_image, (qtG.QIcon, qtG.QPixmap)
-            ), f"{self.parent_app.icon=} did not resolve to a QIcon or a QPixmap"
+            assert isinstance(icon_image, (qtG.QIcon, qtG.QPixmap)), (
+                f"{self.parent_app.icon=} did not resolve to a QIcon or a QPixmap"
+            )
 
             self.dialog.setWindowIcon(icon_image)
         elif self.parent_app.icon is None or (
@@ -7136,9 +7162,9 @@ class PopContainer(_qtpyBase_Control):
         result = 1
 
         if self.callback is not None:
-            assert (
-                self.callback.__code__.co_argcount <= 2
-            ), "open callback has 1 argument - Action"
+            assert self.callback.__code__.co_argcount <= 2, (
+                "open callback has 1 argument - Action"
+            )
 
             handler = _Event_Handler(parent_app=self.parent_app, parent=self)
 
@@ -7214,9 +7240,9 @@ class FormContainer(_Container):
         Returns:
             FormContainer : The Form Container instance.
         """
-        assert isinstance(
-            control, _qtpyBase_Control
-        ), f"{control=}. Must be an instance of _qtpyBase_Control"
+        assert isinstance(control, _qtpyBase_Control), (
+            f"{control=}. Must be an instance of _qtpyBase_Control"
+        )
 
         super().add_control(
             control=control, row=len(self._layout), col=1, zero_based=zero_based
@@ -7257,9 +7283,9 @@ class HBoxContainer(_Container):
         Returns:
             HBoxContainer : The HBoxContainer object.
         """
-        assert isinstance(
-            control, _qtpyBase_Control
-        ), f"{control=}>. Must be an instance of _qtpyBase_Control"
+        assert isinstance(control, _qtpyBase_Control), (
+            f"{control=}>. Must be an instance of _qtpyBase_Control"
+        )
 
         super().add_control(control=control, row=1, zero_based=zero_based)
 
@@ -7287,9 +7313,9 @@ class VBoxContainer(_Container):
         Returns:
             VBoxContainer : The VBoxContainer instance.
         """
-        assert isinstance(
-            control, _qtpyBase_Control
-        ), f"{control=}. Must be an instance of _qtpyBase_Control"
+        assert isinstance(control, _qtpyBase_Control), (
+            f"{control=}. Must be an instance of _qtpyBase_Control"
+        )
 
         super().add_control(
             control=control, row=len(self._layout), col=1, zero_based=zero_based
@@ -7449,16 +7475,16 @@ class ComboBox(_qtpyBase_Control):
         """Constructor event that checks arguments and sets internal variables."""
         super().__post_init__()
 
-        assert self.validate_callback is None or callable(
-            self.validate_callback
-        ), f"{self.validate_callback=}. Must be None | Function | Method | Lambda"
+        assert self.validate_callback is None or callable(self.validate_callback), (
+            f"{self.validate_callback=}. Must be None | Function | Method | Lambda"
+        )
 
-        assert (
-            isinstance(self.dropdown_width, int) and self.dropdown_width > 0
-        ), f"{self.dropdown_width=}. Must be an int > 0"
-        assert isinstance(
-            self.items, (str, list, tuple)
-        ), f"f{self.items=}. Must be a str, list or tuple eg.List[COMBO_ITEM,...]"
+        assert isinstance(self.dropdown_width, int) and self.dropdown_width > 0, (
+            f"{self.dropdown_width=}. Must be an int > 0"
+        )
+        assert isinstance(self.items, (str, list, tuple)), (
+            f"f{self.items=}. Must be a str, list or tuple eg.List[COMBO_ITEM,...]"
+        )
 
         assert self.csv_file_def is None or isinstance(
             self.csv_file_def, CSV_File_Def
@@ -7468,15 +7494,15 @@ class ComboBox(_qtpyBase_Control):
             item: Combo_Item
 
             for item in self.items:
-                assert isinstance(
-                    item, Combo_Item
-                ), f"combo item {item} must be a COMBO_ITEM"
+                assert isinstance(item, Combo_Item), (
+                    f"combo item {item} must be a COMBO_ITEM"
+                )
 
                 item: Combo_Item
 
-                assert isinstance(
-                    item.display, str
-                ), f"combo item {item.display=} must be str"
+                assert isinstance(item.display, str), (
+                    f"combo item {item.display=} must be str"
+                )
                 assert isinstance(
                     item.data, (type(None), str, int, float, bool, bytes, list, tuple)
                 ), (
@@ -7500,9 +7526,9 @@ class ComboBox(_qtpyBase_Control):
             else:
                 raise RuntimeError(f"Dev Error File {self.items=} Does Not Exist")
 
-        assert (
-            isinstance(self.num_visible_items, int) and self.num_visible_items > 0
-        ), f"{self.num_visible_items=}. Must be an int > 1"
+        assert isinstance(self.num_visible_items, int) and self.num_visible_items > 0, (
+            f"{self.num_visible_items=}. Must be an int > 1"
+        )
         assert isinstance(self.display_na, bool), f"{self.display_na=}. Must be bool"
 
     def _create_widget(
@@ -7584,9 +7610,9 @@ class ComboBox(_qtpyBase_Control):
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
-        assert (
-            isinstance(display_width, int) and display_width > 0
-        ), f"{display_width=}. Must Be > 0"
+        assert isinstance(display_width, int) and display_width > 0, (
+            f"{display_width=}. Must Be > 0"
+        )
 
         char_pixel_size = self.pixel_char_size(1, 1)
 
@@ -7619,9 +7645,9 @@ class ComboBox(_qtpyBase_Control):
             isinstance(combo_index, int) and 0 <= combo_index <= self._widget.count
         ), f"select_index ({combo_index=}) must be between 0 and {self._widget.count}"
 
-        assert isinstance(
-            icon, (str, qtG.QIcon, qtG.QPixmap)
-        ), f"{icon=}. Must be str | QIcon | QPixmap"
+        assert isinstance(icon, (str, qtG.QIcon, qtG.QPixmap)), (
+            f"{icon=}. Must be str | QIcon | QPixmap"
+        )
 
         if isinstance(icon, str):
             if not qtC.QFile.exists(icon):
@@ -7650,9 +7676,9 @@ class ComboBox(_qtpyBase_Control):
         Returns:
             tuple[int,str]: Length of maximum item if load OK, Otherwise -1 and error message
         """
-        assert isinstance(
-            csv_file_def, CSV_File_Def
-        ), f"{csv_file_def=}. Must be {CSV_File_Def}"
+        assert isinstance(csv_file_def, CSV_File_Def), (
+            f"{csv_file_def=}. Must be {CSV_File_Def}"
+        )
 
         if csv_file_def.select_text == "":
             select_text = self.text
@@ -7758,9 +7784,9 @@ class ComboBox(_qtpyBase_Control):
 
         self._widget: qtW.QComboBox
 
-        assert isinstance(
-            self._widget, qtW.QComboBox
-        ), f"Dev Error {self._widget=} {type(self._widget)=} Must be qtW.QComboBox! "
+        assert isinstance(self._widget, qtW.QComboBox), (
+            f"Dev Error {self._widget=} {type(self._widget)=} Must be qtW.QComboBox! "
+        )
 
         return [
             Combo_Data(
@@ -7801,9 +7827,9 @@ class ComboBox(_qtpyBase_Control):
 
         self._widget: qtW.QComboBox
 
-        assert isinstance(
-            items, (str, list, tuple)
-        ), f"Items {items=} are a single string, or a list/tuple of COMBO_ITEM "
+        assert isinstance(items, (str, list, tuple)), (
+            f"Items {items=} are a single string, or a list/tuple of COMBO_ITEM "
+        )
 
         if clear_items:
             self._widget.clear()
@@ -7846,9 +7872,9 @@ class ComboBox(_qtpyBase_Control):
                     self._widget.addItem(display, userData=user_data)
                 else:
                     if isinstance(item.icon, str):
-                        assert qtC.QFile.exists(
-                            item.icon
-                        ), f" {item.icon=}. Does not exist!"
+                        assert qtC.QFile.exists(item.icon), (
+                            f" {item.icon=}. Does not exist!"
+                        )
 
                     self._widget.addItem(qtG.QIcon(item.icon), display, user_data)
 
@@ -7906,9 +7932,9 @@ class ComboBox(_qtpyBase_Control):
 
         self._widget: qtW.QComboBox
 
-        assert (
-            isinstance(select_text, str) and select_text.strip() != ""
-        ), f"{select_text=}. Must be non-empty str"
+        assert isinstance(select_text, str) and select_text.strip() != "", (
+            f"{select_text=}. Must be non-empty str"
+        )
 
         assert isinstance(case_sensitive, bool), f"{case_sensitive=}. Must be bool"
         assert isinstance(partial_match, bool), f"{partial_match=}. Must be bool"
@@ -7949,9 +7975,9 @@ class ComboBox(_qtpyBase_Control):
 
         assert isinstance(index, int), f"{index=}. Must be int"
 
-        assert index == -1 or (
-            0 <= index <= self._widget.count()
-        ), f"index <{index}> must be == -1 or >= 0 and <= {self._widget.count()}"
+        assert index == -1 or (0 <= index <= self._widget.count()), (
+            f"index <{index}> must be == -1 or >= 0 and <= {self._widget.count()}"
+        )
 
         if index == -1:  # Want current data
             item_data = self._widget.itemData(self._widget.currentIndex())
@@ -7999,9 +8025,9 @@ class ComboBox(_qtpyBase_Control):
 
         assert isinstance(index, int), f"{index=}. Must be int"
 
-        assert index == -1 or (
-            0 <= index <= self._widget.count()
-        ), f"index <{index}> must be == -1 or >= 0 and <= {self._widget.count()}"
+        assert index == -1 or (0 <= index <= self._widget.count()), (
+            f"index <{index}> must be == -1 or >= 0 and <= {self._widget.count()}"
+        )
 
         self._widget.removeItem(index)
 
@@ -8022,9 +8048,9 @@ class ComboBox(_qtpyBase_Control):
         if insert_alpha:
             self._widget.setInsertPolicy(qtW.QComboBox.InsertAlphabetically)
 
-        assert isinstance(
-            value, (str, Combo_Data)
-        ), f"value {value=}. Must be COMBO_DATA | str"
+        assert isinstance(value, (str, Combo_Data)), (
+            f"value {value=}. Must be COMBO_DATA | str"
+        )
 
         if isinstance(value, Combo_Data):
             value: Combo_Data
@@ -8180,9 +8206,9 @@ class _Custom_Dateedit(qtW.QWidget):
         Args:
             format (str): The date format string.
         """
-        assert isinstance(
-            format, str
-        ), f"{format=}. Must a non-empty str and a valid date format"
+        assert isinstance(format, str), (
+            f"{format=}. Must a non-empty str and a valid date format"
+        )
 
         date_format = country_date_formatmask(format)[0]
         edit_mask = country_date_formatmask(format)[1]
@@ -8385,12 +8411,12 @@ class Dateedit(_qtpyBase_Control):
         if self.date.strip() == "":
             self.date = qtC.QDate.currentDate().toString(self.format)
 
-        assert isinstance(
-            self.min_date, str
-        ), f"{self.min_date=}. Must be str that matches {self.format=}"
-        assert isinstance(
-            self.max_date, str
-        ), f"{self.max_date=}. Must be str that matches {self.format=}"
+        assert isinstance(self.min_date, str), (
+            f"{self.min_date=}. Must be str that matches {self.format=}"
+        )
+        assert isinstance(self.max_date, str), (
+            f"{self.max_date=}. Must be str that matches {self.format=}"
+        )
 
         if self.min_date.strip() == "":
             self.min_date = self.MINDATE.toString(self.format)
@@ -8400,21 +8426,21 @@ class Dateedit(_qtpyBase_Control):
 
         date_check = qtC.QDate.fromString(self.date, self.format)
 
-        assert (
-            date_check.isValid()
-        ), f"Date <{self.date}> or Format <{self.format}> is not valid"
+        assert date_check.isValid(), (
+            f"Date <{self.date}> or Format <{self.format}> is not valid"
+        )
 
         date_check = qtC.QDate.fromString(self.min_date, self.format)
 
-        assert (
-            date_check.isValid()
-        ), f"Date <{self.min_date}> or Format <{self.format}> is not valid"
+        assert date_check.isValid(), (
+            f"Date <{self.min_date}> or Format <{self.format}> is not valid"
+        )
 
         date_check = qtC.QDate.fromString(self.max_date, self.format)
 
-        assert (
-            date_check.isValid()
-        ), f"Date <{self.max_date}> or Format <{self.format}> is not valid"
+        assert date_check.isValid(), (
+            f"Date <{self.max_date}> or Format <{self.format}> is not valid"
+        )
 
         assert qtC.QDate.fromString(self.min_date, self.format) >= self.MINDATE, (
             f"{qtC.QDate.fromString(self.min_date, self.format)=}. Must be >"
@@ -8637,12 +8663,12 @@ class Dateedit(_qtpyBase_Control):
             None.
         """
         assert isinstance(date, str), f"date <{date}> must be a non-empty string"
-        assert isinstance(
-            date_format, str
-        ), f"date_format <{date_format}> must be a str"
-        assert isinstance(
-            default_text, str
-        ), f"default_text <{default_text}> must be a str"
+        assert isinstance(date_format, str), (
+            f"date_format <{date_format}> must be a str"
+        )
+        assert isinstance(default_text, str), (
+            f"default_text <{default_text}> must be a str"
+        )
 
         date = date.strip(SDELIM)  # No Translation Happens Here
 
@@ -8737,12 +8763,12 @@ class Dateedit(_qtpyBase_Control):
         Returns:
             bool : True if date is valid, False otherwise
         """
-        assert (
-            isinstance(date, str) and date.strip() != ""
-        ), f"{date=}. Must be a non-empty string"
-        assert (
-            isinstance(date_format, str) and date_format.strip() != ""
-        ), f"{date_format=}. Must be a non-empty str"
+        assert isinstance(date, str) and date.strip() != "", (
+            f"{date=}. Must be a non-empty string"
+        )
+        assert isinstance(date_format, str) and date_format.strip() != "", (
+            f"{date_format=}. Must be a non-empty str"
+        )
 
         date = date.strip(SDELIM)  # No Translation Happens Here
 
@@ -8799,9 +8825,9 @@ class FolderView(_qtpyBase_Control):
 
         assert isinstance(self.width, int), f"{self.width=}. Must be int"
         assert isinstance(self.height, int), f"{self.height=}. Must be int"
-        assert (
-            isinstance(self.root_dir, str) and self.root_dir.strip() != ""
-        ), f"{self.root_dir=}. Must be a non-empty str"
+        assert isinstance(self.root_dir, str) and self.root_dir.strip() != "", (
+            f"{self.root_dir=}. Must be a non-empty str"
+        )
         assert isinstance(self.dir_only, bool), f"{self.dir_only=}. Must be bool"
         assert isinstance(self.multiselect, bool), f"{self.multiselect=}. Must be bool"
 
@@ -8834,12 +8860,12 @@ class FolderView(_qtpyBase_Control):
 
         self.header_widths = header_widths
 
-        assert self.header_font is None or isinstance(
-            self.header_font, Font
-        ), f"{self.header_font=}. Must be Font"
-        assert isinstance(
-            self.click_expand, bool
-        ), f"{self.click_expand=}. Must be bool"
+        assert self.header_font is None or isinstance(self.header_font, Font), (
+            f"{self.header_font=}. Must be Font"
+        )
+        assert isinstance(self.click_expand, bool), (
+            f"{self.click_expand=}. Must be bool"
+        )
 
         if self.header_font is None:
             self.header_font = Font()
@@ -9114,9 +9140,9 @@ class FolderView(_qtpyBase_Control):
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
-        assert (
-            isinstance(folder, str) and folder.strip() != ""
-        ), f"button_action <{folder}> must be a non-empty string"
+        assert isinstance(folder, str) and folder.strip() != "", (
+            f"button_action <{folder}> must be a non-empty string"
+        )
 
         self._widget: qtW.QTreeView  # Type hinting
         self._widget.reset()
@@ -9199,9 +9225,9 @@ class Grid_Col_Value:
     _grid: "Grid" = None
 
     def __post_init__(self):
-        assert self._grid is None or isinstance(
-            self._grid, Grid
-        ), f"{self._grid=}. Must a Grid instance"
+        assert self._grid is None or isinstance(self._grid, Grid), (
+            f"{self._grid=}. Must a Grid instance"
+        )
 
     @property
     def grid(self) -> Optional["Grid"]:
@@ -9209,9 +9235,9 @@ class Grid_Col_Value:
 
     @grid.setter
     def grid(self, value: Optional["Grid"]) -> None:
-        assert value is None or isinstance(
-            value, Grid
-        ), f"{value=}. Must a Grid instance"
+        assert value is None or isinstance(value, Grid), (
+            f"{value=}. Must a Grid instance"
+        )
 
         self._grid = value
 
@@ -9242,9 +9268,9 @@ class _Grid_TableWidget(qtW.QTableWidget):
 
     @grid.setter
     def grid(self, value: Optional["Grid"]) -> None:
-        assert value is None or isinstance(
-            value, Grid
-        ), f"{value=}. Must a Grid instance"
+        assert value is None or isinstance(value, Grid), (
+            f"{value=}. Must a Grid instance"
+        )
 
         self._grid = value
 
@@ -9504,17 +9530,17 @@ class Grid(_qtpyBase_Control):
         assert isinstance(self.noselection, bool), f"{self.noselection=}. Must be bool"
         assert isinstance(self.header_sort, bool), f"{self.header_sort=}. Must be bool"
 
-        assert isinstance(
-            self.col_def, (list, tuple)
-        ), f"{self.col_def=}. Must be list[Col_Def] | tuplle[Col_Def]"
+        assert isinstance(self.col_def, (list, tuple)), (
+            f"{self.col_def=}. Must be list[Col_Def] | tuplle[Col_Def]"
+        )
 
-        assert (
-            len(self.col_def) > 0
-        ), f"{self.col_def=}. Must be at least one column definition!"
+        assert len(self.col_def) > 0, (
+            f"{self.col_def=}. Must be at least one column definition!"
+        )
 
-        assert all(
-            isinstance(definition, Col_Def) for definition in self.col_def
-        ), f"{self.col_def=}. All items must be instances of Col_Def"
+        assert all(isinstance(definition, Col_Def) for definition in self.col_def), (
+            f"{self.col_def=}. All items must be instances of Col_Def"
+        )
 
         assert all(
             isinstance(definition, Grid_Item) for definition in self.grid_items
@@ -9536,12 +9562,12 @@ class Grid(_qtpyBase_Control):
             qtW.QWidget : The grid control
 
         """
-        assert isinstance(
-            parent_app, QtPyApp
-        ), f"{parent_app=}. must be an instance of QtPyApp"
-        assert isinstance(
-            parent, qtW.QWidget
-        ), f"{parent=}. Must be an instance of qtW.QWidget"
+        assert isinstance(parent_app, QtPyApp), (
+            f"{parent_app=}. must be an instance of QtPyApp"
+        )
+        assert isinstance(parent, qtW.QWidget), (
+            f"{parent=}. Must be an instance of qtW.QWidget"
+        )
         assert isinstance(container_tag, str), f"{container_tag=}. Must be a string"
 
         self.width = self._temp_width  # self.width is being overridden when -1
@@ -9945,9 +9971,9 @@ class Grid(_qtpyBase_Control):
             AssertionError: If the column tag is invalid.
 
         """
-        assert (
-            isinstance(column_tag, str) and column_tag.strip()
-        ), "column_tag must be a non-empty string"
+        assert isinstance(column_tag, str) and column_tag.strip(), (
+            "column_tag must be a non-empty string"
+        )
 
         for col_index in range(self._widget.columnCount()):
             item_data = self._widget.horizontalHeaderItem(col_index).data(
@@ -9971,9 +9997,9 @@ class Grid(_qtpyBase_Control):
             AssertionError: If the column index is invalid.
         """
         assert isinstance(column_index, int), "column_index must be an integer."
-        assert (
-            0 <= column_index < self._widget.columnCount()
-        ), f"{column_index=} is out of range. {self._widget.columnCount()=}"
+        assert 0 <= column_index < self._widget.columnCount(), (
+            f"{column_index=} is out of range. {self._widget.columnCount()=}"
+        )
 
         item = self._widget.horizontalHeaderItem(column_index)
         item_data = item.data(qtC.Qt.UserRole)
@@ -10065,25 +10091,25 @@ class Grid(_qtpyBase_Control):
             int: The length of the maximum item loaded or -1 if there is a problem with the file.
 
         """
-        assert (
-            isinstance(file_name, str) and file_name.strip()
-        ), f"{file_name=}. Must be a non-empty string"
-        assert isinstance(
-            display_col, (str, int)
-        ), f"{display_col=}. Must be a non-empty string or int"
-        assert (
-            isinstance(text_index, int) and text_index > 0
-        ), f"{text_index=}. Must be an int > 0"
-        assert (
-            isinstance(line_start, int) and line_start > 0
-        ), f"{line_start=}. Must be an int > 0"
-        assert (
-            isinstance(data_index, int) and data_index > 0
-        ), f"{data_index=}. Must be an int > 0"
+        assert isinstance(file_name, str) and file_name.strip(), (
+            f"{file_name=}. Must be a non-empty string"
+        )
+        assert isinstance(display_col, (str, int)), (
+            f"{display_col=}. Must be a non-empty string or int"
+        )
+        assert isinstance(text_index, int) and text_index > 0, (
+            f"{text_index=}. Must be an int > 0"
+        )
+        assert isinstance(line_start, int) and line_start > 0, (
+            f"{line_start=}. Must be an int > 0"
+        )
+        assert isinstance(data_index, int) and data_index > 0, (
+            f"{data_index=}. Must be an int > 0"
+        )
         assert isinstance(ignore_header, bool), f"{ignore_header=}. Must be bool"
-        assert (
-            isinstance(delimiter, str) and len(delimiter) == 1
-        ), f"{delimiter=}. Must be str and 1 char long"
+        assert isinstance(delimiter, str) and len(delimiter) == 1, (
+            f"{delimiter=}. Must be str and 1 char long"
+        )
 
         rowcol = self._rowcol_validate(row=self.row_count, col=display_col)
 
@@ -10242,9 +10268,9 @@ class Grid(_qtpyBase_Control):
         Returns:
             int: Row number inserted.
         """
-        assert isinstance(
-            self._widget, qtW.QTableWidget
-        ), f"{self._widget=}. Must be an instance of qtW.QTableWidget"
+        assert isinstance(self._widget, qtW.QTableWidget), (
+            f"{self._widget=}. Must be an instance of qtW.QTableWidget"
+        )
 
         row = self._widget.rowCount()
         self._widget.insertRow(row)
@@ -10303,16 +10329,16 @@ class Grid(_qtpyBase_Control):
         Args:
             row (int): Row index of the row in the grid that is to be deleted.
         """
-        assert (
-            isinstance(row, int) and 0 <= row <= self.row_count
-        ), f"{row=}. Must be an int between 0 and {self.row_count}"
-        assert isinstance(
-            self._widget, qtW.QTableWidget
-        ), f"{self._widget=}. Must be an instance of qtW.QTableWidget"
+        assert isinstance(row, int) and 0 <= row <= self.row_count, (
+            f"{row=}. Must be an int between 0 and {self.row_count}"
+        )
+        assert isinstance(self._widget, qtW.QTableWidget), (
+            f"{self._widget=}. Must be an instance of qtW.QTableWidget"
+        )
 
-        assert (
-            isinstance(row, int) and 0 <= row < self._widget.rowCount()
-        ), f"{row=}. Must be an int between 0 and {self._widget.rowCount()}"
+        assert isinstance(row, int) and 0 <= row < self._widget.rowCount(), (
+            f"{row=}. Must be an int between 0 and {self._widget.rowCount()}"
+        )
 
         col_count = len(self._col_widths)
         widgets = []
@@ -10411,12 +10437,12 @@ class Grid(_qtpyBase_Control):
         assert isinstance(row, int), f"{row=}. Must be int"
         assert isinstance(col, int), f"{col=}. Must be int"
 
-        assert (
-            0 <= row < self._widget.rowCount()
-        ), f"{row=}. Must be >= 0 and < {self._widget.rowCount()}"
-        assert (
-            col == -1 or 0 <= col < self._widget.columnCount()
-        ), f"{col=}. Must be >= 0 and < {self._widget.columnCount()}"
+        assert 0 <= row < self._widget.rowCount(), (
+            f"{row=}. Must be >= 0 and < {self._widget.rowCount()}"
+        )
+        assert col == -1 or 0 <= col < self._widget.columnCount(), (
+            f"{col=}. Must be >= 0 and < {self._widget.columnCount()}"
+        )
 
         self._widget.setCurrentCell(row, col)
 
@@ -10448,12 +10474,12 @@ class Grid(_qtpyBase_Control):
         assert isinstance(row, int), f"{row=}. Must be int"
         assert isinstance(col, int), f"{col=}. Must be int"
 
-        assert (
-            0 <= row <= self._widget.rowCount()
-        ), f"{row=}. Must be >= 0 and < {self._widget.rowCount()}"
-        assert (
-            col == -1 or 0 <= col < self._widget.columnCount()
-        ), f"{col=}. Must be >= 0 and < {self._widget.columnCount()}"
+        assert 0 <= row <= self._widget.rowCount(), (
+            f"{row=}. Must be >= 0 and < {self._widget.rowCount()}"
+        )
+        assert col == -1 or 0 <= col < self._widget.columnCount(), (
+            f"{col=}. Must be >= 0 and < {self._widget.columnCount()}"
+        )
 
         index = self._widget.model().index(row, 0)
         self._widget.scrollTo(index)
@@ -10503,9 +10529,9 @@ class Grid(_qtpyBase_Control):
 
             """
             # user_data anything so no need to check
-            assert isinstance(
-                item, qtW.QTableWidgetItem
-            ), f"{item=}. Must be QTableWidgetItem"
+            assert isinstance(item, qtW.QTableWidgetItem), (
+                f"{item=}. Must be QTableWidgetItem"
+            )
 
             item_data = item.data(qtC.Qt.UserRole)
 
@@ -10674,12 +10700,12 @@ class Grid(_qtpyBase_Control):
         """
         self._widget: qtW.QTableWidget
 
-        assert isinstance(row, int) and (
-            row == -1 or row >= 0
-        ), f"{row=}. Must be an int == -1 or int >= 0"
-        assert isinstance(col, int) and (
-            col == -1 or col >= 0
-        ), f"{col=}. Must be an int == -1 or int >= 0"
+        assert isinstance(row, int) and (row == -1 or row >= 0), (
+            f"{row=}. Must be an int == -1 or int >= 0"
+        )
+        assert isinstance(col, int) and (col == -1 or col >= 0), (
+            f"{col=}. Must be an int == -1 or int >= 0"
+        )
 
         if self._widget is None:
             raise RuntimeError(f"{self._widget=} not set")
@@ -10720,12 +10746,12 @@ class Grid(_qtpyBase_Control):
         """
         self._widget: qtW.QTableWidget
 
-        assert isinstance(row, int) and (
-            row == -1 or row >= 0
-        ), f"{row=}. Must be an int == -1 or int >= 0"
-        assert isinstance(col, int) and (
-            col == -1 or col >= 0
-        ), f"{col=}. Must be an int == -1 or int >= 0"
+        assert isinstance(row, int) and (row == -1 or row >= 0), (
+            f"{row=}. Must be an int == -1 or int >= 0"
+        )
+        assert isinstance(col, int) and (col == -1 or col >= 0), (
+            f"{col=}. Must be an int == -1 or int >= 0"
+        )
 
         if self._widget is None:
             raise RuntimeError(f"{self._widget=} Not set")
@@ -10850,12 +10876,12 @@ class Grid(_qtpyBase_Control):
             value,
             (bool, datetime.date, datetime.datetime, datetime.time, float, int, str),
         ), f"{value=}. Must Be base type"
-        assert isinstance(row, int) and (
-            row == -1 or row >= 0
-        ), f"{row=}. Must be an int == -1 or int >= 0"
-        assert isinstance(col, int) and (
-            col == -1 or col >= 0
-        ), f"{col=}. Must be an int == -1 or int >= 0"
+        assert isinstance(row, int) and (row == -1 or row >= 0), (
+            f"{row=}. Must be an int == -1 or int >= 0"
+        )
+        assert isinstance(col, int) and (col == -1 or col >= 0), (
+            f"{col=}. Must be an int == -1 or int >= 0"
+        )
         assert isinstance(tooltip, str), f"{tooltip=}. Must be str"
         assert isinstance(bold, bool), f"{bold=}. Must be bool"
         assert isinstance(italic, bool), f"{italic=}. Must be bool"
@@ -10949,16 +10975,16 @@ class Grid(_qtpyBase_Control):
         """
         self._widget: qtW.QTableWidget
 
-        assert isinstance(row, int) and (
-            row == -1 or row >= 0
-        ), f"{row=}. Must be an int == -1 or int >= 0"
-        assert isinstance(col, int) and (
-            col == -1 or col >= 0
-        ), f"{col=}. Must be an int == -1 or int >= 0"
+        assert isinstance(row, int) and (row == -1 or row >= 0), (
+            f"{row=}. Must be an int == -1 or int >= 0"
+        )
+        assert isinstance(col, int) and (col == -1 or col >= 0), (
+            f"{col=}. Must be an int == -1 or int >= 0"
+        )
         assert isinstance(container_tag, str), f"{container_tag=}. Must be a str"
-        assert isinstance(tag, str) and (
-            tag.strip() != "" or tag == "-"
-        ), f"{tag=}. Must be a non-empty str or '-'"
+        assert isinstance(tag, str) and (tag.strip() != "" or tag == "-"), (
+            f"{tag=}. Must be a non-empty str or '-'"
+        )
 
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
@@ -11012,9 +11038,9 @@ class Grid(_qtpyBase_Control):
         Returns:
             list[int]:  List of  item_ids of the items found in a specified row
         """
-        assert (
-            isinstance(row, int) and 0 <= row < self._widget.rowCount()
-        ), f"{row=}. Must be an int >= 0 and < {self._widget.rowCount()} "
+        assert isinstance(row, int) and 0 <= row < self._widget.rowCount(), (
+            f"{row=}. Must be an int >= 0 and < {self._widget.rowCount()} "
+        )
 
         self._widget: qtW.QTableWidget
 
@@ -11035,9 +11061,9 @@ class Grid(_qtpyBase_Control):
         Returns:
             int: The row index of the item with the specified item_id. -1 if item_id not found
         """
-        assert (
-            isinstance(item_id, int) and item_id >= 0
-        ), f"{item_id=}. Must be an int >= 0"
+        assert isinstance(item_id, int) and item_id >= 0, (
+            f"{item_id=}. Must be an int >= 0"
+        )
 
         self._widget: qtW.QTableWidget
 
@@ -11065,15 +11091,15 @@ class Grid(_qtpyBase_Control):
         """
         self._widget: qtW.QTableWidget
 
-        assert (
-            isinstance(row, int) and row == -1 or row >= 0
-        ), f"{row=}. Must be an int == -1 or int >= 0"
-        assert (
-            isinstance(col, int) and col == -1 or col >= 0
-        ), f"{col=}. Must be an int == -1 or int >= 0"
-        assert isinstance(
-            widget, _qtpyBase_Control
-        ), f"{widget=}. Must be an instance of _qtpyBase_Control"
+        assert isinstance(row, int) and row == -1 or row >= 0, (
+            f"{row=}. Must be an int == -1 or int >= 0"
+        )
+        assert isinstance(col, int) and col == -1 or col >= 0, (
+            f"{col=}. Must be an int == -1 or int >= 0"
+        )
+        assert isinstance(widget, _qtpyBase_Control), (
+            f"{widget=}. Must be an instance of _qtpyBase_Control"
+        )
         assert isinstance(group_text, str), f"{group_text=}. Must be str"
 
         if self._widget is None:
@@ -11097,9 +11123,9 @@ class Grid(_qtpyBase_Control):
         else:
             rowcol_widget = widget.guiwidget_get
 
-        assert (
-            rowcol_widget is not None and item is not None
-        ), f"Dev Error {rowcol_widget=} {item=}"
+        assert rowcol_widget is not None and item is not None, (
+            f"Dev Error {rowcol_widget=} {item=}"
+        )
 
         item_data = item.data(qtC.Qt.UserRole)
 
@@ -11158,9 +11184,9 @@ class Grid(_qtpyBase_Control):
         else:
             raise AssertionError("col must be an int or a str")
 
-        assert (
-            -1 <= col_index < self._widget.columnCount()
-        ), f"col must be an int == -1 or between 0 and {self._widget.columnCount()}"
+        assert -1 <= col_index < self._widget.columnCount(), (
+            f"col must be an int == -1 or between 0 and {self._widget.columnCount()}"
+        )
 
         return row, col_index
 
@@ -11195,9 +11221,9 @@ class Grid(_qtpyBase_Control):
             Union[int,float,bool,str,qtC.QDate,qtC.QDateTime]: value cast to the correct type
         """
         assert isinstance(value, str), f"{value=}. Must be a str"
-        assert isinstance(
-            data_type, (self._Data_Type, int)
-        ), "data_type is enumerated data_type or an int index into data_type"
+        assert isinstance(data_type, (self._Data_Type, int)), (
+            "data_type is enumerated data_type or an int index into data_type"
+        )
 
         match data_type:
             case self._Data_Type.BOOL:  # bool
@@ -11708,13 +11734,13 @@ class Image(_qtpyBase_Control):
             self.image, (type(None), str, qtG.QIcon, qtG.QPixmap, bytes)
         ), f"{self.image=}. Must Be None. str (file_path/file_name), QPixmap or bytes"
 
-        assert (
-            self.height >= 1 or self.height == -1
-        ), f"{self.height=} must be >= 1 or -1 (auto-calc)"
+        assert self.height >= 1 or self.height == -1, (
+            f"{self.height=} must be >= 1 or -1 (auto-calc)"
+        )
 
-        assert (
-            self.width >= 1 or self.width == -1
-        ), f"{self.width=} must be >= 1 or -1 (auto-calc)"
+        assert self.width >= 1 or self.width == -1, (
+            f"{self.width=} must be >= 1 or -1 (auto-calc)"
+        )
 
         assert (
             isinstance(self.rotate_degrees, int)
@@ -11827,9 +11853,9 @@ class Image(_qtpyBase_Control):
                             - width: int
                             - height: int
         """
-        assert (
-            isinstance(rect_id, str) and rect_id.strip() != ""
-        ), f"{rect_id=}. Must be non-empty str"
+        assert isinstance(rect_id, str) and rect_id.strip() != "", (
+            f"{rect_id=}. Must be non-empty str"
+        )
 
         if rect_id in self._user_items:
             return Rect_Cords(
@@ -11896,25 +11922,25 @@ class Image(_qtpyBase_Control):
             height (int): Height of rectangle in pixels
             colour (str): Colour of rectangle line (mostly legal HTML colours)
         """
-        assert (
-            isinstance(item_id, str) and item_id.strip() != ""
-        ), f"{item_id=}. Must be non-empty str"
+        assert isinstance(item_id, str) and item_id.strip() != "", (
+            f"{item_id=}. Must be non-empty str"
+        )
         assert isinstance(left, int) and left >= 0, f"{left}. Must be int > 0"
         assert isinstance(top, int) and top >= 0, f"{top}. Must be int > 0"
-        assert (
-            isinstance(width, int) and width > 0 or width == -1
-        ), f"{width}. Must be int > 0"
-        assert (
-            isinstance(height, int) and height > 0 or height == -1
-        ), f"{height}. Must be int > 0"
+        assert isinstance(width, int) and width > 0 or width == -1, (
+            f"{width}. Must be int > 0"
+        )
+        assert isinstance(height, int) and height > 0 or height == -1, (
+            f"{height}. Must be int > 0"
+        )
 
-        assert (
-            isinstance(colour, str) and colour.islower() and colour.strip != ()
-        ), f"{colour=}. Must be non=empty lowercase str"
+        assert isinstance(colour, str) and colour.islower() and colour.strip != (), (
+            f"{colour=}. Must be non=empty lowercase str"
+        )
 
-        assert (
-            colour.strip() in qtG.QColor.colorNames()
-        ), f"{colour=}. Not a valid colour \n {qtG.QColor.colorNames()}"
+        assert colour.strip() in qtG.QColor.colorNames(), (
+            f"{colour=}. Not a valid colour \n {qtG.QColor.colorNames()}"
+        )
 
         assert isinstance(visible, bool), f"{visible=}. Must be bool"
 
@@ -11951,13 +11977,13 @@ class Image(_qtpyBase_Control):
             visible (bool) : True shows the rectangle, False hides the rectangle
             suppress_rect_check (bool): Used for debugging, suppresses the assert for checking if a rect_id is in the image
         """
-        assert (
-            isinstance(rect_id, str) and rect_id.strip() != ""
-        ), f"{rect_id=}. Must be non-empty str"
+        assert isinstance(rect_id, str) and rect_id.strip() != "", (
+            f"{rect_id=}. Must be non-empty str"
+        )
 
-        assert isinstance(
-            suppress_rect_check, bool
-        ), f"{suppress_rect_check=}. Must be bool"
+        assert isinstance(suppress_rect_check, bool), (
+            f"{suppress_rect_check=}. Must be bool"
+        )
 
         if not suppress_rect_check:
             assert rect_id in self._user_items, f"{rect_id=}. Not in scene"
@@ -12027,13 +12053,13 @@ class Image(_qtpyBase_Control):
             old_id (str): The old rectangle_id
             new_id (str): The new rectangle_id
         """
-        assert (
-            isinstance(old_id, str) and old_id.strip() != ""
-        ), f"{old_id=}. Must be non-empty str"
+        assert isinstance(old_id, str) and old_id.strip() != "", (
+            f"{old_id=}. Must be non-empty str"
+        )
 
-        assert (
-            isinstance(new_id, str) and new_id.strip() != ""
-        ), f"{new_id=}. Must be non-empty str"
+        assert isinstance(new_id, str) and new_id.strip() != "", (
+            f"{new_id=}. Must be non-empty str"
+        )
 
         if old_id in self._user_items:
             self._user_items[new_id] = copy.copy(self._user_items[old_id])
@@ -12150,12 +12176,12 @@ class Image(_qtpyBase_Control):
         """
         self._widget: _Image
 
-        assert (
-            isinstance(x, int) and 0 < x < self._widget.scene().width()
-        ), f"{x=}. Must be > 0 and < {self._widget.scene().width()}"
-        assert (
-            isinstance(y, int) and 0 < y < self._widget.scene().height()
-        ), f"{y=}. Must be > 0 and < {self._widget.scene().height()}"
+        assert isinstance(x, int) and 0 < x < self._widget.scene().width(), (
+            f"{x=}. Must be > 0 and < {self._widget.scene().width()}"
+        )
+        assert isinstance(y, int) and 0 < y < self._widget.scene().height(), (
+            f"{y=}. Must be > 0 and < {self._widget.scene().height()}"
+        )
 
         assert isinstance(height, int) and height > 0, f"{height=}. Must be > 0"
         assert isinstance(width, int) and width > 0, f"{width=}. Must be > 0"
@@ -12211,12 +12237,12 @@ class Image(_qtpyBase_Control):
                     n_bits_image = img_size.width() * img_size.height() * image.depth()
 
                     # Dev Debug check
-                    assert (
-                        n_bits_buffer == n_bits_image
-                    ), f"DBG Dev size mismatch: {n_bits_buffer=} != {n_bits_image=}"
-                    assert (
-                        image.depth() == 32
-                    ), f"DBG Dev unexpected image depth: {image.depth()}"
+                    assert n_bits_buffer == n_bits_image, (
+                        f"DBG Dev size mismatch: {n_bits_buffer=} != {n_bits_image=}"
+                    )
+                    assert image.depth() == 32, (
+                        f"DBG Dev unexpected image depth: {image.depth()}"
+                    )
 
                     # Note: image.depth() // 8 because alpha channel makes 4 (rgb and alpha)*8 = 32..
                     np_array = np.ndarray(
@@ -12283,15 +12309,15 @@ class Image(_qtpyBase_Control):
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
-        assert isinstance(
-            image, (str, qtG.QIcon, qtG.QPixmap, bytes)
-        ), f"{image=}. Must Be str (file_path/file_name),QPixmap or bytes"
-        assert isinstance(height, int) and (
-            height > 0 or height == -1
-        ), f"{height=}. Must be > 0 or -1 (auto-calc)"
-        assert isinstance(width, int) and (
-            width > 0 or width == -1
-        ), f"{width=}. Must be > 0 or -1 (auto-calc)"
+        assert isinstance(image, (str, qtG.QIcon, qtG.QPixmap, bytes)), (
+            f"{image=}. Must Be str (file_path/file_name),QPixmap or bytes"
+        )
+        assert isinstance(height, int) and (height > 0 or height == -1), (
+            f"{height=}. Must be > 0 or -1 (auto-calc)"
+        )
+        assert isinstance(width, int) and (width > 0 or width == -1), (
+            f"{width=}. Must be > 0 or -1 (auto-calc)"
+        )
         assert isinstance(scaled, bool), f"{scaled=}. Must Be bool"
         assert isinstance(high_quality, bool), f"{high_quality=}. Must Be bool"
         assert isinstance(rotate_degrees, int), f"{rotate_degrees=}. Must be int"
@@ -12626,16 +12652,16 @@ class LCD(_qtpyBase_Control):
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
-        assert isinstance(
-            value, (str, int, float)
-        ), f"{value=} must be a str, int or float"
+        assert isinstance(value, (str, int, float)), (
+            f"{value=} must be a str, int or float"
+        )
 
         self._widget: qtW.QLCDNumber
 
         if isinstance(value, str):  # Check if a valid number (0..9 or .)
-            assert re.match(
-                "^[0-9\.\-]*$", value.strip()
-            ), f"{value=}. Must be a number"  # pylint: disable=W1401
+            assert re.match("^[0-9\.\-]*$", value.strip()), (
+                f"{value=}. Must be a number"
+            )  # pylint: disable=W1401
 
         if shiboken6.isValid(self._widget):
             self._widget.display(value)
@@ -12724,16 +12750,16 @@ class LineEdit(_qtpyBase_Control):
 
         assert isinstance(self.label, str), f"{self.label=}. Must be str"
         assert isinstance(self.input_mask, str), f"{self.input_mask=}. Must be str"
-        assert self.label_font is None or isinstance(
-            self.label_font, Font
-        ), f"{self.label_font=}. Must be font"
+        assert self.label_font is None or isinstance(self.label_font, Font), (
+            f"{self.label_font=}. Must be font"
+        )
         assert isinstance(self.char_length, int), f"{self.char_length=}. Must be int"
-        assert isinstance(
-            self.label_align, Align_Text
-        ), f"{self.label_align}. Must be Align_Text"
-        assert self.validate_callback is None or callable(
-            self.validate_callback
-        ), f"{self.validate_callback=}. Must be None | Function | Method | Lambda"
+        assert isinstance(self.label_align, Align_Text), (
+            f"{self.label_align}. Must be Align_Text"
+        )
+        assert self.validate_callback is None or callable(self.validate_callback), (
+            f"{self.validate_callback=}. Must be None | Function | Method | Lambda"
+        )
 
         if self.label_font is None:
             self.label_fone = Font(size=DEFAULT_FONT_SIZE, weight=Font_Weight.NORMAL)
@@ -12889,9 +12915,9 @@ class LineEdit(_qtpyBase_Control):
 
         self._widget: _Line_Edit
 
-        assert (
-            isinstance(input_mask, str) and input_mask != ""
-        ), "input mask must be a non-empty string"
+        assert isinstance(input_mask, str) and input_mask != "", (
+            "input mask must be a non-empty string"
+        )
 
         # Note: if need a blank other than a space need to add ;<blank_char> at end of string
         # Note * and @ at start of mask are password masking chars
@@ -12923,9 +12949,9 @@ class LineEdit(_qtpyBase_Control):
         Args:
             max_chars (int): The maximum number of characters to use in the line edit control.
         """
-        assert (
-            isinstance(max_chars, int) and 0 < max_chars <= MAX_CHARS
-        ), f" 0 < max_chars <{max_chars}> <= {MAX_CHARS}"
+        assert isinstance(max_chars, int) and 0 < max_chars <= MAX_CHARS, (
+            f" 0 < max_chars <{max_chars}> <= {MAX_CHARS}"
+        )
 
         self.char_length = max_chars
 
@@ -12998,12 +13024,12 @@ class Menu_Element(_qtpyBase_Control):
         """Constructor that checks parameters and sets defaults"""
         assert isinstance(self.separator, bool), f"{self.separator=}. Must be bool"
         assert isinstance(self.checkable, bool), f"{self.checkable=}. Must be bool"
-        assert isinstance(
-            self.icon, (type(None), str, qtG.QIcon, qtG.QPixmap)
-        ), f"{self.icon=}. Must be None | str | QIcon | QPixmap"
-        assert isinstance(
-            self.font, (type(None), Font)
-        ), f"{self.font=}. Must be None | Font"
+        assert isinstance(self.icon, (type(None), str, qtG.QIcon, qtG.QPixmap)), (
+            f"{self.icon=}. Must be None | str | QIcon | QPixmap"
+        )
+        assert isinstance(self.font, (type(None), Font)), (
+            f"{self.font=}. Must be None | Font"
+        )
 
         super().__post_init__()
 
@@ -13025,9 +13051,9 @@ class Menu_Entry(_qtpyBase_Control):
         """Constructor that checks parameters and sets defaults"""
         assert isinstance(self.parent_tag, str), f"{self.parent_tag=}. Must be str"
         assert isinstance(self.tag, str), f"{self.tag=}. Must be str"
-        assert isinstance(
-            self.element, Menu_Element
-        ), f"{self.element=}. Must be Menu_Element"
+        assert isinstance(self.element, Menu_Element), (
+            f"{self.element=}. Must be Menu_Element"
+        )
 
     @property
     def checked_get(self) -> bool:
@@ -13111,9 +13137,9 @@ class Menu_Entry(_qtpyBase_Control):
         Args:
             icon (Optional[Union[str, qtG.QPixmap, qtG.QIcon]]): Icon definition object.
         """
-        assert isinstance(
-            icon, (str, qtG.QPixmap, qtG.QIcon)
-        ), f"{icon=}. Must be str, QPixmap or QIcon"
+        assert isinstance(icon, (str, qtG.QPixmap, qtG.QIcon)), (
+            f"{icon=}. Must be str, QPixmap or QIcon"
+        )
 
         super().icon_set(icon)
 
@@ -13386,15 +13412,15 @@ class Menu(_qtpyBase_Control):
             AssertionError: Rasied if the parent_tag does  not exist
         """
         assert isinstance(parent_tag, str), f"{parent_tag=}. Must be str"
-        assert isinstance(
-            menu_element, Menu_Element
-        ), f"{menu_element=}. Must be an instance of Menu_Element"
+        assert isinstance(menu_element, Menu_Element), (
+            f"{menu_element=}. Must be an instance of Menu_Element"
+        )
 
         menu_item: Menu_Entry = self._element_find(menu_element.tag, self._menu_items)
 
-        assert (
-            menu_item.parent_tag == "" and menu_item.tag == ""
-        ), f"{menu_item.tag=} already used!"
+        assert menu_item.parent_tag == "" and menu_item.tag == "", (
+            f"{menu_item.tag=} already used!"
+        )
 
         # Top Level Menu has an empty parent_tag
         if parent_tag.strip() == "":
@@ -13418,9 +13444,9 @@ class Menu(_qtpyBase_Control):
                 )
 
     def menu_entry_find(self, tag: str) -> Menu_Entry:
-        assert (
-            isinstance(tag, str) and tag.strip() != ""
-        ), f"{tag=}. Must be non-empty str"
+        assert isinstance(tag, str) and tag.strip() != "", (
+            f"{tag=}. Must be non-empty str"
+        )
 
         menu_entry = self._element_find(tag, self._menu_items)
 
@@ -13480,15 +13506,15 @@ class Menu(_qtpyBase_Control):
         Returns:
             bool : The checked state of the menu item.
         """
-        assert (
-            isinstance(tag, str) and tag.strip() != ""
-        ), f"{tag=}. Must be a non-empty str"
+        assert isinstance(tag, str) and tag.strip() != "", (
+            f"{tag=}. Must be a non-empty str"
+        )
 
         menu_item: Menu_Entry = self._element_find(tag, self._menu_items)
 
-        assert (
-            menu_item.parent_tag.strip() != "" and menu_item.tag.strip() != ""
-        ), f"menu item <{tag=}> not found!"
+        assert menu_item.parent_tag.strip() != "" and menu_item.tag.strip() != "", (
+            f"menu item <{tag=}> not found!"
+        )
 
         self._element_find(menu_item.parent_tag, self._menu_items)
 
@@ -13510,16 +13536,16 @@ class Menu(_qtpyBase_Control):
             tag (str): tag name of menu item
             checked (bool): The checked state of the menu item.
         """
-        assert (
-            isinstance(tag, str) and tag.strip() != ""
-        ), f"{tag=}. Must be a non-empty str"
+        assert isinstance(tag, str) and tag.strip() != "", (
+            f"{tag=}. Must be a non-empty str"
+        )
         assert isinstance(checked, bool), f"{checked=}. Must be bool"
 
         menu_item: Menu_Entry = self._element_find(tag, self._menu_items)
 
-        assert (
-            menu_item.parent_tag.strip() != "" and menu_item.tag.strip() != ""
-        ), f"menu item <{tag=}> not found!"
+        assert menu_item.parent_tag.strip() != "" and menu_item.tag.strip() != "", (
+            f"menu item <{tag=}> not found!"
+        )
 
         self._element_find(menu_item.parent_tag, self._menu_items)
 
@@ -13542,18 +13568,18 @@ class Menu(_qtpyBase_Control):
             tooltip (str): The tooltip
 
         """
-        assert (
-            isinstance(tag, str) and tag.strip() != ""
-        ), f"{tag=}. Must be a non-empty str"
-        assert (
-            isinstance(tooltip, str) and tooltip.strip() != ""
-        ), f"{tooltip=}. Must be a non-empty str"
+        assert isinstance(tag, str) and tag.strip() != "", (
+            f"{tag=}. Must be a non-empty str"
+        )
+        assert isinstance(tooltip, str) and tooltip.strip() != "", (
+            f"{tooltip=}. Must be a non-empty str"
+        )
 
         menu_item: Menu_Entry = self._element_find(tag, self._menu_items)
 
-        assert (
-            menu_item.parent_tag.strip() != "" and menu_item.tag.strip() != ""
-        ), f"menu item <{tag=}> not found!"
+        assert menu_item.parent_tag.strip() != "" and menu_item.tag.strip() != "", (
+            f"menu item <{tag=}> not found!"
+        )
 
         parent_item: Menu_Entry = self._element_find(
             menu_item.parent_tag, self._menu_items
@@ -13582,17 +13608,17 @@ class Menu(_qtpyBase_Control):
             tag (str) : Tag name of menu item that is having the tooltip set
             visible (bool) : True - tooltip visible, False - tooltip not visible
         """
-        assert (
-            isinstance(tag, str) and tag.strip() != ""
-        ), f"{tag=}. Must be a non-empty str"
+        assert isinstance(tag, str) and tag.strip() != "", (
+            f"{tag=}. Must be a non-empty str"
+        )
 
         assert isinstance(visible, bool), f"{visible=}. Must be a bool"
 
         menu_item: Menu_Entry = self._element_find(tag, self._menu_items)
 
-        assert (
-            menu_item.parent_tag.strip() != "" and menu_item.tag.strip() != ""
-        ), f"menu item <{tag=}> not found!"
+        assert menu_item.parent_tag.strip() != "" and menu_item.tag.strip() != "", (
+            f"menu item <{tag=}> not found!"
+        )
 
         parent_item: Menu_Entry = self._element_find(
             menu_item.parent_tag, self._menu_items
@@ -13624,21 +13650,21 @@ class ProgressBar(_qtpyBase_Control):
 
     def __post_init__(self) -> None:
         """Initializes the progressbar object."""
-        assert (
-            isinstance(self.range_min, int) and self.range_min >= 0
-        ), f"{self.range_min=}. Must be an int >= 0"
+        assert isinstance(self.range_min, int) and self.range_min >= 0, (
+            f"{self.range_min=}. Must be an int >= 0"
+        )
         assert (
             isinstance(self.range_max, int)
             and self.range_max > 0
             and self.range_max > self.range_min
         ), f"{self.range_max=}. Must be an int > 0 and < {self.range_min=}."
         assert isinstance(self.horizontal, bool), f"{self.horizontal=}. Must be a bool"
-        assert (
-            isinstance(self.width, int) and self.width > 0
-        ), f"{self.width=}. Must be an int > 0"
-        assert (
-            isinstance(self.height, int) and self.height > 0
-        ), f"{self.height=}. Must be an int > 0"
+        assert isinstance(self.width, int) and self.width > 0, (
+            f"{self.width=}. Must be an int > 0"
+        )
+        assert isinstance(self.height, int) and self.height > 0, (
+            f"{self.height=}. Must be an int > 0"
+        )
 
         super().__post_init__()
 
@@ -13684,9 +13710,9 @@ class ProgressBar(_qtpyBase_Control):
             max (int): The maximum value of the progressbar.
         """
         assert isinstance(min, int) and min >= 0, f"{min=}. Must be an int >= 0"
-        assert (
-            isinstance(max, int) and max > 0 and max > min
-        ), f"{max=}. Must be an int > 0 and < {min=}."
+        assert isinstance(max, int) and max > 0 and max > min, (
+            f"{max=}. Must be an int > 0 and < {min=}."
+        )
         self._widget: qtW.QProgressBar
         self._widget.setRange(min, max)
 
@@ -13711,9 +13737,9 @@ class ProgressBar(_qtpyBase_Control):
         Args:
             value (int): The value to set the progressbar to.
         """
-        assert (
-            isinstance(value, int) and self.range_min <= value <= self.range_max
-        ), f"{value=}. Must be an int >= {self.range_min} and < {self.range_max}."
+        assert isinstance(value, int) and self.range_min <= value <= self.range_max, (
+            f"{value=}. Must be an int >= {self.range_min} and < {self.range_max}."
+        )
         self._widget: qtW.QProgressBar
         self._widget.setValue(value)
 
@@ -14324,9 +14350,9 @@ class TextEdit(_qtpyBase_Control):
         Args:
             text_input (qtW.QTextEdit): The text widget
         """
-        assert isinstance(
-            text_widget, qtW.QTextEdit
-        ), f"{text_widget=}. Must be a qtW.QTextEdit"
+        assert isinstance(text_widget, qtW.QTextEdit), (
+            f"{text_widget=}. Must be a qtW.QTextEdit"
+        )
 
         text = text_widget.toPlainText()
 
@@ -14403,19 +14429,19 @@ class Timeedit(_qtpyBase_Control):
 
         super().__post_init__()
 
-        assert isinstance(
-            self.display_width, int
-        ), f"{self.display_width=}. Must be int"
+        assert isinstance(self.display_width, int), (
+            f"{self.display_width=}. Must be int"
+        )
         assert isinstance(self.hour, int), f"{self.hour=}. Must be int"
         assert isinstance(self.min, int), f"{self.min=}. Must be int"
         assert isinstance(self.sec, int), f"{self.sec=}. Must be int"
         assert isinstance(self.msec, int), f"{self.msec=}. Must be int"
-        assert isinstance(
-            self.display_format, str
-        ), f"{self.display_format=}. Must be str"
-        assert self.validate_callback is None or callable(
-            self.validate_callback
-        ), f"{self.validate_callback=}. Must be None | Function | Method | Lambda"
+        assert isinstance(self.display_format, str), (
+            f"{self.display_format=}. Must be str"
+        )
+        assert self.validate_callback is None or callable(self.validate_callback), (
+            f"{self.validate_callback=}. Must be None | Function | Method | Lambda"
+        )
 
         # Buddy checks are in super...bypassed here
         buddy_buton = Button(
@@ -14720,12 +14746,12 @@ class Tab(_qtpyBase_Control):
     def __post_init__(self) -> None:
         """Constructor check parameters ans sets properties"""
 
-        assert isinstance(
-            self.page_right_margin, int
-        ), f"{self.page_right_margin=}. Must be int"
-        assert isinstance(
-            self.page_bottom_margin, int
-        ), f"{self.page_bottom_margin=}. Must be int"
+        assert isinstance(self.page_right_margin, int), (
+            f"{self.page_right_margin=}. Must be int"
+        )
+        assert isinstance(self.page_bottom_margin, int), (
+            f"{self.page_bottom_margin=}. Must be int"
+        )
 
         super().__post_init__()
 
@@ -14938,16 +14964,16 @@ class Tab(_qtpyBase_Control):
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
-        assert (
-            isinstance(tag, str) and tag.strip() != ""
-        ), f"{tag=}. Must be a non-empty str"
+        assert isinstance(tag, str) and tag.strip() != "", (
+            f"{tag=}. Must be a non-empty str"
+        )
 
         if self.tag == tag:
             return super().enable_get
 
-        assert (
-            tag in self._tab_pages
-        ), f"{tag=}. Not found in Tab {self.tag=}  or tab pages: {self._tab_pages=}"
+        assert tag in self._tab_pages, (
+            f"{tag=}. Not found in Tab {self.tag=}  or tab pages: {self._tab_pages=}"
+        )
 
         for index in range(self._widget.count()):
             if self._widget.widget(index).objectName() == tag:
@@ -15020,14 +15046,14 @@ class Tab(_qtpyBase_Control):
             Tab: The Tab control
 
         """
-        assert (
-            isinstance(tag, str) and tag.strip() != ""
-        ), f"{tag=}. Must be a non-empty str"
+        assert isinstance(tag, str) and tag.strip() != "", (
+            f"{tag=}. Must be a non-empty str"
+        )
 
         assert isinstance(title, str), f"{title=}. Must be str"
-        assert isinstance(
-            control, (_qtpyBase_Control, _Container)
-        ), f"{control=}. Must be a descendant of _qtpyBase_Control or _Container"
+        assert isinstance(control, (_qtpyBase_Control, _Container)), (
+            f"{control=}. Must be a descendant of _qtpyBase_Control or _Container"
+        )
 
         if self._widget is not None:
             for index in range(self._widget.count()):
@@ -15056,9 +15082,9 @@ class Tab(_qtpyBase_Control):
                 HBoxContainer(align=Align.CENTER).add_control(control)
             )
 
-        assert isinstance(
-            self.icon, (type(None), str, qtG.QPixmap, qtG.QIcon)
-        ), f" {self.icon=}. Must be None | str (file name)| QPixmap | QIcon"
+        assert isinstance(self.icon, (type(None), str, qtG.QPixmap, qtG.QIcon)), (
+            f" {self.icon=}. Must be None | str (file name)| QPixmap | QIcon"
+        )
 
         assert isinstance(tooltip, str), f"{tooltip=}. Must be str"
         assert isinstance(enabled, bool), f"{enabled=}. Must be bool"
@@ -15098,9 +15124,9 @@ class Tab(_qtpyBase_Control):
             tag_name (str): The tag name of the tab page to be selected
         """
         assert isinstance(tag_name, str), f"{tag_name=}. Must be str"
-        assert (
-            tag_name in self._tab_pages
-        ), f"{tag_name=}. Not found in tab pages: {self._tab_pages=}"
+        assert tag_name in self._tab_pages, (
+            f"{tag_name=}. Not found in tab pages: {self._tab_pages=}"
+        )
         for index in range(self._widget.count()):
             if self._widget.widget(index).objectName() == tag_name:
                 self._widget.setCurrentIndex(index)
@@ -15127,9 +15153,9 @@ class Tab(_qtpyBase_Control):
             bool: True if the tab page exists
 
         """
-        assert (
-            isinstance(tag, str) and tag.strip() != ""
-        ), f"{tag=}. Must be a non-empty str"
+        assert isinstance(tag, str) and tag.strip() != "", (
+            f"{tag=}. Must be a non-empty str"
+        )
         assert isinstance(tag, str), f"{tag=}. Must be non-empty str"
 
         for index in range(self._widget.count()):
@@ -15149,17 +15175,17 @@ class Tab(_qtpyBase_Control):
         """
         self._widget: qtW.QTabWidget
 
-        assert (
-            isinstance(tag, str) and tag.strip() != ""
-        ), f"{tag=}. Must be a non-empty str"
+        assert isinstance(tag, str) and tag.strip() != "", (
+            f"{tag=}. Must be a non-empty str"
+        )
 
-        assert (
-            tag in self._tab_pages
-        ), f"{tag=}. Not found in tab pages: {self._tab_pages=}"
+        assert tag in self._tab_pages, (
+            f"{tag=}. Not found in tab pages: {self._tab_pages=}"
+        )
 
-        assert isinstance(
-            self.icon, (type(None), str, qtG.QPixmap, qtG.QIcon)
-        ), f" {self.icon=}. Must be None | str (file name)| QPixmap | QIcon"
+        assert isinstance(self.icon, (type(None), str, qtG.QPixmap, qtG.QIcon)), (
+            f" {self.icon=}. Must be None | str (file name)| QPixmap | QIcon"
+        )
 
         if icon is not None:
             if isinstance(icon, str):
@@ -15185,9 +15211,9 @@ class Tab(_qtpyBase_Control):
         Returns:
             int: The index of the tab page or -1 if tab not found
         """
-        assert (
-            isinstance(tag, str) and tag.strip() != ""
-        ), f"{tag=}. Must be a non-empty str"
+        assert isinstance(tag, str) and tag.strip() != "", (
+            f"{tag=}. Must be a non-empty str"
+        )
 
         for index in range(self._widget.count()):
             if self._widget.widget(index).objectName() == tag:
@@ -15214,15 +15240,15 @@ class Tab(_qtpyBase_Control):
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
-        assert (
-            isinstance(tag, str) and tag.strip() != ""
-        ), f"{tag=}. Must be a non-empty str"
-        assert (
-            tag in self._tab_pages
-        ), f"{tag=}. Not found in tab pages: {self._tab_pages=}"
-        assert (
-            self._tab_pages[tag].index >= 0
-        ), f"{self._tab_pages[tag].index=} {self._tab_pages[tag]=}. Page not created!"
+        assert isinstance(tag, str) and tag.strip() != "", (
+            f"{tag=}. Must be a non-empty str"
+        )
+        assert tag in self._tab_pages, (
+            f"{tag=}. Not found in tab pages: {self._tab_pages=}"
+        )
+        assert self._tab_pages[tag].index >= 0, (
+            f"{self._tab_pages[tag].index=} {self._tab_pages[tag]=}. Page not created!"
+        )
 
         self._tab_pages[tag].container.widgets_clear()
 
@@ -15245,16 +15271,16 @@ class Tab(_qtpyBase_Control):
         """
         self._widget: qtW.QTabWidget
 
-        assert (
-            isinstance(tag, str) and tag.strip() != ""
-        ), f"{tag=}. Must be a non-empty str"
-        assert (
-            tag in self._tab_pages
-        ), f"{tag=}. Not found in tab pages: {self._tab_pages=}"
+        assert isinstance(tag, str) and tag.strip() != "", (
+            f"{tag=}. Must be a non-empty str"
+        )
+        assert tag in self._tab_pages, (
+            f"{tag=}. Not found in tab pages: {self._tab_pages=}"
+        )
 
-        assert (
-            self._tab_pages[tag].index >= 0
-        ), f"{self._tab_pages[tag]=}. Page not created!"
+        assert self._tab_pages[tag].index >= 0, (
+            f"{self._tab_pages[tag]=}. Page not created!"
+        )
 
         for index in range(self._widget.count()):
             if self._widget.widget(index).objectName() == tag:
@@ -15270,25 +15296,25 @@ class Tab(_qtpyBase_Control):
             visible (bool): `True` to make the page visible, `False` to hide it
 
         """
-        assert (
-            isinstance(tag, str) and tag.strip() != ""
-        ), f"{tag=}. Must be a non-empty str"
+        assert isinstance(tag, str) and tag.strip() != "", (
+            f"{tag=}. Must be a non-empty str"
+        )
 
         self._widget: qtW.QTabWidget
 
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
-        assert (
-            isinstance(tag, str) and tag.strip() != ""
-        ), f"{tag=}. Must be a non-empty str"
-        assert (
-            tag in self._tab_pages
-        ), f"{tag=}. Not found in tab pages: {self._tab_pages=}"
+        assert isinstance(tag, str) and tag.strip() != "", (
+            f"{tag=}. Must be a non-empty str"
+        )
+        assert tag in self._tab_pages, (
+            f"{tag=}. Not found in tab pages: {self._tab_pages=}"
+        )
 
-        assert (
-            self._tab_pages[tag].index >= 0
-        ), f"{self._tab_pages[tag]=}. Page not created!"
+        assert self._tab_pages[tag].index >= 0, (
+            f"{self._tab_pages[tag]=}. Page not created!"
+        )
         for index in range(self._widget.count()):
             if self._widget.widget(index).objectName() == tag:
                 self._widget.setTabVisible(index, visible)
@@ -15304,9 +15330,9 @@ class Tab(_qtpyBase_Control):
         Returns:
             str : The tooltip text for the tab page with the tag name.
         """
-        assert (
-            isinstance(tag, str) and tag.strip() != ""
-        ), f"{tag=}. Must be a non-empty str"
+        assert isinstance(tag, str) and tag.strip() != "", (
+            f"{tag=}. Must be a non-empty str"
+        )
 
         self._widget: qtW.QTabWidget
         if self._widget is None:
@@ -15315,9 +15341,9 @@ class Tab(_qtpyBase_Control):
         if self.tag == tag:
             return super().tooltip_get
 
-        assert (
-            tag in self._tab_pages
-        ), f"{tag=}. Not found in Tab {self.tag=}  or tab pages: {self._tab_pages=}"
+        assert tag in self._tab_pages, (
+            f"{tag=}. Not found in Tab {self.tag=}  or tab pages: {self._tab_pages=}"
+        )
 
         for index in range(self._widget.count()):
             if self._widget.widget(index).objectName() == tag:
@@ -15337,16 +15363,16 @@ class Tab(_qtpyBase_Control):
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
-        assert (
-            isinstance(tag, str) and tag.strip() != ""
-        ), f"{tag=}. Must be a non-empty str"
+        assert isinstance(tag, str) and tag.strip() != "", (
+            f"{tag=}. Must be a non-empty str"
+        )
 
         if self.tag == tag:
             super().tooltip_set(tooltip)
         else:
-            assert (
-                tag in self._tab_pages
-            ), f"{tag=}. Not found in Tab {self.tag=}  or tab pages: {self._tab_pages=}"
+            assert tag in self._tab_pages, (
+                f"{tag=}. Not found in Tab {self.tag=}  or tab pages: {self._tab_pages=}"
+            )
 
             for index in range(self._widget.count()):
                 if self._widget.widget(index).objectName() == tag:
@@ -15375,15 +15401,15 @@ class Treeview(_qtpyBase_Control):
 
         super().__post_init__()
 
-        assert isinstance(
-            self.headers, (list, tuple)
-        ), f"{self.headers=}. Must be a list ot tupe of str"
-        assert isinstance(
-            self.header_widths, (list, tuple)
-        ), f"{self.header_widths=}. Must be a list ot tupe of ints"
-        assert isinstance(
-            self.header_font, Font
-        ), f"{self.header_font=}. Must be a Font"
+        assert isinstance(self.headers, (list, tuple)), (
+            f"{self.headers=}. Must be a list ot tupe of str"
+        )
+        assert isinstance(self.header_widths, (list, tuple)), (
+            f"{self.header_widths=}. Must be a list ot tupe of ints"
+        )
+        assert isinstance(self.header_font, Font), (
+            f"{self.header_font=}. Must be a Font"
+        )
         assert (
             isinstance(self.header_width_default, int) and self.header_width_default > 0
         ), f"{self.header_width_default=}. Must be an int > 0"
@@ -15391,9 +15417,9 @@ class Treeview(_qtpyBase_Control):
         for title in self.headers:
             assert isinstance(title, str), f"header title <{title}> must be a str"
 
-        assert isinstance(
-            self.toplevel_items, (list, tuple)
-        ), f"{self.toplevel_items=}. Must be a list of str"
+        assert isinstance(self.toplevel_items, (list, tuple)), (
+            f"{self.toplevel_items=}. Must be a list of str"
+        )
 
         for item in self.toplevel_items:
             assert isinstance(item, str), f"{item=}. Must be a str"
@@ -15407,9 +15433,9 @@ class Treeview(_qtpyBase_Control):
         self.header_widths = tuple(header_widths)
 
         for num in self.header_widths:
-            assert (
-                isinstance(num, int) and num > 0
-            ), f"header_width <{num}> must be int > 0"
+            assert isinstance(num, int) and num > 0, (
+                f"header_width <{num}> must be int > 0"
+            )
 
         if self.width == -1:
             self.width = 0
@@ -15639,9 +15665,9 @@ class Treeview(_qtpyBase_Control):
         )
 
         for label in treeview_path:
-            assert (
-                isinstance(label, str) and label.strip() != ""
-            ), f"parent_label <{treeview_path}> must be a non-empty str"
+            assert isinstance(label, str) and label.strip() != "", (
+                f"parent_label <{treeview_path}> must be a non-empty str"
+            )
 
         child_label = treeview_path[-1]
 
@@ -15660,9 +15686,9 @@ class Treeview(_qtpyBase_Control):
             if parent_route == item_route:
                 parent_item = item_tuple[0]
                 for _, text in enumerate(display_items):
-                    assert (
-                        isinstance(text, str) and text.strip() != ""
-                    ), f"treeview display item <{text}> must a non-empty str"
+                    assert isinstance(text, str) and text.strip() != "", (
+                        f"treeview display item <{text}> must a non-empty str"
+                    )
 
                     child_item = qtW.QTreeWidgetItem(parent_item)
                     # item_data = self.Item_Data(user_data=user_data[index])  # TODO Fix
@@ -15702,9 +15728,9 @@ class Treeview(_qtpyBase_Control):
         )
 
         for label in treeview_path:
-            assert (
-                isinstance(label, str) and label.strip() != ""
-            ), f"parent_label <{treeview_path}> must be a non-empty str"
+            assert isinstance(label, str) and label.strip() != "", (
+                f"parent_label <{treeview_path}> must be a non-empty str"
+            )
 
         assert isinstance(checked, bool), f"checked <{checked}> must be bool"
 
@@ -15828,9 +15854,9 @@ class Treeview(_qtpyBase_Control):
         )
 
         for label in treeview_path:
-            assert (
-                isinstance(label, str) and label.strip() != ""
-            ), f"parent_label <{treeview_path}> must be a non-empty str"
+            assert isinstance(label, str) and label.strip() != "", (
+                f"parent_label <{treeview_path}> must be a non-empty str"
+            )
 
         child_label = treeview_path[-1]
 
@@ -15971,20 +15997,20 @@ class Slider(_qtpyBase_Control):
 
     def __post_init__(self) -> None:
         """Initializes the slider object."""
-        assert (
-            isinstance(self.range_min, int) and self.range_min >= 0
-        ), f"{self.range_min=}. Must be an int >= 0"
+        assert isinstance(self.range_min, int) and self.range_min >= 0, (
+            f"{self.range_min=}. Must be an int >= 0"
+        )
         assert (
             isinstance(self.range_max, int)
             and self.range_max > 0
             and self.range_max > self.range_min
         ), f"{self.range_max=}. Must be an int > 0 and < {self.range_min=}."
-        assert (
-            isinstance(self.page_step, int) and self.page_step > 0
-        ), f"{self.page_step=}. Must be an int > 0"
-        assert (
-            isinstance(self.single_step, int) and self.single_step > 0
-        ), f"{self.single_step=}. Must be an int > 0"
+        assert isinstance(self.page_step, int) and self.page_step > 0, (
+            f"{self.page_step=}. Must be an int > 0"
+        )
+        assert isinstance(self.single_step, int) and self.single_step > 0, (
+            f"{self.single_step=}. Must be an int > 0"
+        )
         assert isinstance(self.orientation, str) and self.orientation in [
             "horizontal",
             "vertical",
@@ -16063,9 +16089,9 @@ class Slider(_qtpyBase_Control):
         Args:
             range_min (int): The minimum value of the slider.
         """
-        assert (
-            isinstance(range_min, int) and range_min >= 0
-        ), f"{range_min=}. Must be an int >= 0"
+        assert isinstance(range_min, int) and range_min >= 0, (
+            f"{range_min=}. Must be an int >= 0"
+        )
 
         self.range_min = range_min
 
@@ -16143,17 +16169,17 @@ class Spinbox(_qtpyBase_Control):
 
     def __post_init__(self) -> None:
         """Initializes the spinbox object."""
-        assert (
-            isinstance(self.range_min, int) and self.range_min >= 0
-        ), f"{self.range_min=}. Must be an int >= 0"
+        assert isinstance(self.range_min, int) and self.range_min >= 0, (
+            f"{self.range_min=}. Must be an int >= 0"
+        )
         assert (
             isinstance(self.range_max, int)
             and self.range_max > 0
             and self.range_max > self.range_min
         ), f"{self.range_max=}. Must be an int > 0 and < {self.range_min=}."
-        assert (
-            isinstance(self.single_step, int) and self.single_step > 0
-        ), f"{self.single_step=}. Must be an int > 0"
+        assert isinstance(self.single_step, int) and self.single_step > 0, (
+            f"{self.single_step=}. Must be an int > 0"
+        )
         assert isinstance(self.suffix, str), f"{self.suffix=}. Must be a str"
         assert isinstance(self.prefix, str), f"{self.prefix=}. Must be a str"
 
@@ -16210,9 +16236,9 @@ class Spinbox(_qtpyBase_Control):
         Args:
             value (int): The value to set the spinbox to.
         """
-        assert (
-            isinstance(value, int) and self.range_min <= value <= self.range_max
-        ), f"{value=}. Must be an int >= {self.range_min} and < {self.range_max}."
+        assert isinstance(value, int) and self.range_min <= value <= self.range_max, (
+            f"{value=}. Must be an int >= {self.range_min} and < {self.range_max}."
+        )
         self._widget: qtW.QSpinBox
         self._widget.setValue(value)
 
@@ -16249,15 +16275,15 @@ class Video_Player(qtM.QMediaPlayer):
         #    "gstreamer"  # Nice to know how to use gstreamer if you have to!
         # )
 
-        assert parent is None or isinstance(
-            parent, qtC.QObject
-        ), f"{parent =} must be None or a qtC.QObject"
-        assert (
-            isinstance(display_width, int) and display_width > 0
-        ), f"{display_width =} must be an int > 0"
-        assert (
-            isinstance(display_height, int) and display_height > 0
-        ), f"{display_height =} must be an int > 0"
+        assert parent is None or isinstance(parent, qtC.QObject), (
+            f"{parent =} must be None or a qtC.QObject"
+        )
+        assert isinstance(display_width, int) and display_width > 0, (
+            f"{display_width =} must be an int > 0"
+        )
+        assert isinstance(display_height, int) and display_height > 0, (
+            f"{display_height =} must be an int > 0"
+        )
 
         self.source_state = "no_media"
 
@@ -16365,13 +16391,13 @@ class Video_Player(qtM.QMediaPlayer):
 
         """
 
-        assert (
-            isinstance(frame_rate, float) and frame_rate > 0
-        ), f"{frame_rate =}. Must be float > 0"
+        assert isinstance(frame_rate, float) and frame_rate > 0, (
+            f"{frame_rate =}. Must be float > 0"
+        )
 
-        assert (
-            isinstance(input_file, str) and input_file.strip() != ""
-        ), f"{input_file =} must be a non-empty str"
+        assert isinstance(input_file, str) and input_file.strip() != "", (
+            f"{input_file =} must be a non-empty str"
+        )
 
         with sys_cursor(Cursor.hourglass):
             self.stop()

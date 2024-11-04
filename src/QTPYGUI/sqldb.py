@@ -17,8 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-# Tell Black to leave this block alone (realm of isort)
-# fmt: off
 import base64
 import binascii
 import dataclasses
@@ -31,21 +29,16 @@ from decimal import Decimal
 from enum import unique
 from pathlib import Path
 from sqlite3 import Connection
-from typing import Callable, TextIO, overload, cast
+from typing import Callable, TextIO, overload, cast, Final
 
 import platformdirs
+
 try:
-    import sys_consts
     from file_utils import File
-    from sys_consts import SDELIM
     from utils import NUMBER, Get_Unique_Sysid, Is_Complied, strEnum
 except ImportError:
-    from .sys_consts import *
     from .file_utils import File
-    from .sys_consts import SDELIM
     from .utils import NUMBER, Get_Unique_Sysid, Is_Complied, strEnum
-
-# fmt: on
 
 
 @dataclasses.dataclass(slots=True)
@@ -213,40 +206,40 @@ class ColDef:
     index: bool = False
 
     def __post_init__(self) -> None:
-        assert (
-            isinstance(self.name, str) and self.name.strip() != ""
-        ), f"{self.name=}. Must be a non-empty str"
+        assert isinstance(self.name, str) and self.name.strip() != "", (
+            f"{self.name=}. Must be a non-empty str"
+        )
 
-        assert (
-            self.data_type in DATATYPES
-        ), f"data_type <{self.data_type}> not in list <{list(DATATYPES)}>"
+        assert self.data_type in DATATYPES, (
+            f"data_type <{self.data_type}> not in list <{list(DATATYPES)}>"
+        )
 
-        assert (
-            isinstance(self.size, int) and self.size >= 0
-        ), f"{self.size=}. Must be int >= 0"
-        assert (
-            isinstance(self.num_decs, int) and self.num_decs >= 0
-        ), f"{self.num_decs=}. Must be int >= 0"
+        assert isinstance(self.size, int) and self.size >= 0, (
+            f"{self.size=}. Must be int >= 0"
+        )
+        assert isinstance(self.num_decs, int) and self.num_decs >= 0, (
+            f"{self.num_decs=}. Must be int >= 0"
+        )
         assert isinstance(self.description, str), f"{self.description}. Must be str"
         assert isinstance(self.primary_key, bool), f"{self.primary_key=}. Must be bool"
         assert isinstance(self.foreign_key, bool), f"{self.foreign_key=}. Must be bool"
         assert isinstance(self.unique, bool), f"{self.unique=}. Must be bool"
         assert isinstance(self.deferrable, bool), f"{self.deferrable=}. Must be bool"
-        assert isinstance(
-            self.cascade_delete, bool
-        ), f"{self.cascade_delete=}. Must be bool"
-        assert isinstance(
-            self.cascaded_update, bool
-        ), f"{self.cascaded_update=}. Must be bool"
+        assert isinstance(self.cascade_delete, bool), (
+            f"{self.cascade_delete=}. Must be bool"
+        )
+        assert isinstance(self.cascaded_update, bool), (
+            f"{self.cascaded_update=}. Must be bool"
+        )
         assert isinstance(self.index, bool), f"{self.index=}. Must be bool"
 
         if self.foreign_key:  # Must have parent table and col
             assert (
                 isinstance(self.parent_table, str) and self.parent_table.strip() != ""
             ), f"{self.parent_table}. Must be a mom-empty str for FK"
-            assert (
-                isinstance(self.parent_col, str) and self.parent_col.strip() != ""
-            ), f"{self.parent_col=}. Must be  a non-empty str for FK"
+            assert isinstance(self.parent_col, str) and self.parent_col.strip() != "", (
+                f"{self.parent_col=}. Must be  a non-empty str for FK"
+            )
 
         # Numbers need massaging depending on Num Decs
         if self.data_type in (SQL.INTEGER, SQL.DECIMAL):
@@ -275,9 +268,9 @@ class App_Settings:
             app_name (str): Application name
         """
 
-        assert (
-            isinstance(app_name, str) and app_name.strip() != ""
-        ), f"app_name <{app_name}> must be a non-empty str"
+        assert isinstance(app_name, str) and app_name.strip() != "", (
+            f"app_name <{app_name}> must be a non-empty str"
+        )
 
         self._app_name = app_name
         self._error_code = 1
@@ -384,9 +377,9 @@ class App_Settings:
             int : 1 - Ok, -1 Failed to set
 
         """
-        assert (
-            isinstance(password, str) and password.strip() != ""
-        ), f"{password}. Must be non-empty str"
+        assert isinstance(password, str) and password.strip() != "", (
+            f"{password}. Must be non-empty str"
+        )
 
         if password_hash:
             password = Crypto().hash_password(password)
@@ -405,9 +398,9 @@ class App_Settings:
             bool : True - passwords match, False - no match
 
         """
-        assert (
-            isinstance(password, str) and password.strip() != ""
-        ), f"{password}. Must be non-empty str"
+        assert isinstance(password, str) and password.strip() != "", (
+            f"{password}. Must be non-empty str"
+        )
         assert isinstance(password_hash, bool), f"{password_hash=}. Must be bool"
 
         if password_hash:
@@ -447,9 +440,9 @@ class App_Settings:
             bool : True - setting exists, False it does not
 
         """
-        assert (
-            isinstance(setting_name, str) and setting_name.strip() != ""
-        ), f"{setting_name=}. Must be str"
+        assert isinstance(setting_name, str) and setting_name.strip() != "", (
+            f"{setting_name=}. Must be str"
+        )
 
         sql_statement = (
             f"{SQL.SELECT} id {SQL.FROM} {SYSDEF.SYSTABLE} "
@@ -508,9 +501,9 @@ class App_Settings:
         Returns:
             str| bool| int| float| None:: The setting value
         """
-        assert (
-            isinstance(setting_name, str) and setting_name.strip() != ""
-        ), f"{setting_name=}. Must be non-empty str"
+        assert isinstance(setting_name, str) and setting_name.strip() != "", (
+            f"{setting_name=}. Must be non-empty str"
+        )
 
         sql_statement = (
             f"{SQL.SELECT} id {SQL.FROM} {SYSDEF.SYSTABLE} "
@@ -579,13 +572,13 @@ class App_Settings:
         Returns:
             int: 1 ok, -1 fail
         """
-        assert (
-            isinstance(setting_name, str) and setting_name.strip() != ""
-        ), f"{setting_name=}. Must be non-empty str"
+        assert isinstance(setting_name, str) and setting_name.strip() != "", (
+            f"{setting_name=}. Must be non-empty str"
+        )
 
-        assert isinstance(
-            setting_value, (bool, int, float, str)
-        ), f"{setting_value=}. Must be bool, int, float or str"
+        assert isinstance(setting_value, (bool, int, float, str)), (
+            f"{setting_value=}. Must be bool, int, float or str"
+        )
 
         sql_statement = (
             f"{SQL.SELECT} id {SQL.FROM} {SYSDEF.SYSTABLE} "
@@ -827,12 +820,12 @@ class App_Settings:
         Returns:
             int: 1 if not fatal otherwise raises a value _error halting app execution and displays an _error message
         """
-        assert (
-            isinstance(title, str) and title.strip() != ""
-        ), f"{title=}. Must be non-empty str"
-        assert (
-            isinstance(message, str) and message.strip() != ""
-        ), f"{message=}. Must be non-empty str"
+        assert isinstance(title, str) and title.strip() != "", (
+            f"{title=}. Must be non-empty str"
+        )
+        assert isinstance(message, str) and message.strip() != "", (
+            f"{message=}. Must be non-empty str"
+        )
         assert isinstance(fatal, bool), f"{fatal=}. Must be bool"
 
         self._error_code = -1
@@ -859,9 +852,9 @@ class Crypto:
         Returns:
             str: The hashed password
         """
-        assert (
-            isinstance(clear_password, str) and clear_password.strip() != ""
-        ), f"{clear_password=}. Must be non-empty str"
+        assert isinstance(clear_password, str) and clear_password.strip() != "", (
+            f"{clear_password=}. Must be non-empty str"
+        )
 
         salt = hashlib.sha256(os.urandom(60)).hexdigest().encode("ascii")
 
@@ -882,12 +875,12 @@ class Crypto:
         Returns:
             bool: True - Passwords match, False Passwords do not match
         """
-        assert (
-            isinstance(password_hash, str) and password_hash.strip() != ""
-        ), f"{password_hash=}. Must be non-empty str"
-        assert (
-            isinstance(clear_password, str) and clear_password.strip() != ""
-        ), f"{clear_password=}. Must be non-empty str"
+        assert isinstance(password_hash, str) and password_hash.strip() != "", (
+            f"{password_hash=}. Must be non-empty str"
+        )
+        assert isinstance(clear_password, str) and clear_password.strip() != "", (
+            f"{clear_password=}. Must be non-empty str"
+        )
 
         salt = password_hash[:64]
         password_hash = password_hash[64:]
@@ -930,9 +923,9 @@ class SQL_Shelf:
 
     def __post_init__(self):
         """Initialises the object"""
-        assert (
-            isinstance(self.db_name, str) and self.db_name.strip() != ""
-        ), f"{self.db_name=}. Must be non-empty str"
+        assert isinstance(self.db_name, str) and self.db_name.strip() != "", (
+            f"{self.db_name=}. Must be non-empty str"
+        )
 
         file_handler = File()
         self._data_path = platformdirs.user_data_dir(self.db_name)
@@ -1015,9 +1008,9 @@ class SQL_Shelf:
         Returns:
             dict: Dictionary stored on the shelf
         """
-        assert (
-            isinstance(shelf_name, str) and shelf_name.strip() != ""
-        ), f"{shelf_name=}. Must be non-empty str"
+        assert isinstance(shelf_name, str) and shelf_name.strip() != "", (
+            f"{shelf_name=}. Must be non-empty str"
+        )
 
         sql_statement = (
             f"{SQL.SELECT} {SQL.COUNT}('name') {SQL.FROM} shelves "
@@ -1079,13 +1072,13 @@ class SQL_Shelf:
             - arg 2: If the status code is -1, an error occurred, and the message provides details.:
 
         """
-        assert (
-            isinstance(shelf_name, str) and shelf_name.strip() != ""
-        ), f"{shelf_name=}. Must be non-empty str"
+        assert isinstance(shelf_name, str) and shelf_name.strip() != "", (
+            f"{shelf_name=}. Must be non-empty str"
+        )
 
-        assert (
-            isinstance(shelf_key, str) and shelf_key.strip() != ""
-        ), f"{shelf_key=}. Must be non-empty str"
+        assert isinstance(shelf_key, str) and shelf_key.strip() != "", (
+            f"{shelf_key=}. Must be non-empty str"
+        )
 
         shelf_dict = self.open(shelf_name=shelf_name)
 
@@ -1114,9 +1107,9 @@ class SQL_Shelf:
             - arg 1: If the status code is 1, the operation was successful otherwise it failed.
             - arg 2: If the status code is -1, an error occurred, and the message provides details.:
         """
-        assert (
-            isinstance(shelf_name, str) and shelf_name.strip() != ""
-        ), f"{shelf_name=}. Must be non-empty str"
+        assert isinstance(shelf_name, str) and shelf_name.strip() != "", (
+            f"{shelf_name=}. Must be non-empty str"
+        )
 
         assert isinstance(shelf_data, dict), f"{shelf_data=}. Must be a dict"
 
@@ -1163,6 +1156,8 @@ class SQL_Shelf:
 class SQLDB:
     """Class provides app database, utility and SQL methods -> SQLLITE focused but could be extended"""
 
+    SDELIM: Final[str] = "||"  # Delimiter used to cut out sections of the string
+
     def __init__(
         self,
         appname: str,
@@ -1172,13 +1167,24 @@ class SQLDB:
         dbpassword: str,  # Need a special sqllite build for this to work
         currency_num_decs: int = 2,
     ):
-        # Private instance methods
-        self._db_new = False
-        self._transaction_begun = False  # Used in SQL Statements execution
+        """
+        Initialises the SQL database object
 
-        assert (
-            isinstance(appname, str) and appname.strip() != ""
-        ), f"{appname=}. Must be a non-rmpty str"
+        Args:
+            appname (str): App name
+            dbpath (str): Path to the database file
+            dbfile (str): Database file name
+            suffix (str): Suffix to append to the database file name
+            dbpassword (str): Password to encrypt the database file with
+            currency_num_decs (int): Number of decimal places to store currency values with
+
+        Raises:
+            AssertionError: If any of the arguments are invalid
+        """
+
+        assert isinstance(appname, str) and appname.strip() != "", (
+            f"{appname=}. Must be a non-rmpty str"
+        )
         assert isinstance(dbpath, str), f"{dbpath=}. Must be a str"
         assert (
             isinstance(dbfile, str)
@@ -1189,9 +1195,14 @@ class SQLDB:
             and suffix.strip() != f"{suffix=}. Must be a non-empty str"
         )
         assert isinstance(dbpassword, str), f"{dbpassword=}. Must be a str"
-        assert (
-            isinstance(currency_num_decs, int) and currency_num_decs >= 0
-        ), f"{currency_num_decs=}. Must be an int >= 0"
+        assert isinstance(currency_num_decs, int) and currency_num_decs >= 0, (
+            f"{currency_num_decs=}. Must be an int >= 0"
+        )
+
+        # Private instance methods
+        self._db_new: bool = False
+        self._appname: str = appname
+        self._transaction_begun: bool = False  # Used in SQL Statements execution
 
         if dbpath.strip() == "":
             dbpath = os.getcwd()
@@ -1347,12 +1358,12 @@ class SQLDB:
             return col_def
 
         # ####### Main body #######
-        assert (
-            isinstance(file_name, str) and file_name.strip() != ""
-        ), f"{file_name=}. Must be non-empty str"
-        assert (
-            isinstance(table_name, str) and table_name.strip() != ""
-        ), f"{table_name=}. Must be non-empty str"
+        assert isinstance(file_name, str) and file_name.strip() != "", (
+            f"{file_name=}. Must be non-empty str"
+        )
+        assert isinstance(table_name, str) and table_name.strip() != "", (
+            f"{table_name=}. Must be non-empty str"
+        )
         assert isinstance(text_index, int), f"{text_index=}. Must be int"
         assert isinstance(has_header, bool), f"{has_header=}. Must be bool"
         assert isinstance(delimiter, str), f"{delimiter=}. Must be str"
@@ -1374,9 +1385,9 @@ class SQLDB:
                 line_list = line.strip().split(delimiter)
 
                 if line_no == 0:
-                    assert (
-                        0 <= text_index - 1 <= len(line)
-                    ), f"text_index({text_index - 1}) >= 0 and text_index <={len(line)}"
+                    assert 0 <= text_index - 1 <= len(line), (
+                        f"text_index({text_index - 1}) >= 0 and text_index <={len(line)}"
+                    )
                     column_definition = _get_col_props(csv_file, delimiter, has_header)
 
                     table_def = []
@@ -1458,9 +1469,9 @@ class SQLDB:
         Returns:
             list | tuple: List containing rows returned from database or empty tuple if not a select statement or error
         """
-        assert (
-            isinstance(sql_statement, str) and sql_statement.strip() != ""
-        ), f"{sql_statement=}. Must be non-empty str"
+        assert isinstance(sql_statement, str) and sql_statement.strip() != "", (
+            f"{sql_statement=}. Must be non-empty str"
+        )
         assert isinstance(transactional, bool), f"{transactional=}. Must be bool"
         assert isinstance(debug, bool), f"{debug=}. Must be bool"
 
@@ -1541,9 +1552,9 @@ class SQLDB:
         Returns:
             list | tuple: Expect an empty tuple to be returned. Check error after executing
         """
-        assert (
-            isinstance(table, str) and table.strip() != ""
-        ), f"{table=}. Must be non-empty str"
+        assert isinstance(table, str) and table.strip() != "", (
+            f"{table=}. Must be non-empty str"
+        )
         assert isinstance(where_str, str), f"{where_str=}. Must be non-empty str"
 
         if not self.table_exists(table):
@@ -1565,9 +1576,9 @@ class SQLDB:
         """
 
         # Table/Column cannot start with a quote(') or ('-') or be a number
-        assert (
-            isinstance(col_item, list) and col_item
-        ), f"DBG {col_item=}. Must be a list with at least one entry"
+        assert isinstance(col_item, list) and col_item, (
+            f"DBG {col_item=}. Must be a list with at least one entry"
+        )
 
         match len(col_item):
             case 1:  # Col Only
@@ -1586,9 +1597,9 @@ class SQLDB:
 
                 table_name = "".join(tables)
 
-                assert self.table_exists(
-                    table_name
-                ), f"table <{table_name}> does not exist!"
+                assert self.table_exists(table_name), (
+                    f"table <{table_name}> does not exist!"
+                )
 
             case 2:  # Table.Col
                 if (
@@ -1605,13 +1616,13 @@ class SQLDB:
                 ):  # Text data
                     return None
 
-                assert self.table_exists(
-                    col_item[0]
-                ), f"table <{col_item[0]}> does not exist!"
+                assert self.table_exists(col_item[0]), (
+                    f"table <{col_item[0]}> does not exist!"
+                )
 
-                assert self.col_exists(
-                    col_item[0], col_item[1]
-                ), f"Col <{col_item[1]}> does not exist in table <{col_item[0]}>!"
+                assert self.col_exists(col_item[0], col_item[1]), (
+                    f"Col <{col_item[1]}> does not exist in table <{col_item[0]}>!"
+                )
 
             case _:  # Not legal
                 raise ValueError(f"col <{col_item}> must be [column | table.column]")
@@ -1639,12 +1650,12 @@ class SQLDB:
             list | tuple: The result of the select statement
         """
 
-        assert (
-            isinstance(col_str, str) and col_str.strip() != ""
-        ), f"{col_str=}. Must be non-empty str"
-        assert (
-            isinstance(table_str, str) and table_str.strip() != ""
-        ), f"{table_str=}. Must be non-empty str"
+        assert isinstance(col_str, str) and col_str.strip() != "", (
+            f"{col_str=}. Must be non-empty str"
+        )
+        assert isinstance(table_str, str) and table_str.strip() != "", (
+            f"{table_str=}. Must be non-empty str"
+        )
         assert isinstance(where_str, str), f"{where_str=}. Must be str"
         assert isinstance(orderby_str, str), f"{orderby_str=}. Must be str"
         assert isinstance(udf_function_name, str), f"{udf_function_name=}. Must be str"
@@ -1661,8 +1672,8 @@ class SQLDB:
                 # Ignore user defined and SQL Lite function massaging of cols - coder knows what they are doing!:
                 # TODO: Process it!
                 pass
-            elif SDELIM in column:  # SQL Lite Concat -
-                concat_cols = column.split(SDELIM)
+            elif self.SDELIM in column:  # SQL Lite Concat -
+                concat_cols = column.split(self.SDELIM)
 
                 for concat_col in concat_cols:
                     column_components = concat_col.split(".")
@@ -1717,12 +1728,12 @@ class SQLDB:
             debug (bool): If True, prints the SQL statement to the console. Defaults to False
         """
 
-        assert (
-            isinstance(col_dict, dict) and col_dict
-        ), f"{col_dict=}. Must be non-empty dict  of column name/value pairs"
-        assert (
-            isinstance(table_str, str) and table_str.strip() != ""
-        ), f"{table_str=}. Must be non-empty str"
+        assert isinstance(col_dict, dict) and col_dict, (
+            f"{col_dict=}. Must be non-empty dict  of column name/value pairs"
+        )
+        assert isinstance(table_str, str) and table_str.strip() != "", (
+            f"{table_str=}. Must be non-empty str"
+        )
         assert isinstance(where_str, str), f"{where_str=}. Must be str"
 
         tables = table_str.split(",")
@@ -1741,8 +1752,8 @@ class SQLDB:
             if (func_name in column.lower() for func_name in SQLFUN.list()):
                 # Ignore SQL Lite function massaging of cols - coder knows what they are doing!: TODO: Process it!
                 pass
-            elif SDELIM in column:  # SQL Lite Concat -
-                concat_cols = column.split(SDELIM)
+            elif self._sdelim in column:  # SQL Lite Concat -
+                concat_cols = column.split(self._sdelim)
 
                 for concat_col in concat_cols:
                     column_components = concat_col.split(".")
@@ -1807,12 +1818,12 @@ class SQLDB:
                 List Defining Column Properties as a tuple [0] col_name,
                 [1] data type [2] Col Nullable [3] Default value [4] 0 or index of PK col
         """
-        assert (
-            isinstance(table_name, str) and table_name.strip() != ""
-        ), f"{table_name=}. Must be non-empty str"
-        assert self.table_exists(
-            table_name
-        ), f"table <{table_name}> does not exist in database"
+        assert isinstance(table_name, str) and table_name.strip() != "", (
+            f"{table_name=}. Must be non-empty str"
+        )
+        assert self.table_exists(table_name), (
+            f"table <{table_name}> does not exist in database"
+        )
 
         cursor = self._dbconnection.execute(f"pragma table_info({table_name})")
 
@@ -1837,12 +1848,12 @@ class SQLDB:
         Returns:
             int: 1 if table created, -1 if failed. Check error!
         """
-        assert (
-            isinstance(table_name, str) and table_name.strip() != ""
-        ), f"{table_name=}. Must be non-empty str"
-        assert isinstance(
-            col_defs, (list, tuple)
-        ), f"{col_defs=}. Must be list|tuple of col_defs"
+        assert isinstance(table_name, str) and table_name.strip() != "", (
+            f"{table_name=}. Must be non-empty str"
+        )
+        assert isinstance(col_defs, (list, tuple)), (
+            f"{col_defs=}. Must be list|tuple of col_defs"
+        )
         assert isinstance(drop_table, bool), f"{drop_table=}. Must be bool"
 
         col_list, primary_key_stmt = self._build_column_definition(col_defs)
@@ -2002,12 +2013,12 @@ class SQLDB:
             bool: True if column exists, False if it does not exist
 
         """
-        assert (
-            isinstance(table_name, str) and table_name.strip() != ""
-        ), f"{table_name=}. Must be non-empty str"
-        assert (
-            isinstance(column_name, str) and column_name.strip() != ""
-        ), f"{column_name=}. Must be non-empty str"
+        assert isinstance(table_name, str) and table_name.strip() != "", (
+            f"{table_name=}. Must be non-empty str"
+        )
+        assert isinstance(column_name, str) and column_name.strip() != "", (
+            f"{column_name=}. Must be non-empty str"
+        )
 
         if self.table_exists(table_name):
             sql_statement = (
@@ -2033,9 +2044,9 @@ class SQLDB:
         Returns:
             bool: True if table exists, False if table does not exist
         """
-        assert (
-            isinstance(table_name, str) and table_name.strip() != ""
-        ), f"{table_name=}. Must be non-empty str"
+        assert isinstance(table_name, str) and table_name.strip() != "", (
+            f"{table_name=}. Must be non-empty str"
+        )
 
         sql_statement = (
             f"{SQL.SELECT} name {SQL.FROM} {SYSDEF.SQLMASTERTABLE} "
@@ -2090,12 +2101,12 @@ class SQLDB:
         Returns:
             int: 1 if not fatal otherwise raises a value _error halting app execution and displays an _error message
         """
-        assert (
-            isinstance(title, str) and title.strip() != ""
-        ), f"{title=}. Must be non-empty str"
-        assert (
-            isinstance(message, str) and message.strip() != ""
-        ), f"{message=}. Must be non-empty str"
+        assert isinstance(title, str) and title.strip() != "", (
+            f"{title=}. Must be non-empty str"
+        )
+        assert isinstance(message, str) and message.strip() != "", (
+            f"{message=}. Must be non-empty str"
+        )
         assert isinstance(fatal, bool), f"{fatal=}. Must be bool"
 
         self._error_txt = message
@@ -2114,12 +2125,12 @@ class SQLDB:
             func_name (str): Name of function
         """
         assert isinstance(func, Callable), f"{func=}. Must be Func|Method|Lambda etc."
-        assert (
-            isinstance(num_args, int) and num_args >= 0
-        ), f"{num_args=}. Must be the number of args to the func"
-        assert (
-            isinstance(func_name, str) and func_name.strip() != ""
-        ), f"{func_name=}. Must be str and the name of the func"
+        assert isinstance(num_args, int) and num_args >= 0, (
+            f"{num_args=}. Must be the number of args to the func"
+        )
+        assert isinstance(func_name, str) and func_name.strip() != "", (
+            f"{func_name=}. Must be str and the name of the func"
+        )
 
         self._dbconnection.create_function(func_name, num_args, func)
 
