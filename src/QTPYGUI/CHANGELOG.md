@@ -16,7 +16,7 @@
     | select_text       | str (")              | The text to select after load                            | ✓            |
     | text_index        | int (1)              | The column in the CSV file to load into display          | ✓            |
     
-    CommBox now supports limited filtering - exact match only 
+    ComboBox now supports limited filtering - exact match only 
   
     Note: filter is a list of tuples of (column_index, filter_string) where the
           column index is the index of the column in the CSV file which must equal
