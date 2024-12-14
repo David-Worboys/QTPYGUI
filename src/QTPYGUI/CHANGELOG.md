@@ -1,5 +1,6 @@
 # QTPYGUI Change Log
 ## 1.0.3
+- Removed sys_const.py, possible breaking change.  Each application should have its own sys_const.py 
 - Modifed ComboBox and supporting class CSV_File_Def used only with class ComboBox
   - CSV_File_Def properties now are
     
