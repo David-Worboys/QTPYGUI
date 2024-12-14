@@ -52,7 +52,7 @@ class Example_03:
         """
         assert isinstance(event, qtg.Action), f"{event=}. Must be Action"
 
-        print(f"DBG {event.event=} {event.container_tag=} {event.tag=} {event.value=}")
+        #print(f"DBG {event.event=} {event.container_tag=} {event.tag=} {event.value=}")
         match event.event:
             case qtg.Sys_Events.APPPOSTINIT:
                 self._treeview.child_add(treeview_path="Test 1", items="Test 3")
@@ -387,7 +387,7 @@ class Example_03:
                         text="Date Edit 2",
                         date="2022-01-01",
                         format="yyyy-MM-dd",
-                        max_date="2032-01-01",
+                        max_date="2132-01-01",
                         min_date="2000-01-01",
                         label="Date edit 2",
                         callback=self.event_handler,

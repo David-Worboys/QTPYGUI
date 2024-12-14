@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import sys
+from typing import cast
 
 try:
     import QTPYGUI.qtpygui as qtg
@@ -96,7 +97,7 @@ class Example_04:
                     else:
                         # Delete page
                         tab_widget.page_remove(page_tag)
-                        # tab_widget.page_remove(event.tag)
+
                 elif event.tag == "ok":
                     self.example_04.app_exit()
 

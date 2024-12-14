@@ -60,9 +60,8 @@ class Hello_World:
             qtg.FormContainer().add_row(
                 qtg.Label(
                     text="Hello World!",
-                    txt_fontsize=48,
-                    txt_align=qtg.Align.CENTER,
-                    txt_font=qtg.Font(backcolor="blue", forecolor="yellow"),
+                    txt_align=qtg.Align_Text.CENTER,
+                    txt_font=qtg.Font(backcolor="blue", forecolor="yellow", size=48),
                 ),
             ),
             qtg.HBoxContainer().add_row(
