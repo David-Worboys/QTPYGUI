@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-# TODO Split file into multiple files - well this is bigger than Ben Hur now, needs its own git project,
+# TODO Split file into multiple files - well this is bigger than Ben Hur now, needs,
 # doco, examples etc. Code needs review as well...sigh, where to find the time!
 
 import copy
@@ -1133,7 +1133,7 @@ class Time_Struct:
         Args:
             value (int): The hour
         """
-        assert isinstance(value, int) and value >= 0 and value < 24
+        assert isinstance(value, int) and 0 <= value < 24
         self._hour = value
 
     @property
@@ -1148,7 +1148,7 @@ class Time_Struct:
         Args:
             value (int): The minutes
         """
-        assert isinstance(value, int) and value >= 0 and value < 60
+        assert isinstance(value, int) and 0 <= value < 60
         self._min = value
 
     @property
@@ -1163,7 +1163,7 @@ class Time_Struct:
         Args:
             value (int): The seconds
         """
-        assert isinstance(self.sec, int) and self.sec >= 0 and self.sec < 60
+        assert isinstance(self.sec, int) and 0 <= self.sec < 60
         self._sec = value
 
     @property
@@ -1178,7 +1178,7 @@ class Time_Struct:
         Args:
             value (int): The milliseconds
         """
-        assert isinstance(value, int) and value >= 0 and value < 1000
+        assert isinstance(value, int) and 0 <= value < 1000
         self._msec = value
 
 
@@ -8521,7 +8521,7 @@ class Dateedit(_qtpyBase_Control):
         Returns:
             int : 1 is OK, -1 is a problem
         """
-        print(f"DBG DEA {args=}")
+
         event = cast(Action, args[0])  # type: Action
 
         if isinstance(event, Action):
