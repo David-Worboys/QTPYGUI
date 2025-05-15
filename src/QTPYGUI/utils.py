@@ -47,7 +47,6 @@ from typing import (
 )
 
 import dateutil.parser as dateparse
-import netifaces
 from Crypto.Cipher import AES
 from PySide6 import QtCore, QtWidgets
 
@@ -588,31 +587,32 @@ def Get_File_Hash(file_path: str) -> str:
 
 def Get_Unique_Sysid() -> str:
     """
-    Returns a unique system_id - Based on MAC address if all goes well or a fixed random string with the username
-    tacked on the end then all mixed-up. Not cryptographically secure but not obvious either.
-
-    Note: Ignores USB interfaces and may not always return the same sys_id if an interface is deactivated
+    Returns a unique system_id - Based on MAC address if all goes well,
+    or a fixed random string with the username tacked on the end, then all mixed-up.
+    Not cryptographically secure, but not obvious either.  This version does NOT
+    require the netifaces library.
 
     Returns:
-        str : A unique system id based on the MAC address or a random string if MAC address is not available
+        str: A unique system id based on the MAC address or a random string
+             if a MAC address is not available.
     """
-    sys_id = (
-        "jMSYkph66BhuhXRQGz6mHc4d" + getpass.getuser()
-    )  # Use random string if no MAC address found
+    sys_id = "jMSYkph66BhuhXRQGz6mHc4d" + getpass.getuser()  # Fallback
 
-    for interface in netifaces.interfaces():
-        address = netifaces.ifaddresses(interface)
+    try:
+        # Get the MAC address of the first available network interface
+        mac_address = None
+        for interface in uuid.getnode().to_bytes(6, "big"):
+            if interface != 0:
+                mac_address = ":".join([
+                    "{:02x}".format(b) for b in uuid.getnode().to_bytes(6, "big")
+                ])
+                break
 
-        if (
-            not interface.startswith("usb")
-            and netifaces.AF_LINK in address
-            and netifaces.AF_INET in address
-        ):  # Grab last valid MAC address for non-usb interface
-            mac_address = address[netifaces.AF_LINK][0]["addr"]
-            # ip_address = address[netifaces.AF_INET][0]['addr']
+        if mac_address and mac_address != "00:00:00:00:00:00":
+            sys_id = mac_address
 
-            if mac_address != "00:00:00:00:00:00":
-                sys_id = mac_address
+    except Exception:
+        pass  # If uuid.getnode() fails, fall back to the random string + username
 
     sys_list = []
     for index, character in enumerate(sys_id):
@@ -621,7 +621,6 @@ def Get_Unique_Sysid() -> str:
             sys_list.append(str(number))
 
     sys_number = int("".join(sys_list))
-
     random.seed(sys_number)
     random.shuffle(sys_list)
 
@@ -1986,7 +1985,7 @@ def cosine_similarity(data_x: list[float] | str, data_y: list[float] | str) -> f
 
 def euclidean_dist(data_x: str | list[float], data_y: str | list[float]) -> float:
     """
-    Calculates the euclidean distance between two lists of data
+    Calculates the Euclidean distance between two lists of data
 
     Args:
         data_x: List of floats or a string delimited by "," containing floats to be used as the x set
@@ -2432,15 +2431,25 @@ def Transform_Str_To_Value(
     return str(scrubbed_value)
 
 
-""" Regex for email check TODO put in function
-re.fullmatch(regex, email):
-(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=^_`{|}~-]+)*
-|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]
-|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")
-@
-(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?
-|\[(?:(?:(2(5[0-5]|[0-4][0-9])
-|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])
-|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]
-|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])
-"""
+def Is_Valid_Email(email: str) -> bool:
+    """
+    Checks if a given string is a valid email address using a regular expression.
+
+    Args:
+        email (str): The string to check.
+
+    Returns:
+        bool: True if the string is a valid email address, False otherwise.
+    """
+    assert isinstance(email, str) and email.strip() != "", (
+        f"{email=}. Must be non-empty str"
+    )
+    regex = r"""(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=
+                   ?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5b\x5d-
+                   \x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*
+                   [a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|
+                   [0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|
+                   1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-
+                   \x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])"""
+
+    return bool(re.fullmatch(regex, email))
