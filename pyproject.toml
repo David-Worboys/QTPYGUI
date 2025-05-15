@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "QTPYGUI"
-version = "1.0.3"
+version = "1.0.4"
 authors = [
   { name = "David Worboys", email = "davidaworboys@gmail.com"},
 ]
@@ -24,7 +24,6 @@ dependencies = [
 "fs >= 2.4.16",
 "idna >= 3.10",
 "Naked >= 0.1.32",
-"netifaces >= 0.11.0",
 "numpy >= 1.26.4",
 "pathvalidate >= 3.2.1",
 "platformdirs >= 4.2.0",
@@ -48,6 +47,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Operating System :: POSIX :: Linux",
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
 ]
@@ -67,7 +67,6 @@ dependencies = [
 "fs >= 2.4.16",
 "idna >= 3.10",
 "Naked >= 0.1.32",
-"netifaces >= 0.11.0",
 "numpy >= 1.26.4",
 "pathvalidate >= 3.2.1",
 "platformdirs >= 4.2.0",
@@ -106,5 +105,6 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Operating System :: Unix"
 ]
