@@ -25,8 +25,10 @@ import dataclasses
 import datetime
 import functools
 import math
+import os
 import platform
 import random
+import re
 import string
 import sys
 import time
@@ -43,6 +45,7 @@ import PySide6.QtGui as qtG
 import PySide6.QtMultimedia as qtM
 import PySide6.QtWidgets as qtW
 import numpy as np
+import platformdirs
 import shiboken6
 from attrs import define
 
@@ -61,6 +64,7 @@ try:
         Get_Unique_Int,
         strEnum,
     )
+
 except ImportError:
     from .file_utils import *
     from .langtran import *
@@ -436,12 +440,13 @@ class Grid_Item:
 class Special_Path(strEnum):
     """Contains enums for strings that represent special paths on the user's computer"""
 
-    DESKTOP: Final[str] = platformdirs.user_desktop_dir()
-    DOCUMENTS: Final[str] = platformdirs.user_documents_dir()
-    DOWNLOADS: Final[str] = platformdirs.user_downloads_dir()
-    MUSIC: Final[str] = platformdirs.user_music_dir()
-    PICTURES: Final[str] = platformdirs.user_pictures_dir()
-    VIDEOS: Final[str] = platformdirs.user_videos_dir()
+    DESKTOP = platformdirs.user_desktop_dir()
+    DOCUMENTS = platformdirs.user_documents_dir()
+    DOWNLOADS  = platformdirs.user_downloads_dir()
+    MUSIC  = platformdirs.user_music_dir()
+    PICTURES = platformdirs.user_pictures_dir()
+    VIDEOS = platformdirs.user_videos_dir()
+    APP_DATA = platformdirs.user_data_dir(appname=g_application.program_name)
 
 
 # An enumeration of all the application events that can be handled by the GUI.
@@ -1116,10 +1121,10 @@ class Time_Struct:
 
     def _post_init(self):
         """Checking the arguments passed to the constructor are of the correct type"""
-        assert isinstance(self._hour, int) and self._hour >= 0 and self._hour < 24
-        assert isinstance(self._min, int) and self._min >= 0 and self._min < 60
-        assert isinstance(self._sec, int) and self._sec >= 0 and self._sec < 60
-        assert isinstance(self._msec, int) and self._msec >= 0 and self._msec < 1000
+        assert isinstance(self._hour, int) and 0 <= self._hour < 24
+        assert isinstance(self._min, int) and 0 <= self._min < 60
+        assert isinstance(self._sec, int) and 0 <= self._sec < 60
+        assert isinstance(self._msec, int) and 0 <= self._msec < 1000
 
     @property
     def hour(self) -> int:
@@ -1929,68 +1934,6 @@ class _qtpySDI_Frame(_qtpyFrame):
         )
 
 
-class _Event_Filter(qtC.QObject):
-    """This class is a Qt event filter that emits signals when certain events occur."""
-
-    focusIn: qtC.Signal = qtC.Signal(qtC.QEvent)
-    focusOut: qtC.Signal = qtC.Signal(qtC.QEvent)
-    mousePressed: qtC.Signal = qtC.Signal(qtC.QEvent)
-    popupSignal: qtC.Signal = qtC.Signal(qtC.QEvent)
-    returnPressed: qtC.Signal = qtC.Signal(qtC.QEvent)
-
-    def __init__(
-        self,
-        parent_app: "QtPyApp",
-        owner_widget: "_qtpyBase_Control",
-        container_tag: str,
-    ):
-        qtC.QObject.__init__(self)
-        self._parent_app = parent_app
-        self._owner_widget = owner_widget
-        self._container_tag = container_tag
-
-    def eventFilter(self, obj: qtC.QObject, event: qtC.QEvent) -> bool:
-        """
-        The function emits signals when certain events occur.
-
-        Args:
-            obj (qtC.QObject): The object that the event is being sent to.
-            event (qtC.QEvent): The event that occurred.
-
-        Returns:
-            bool: The return value is a boolean that indicates whether the event was handled (true) or not (false).
-        """
-        try:
-            match event.type():
-                case qtC.QEvent.FocusIn:
-                    self.focusIn.emit(event)  # type: ignore
-                    return False
-                case qtC.QEvent.FocusOut:
-                    self.focusOut.emit(event)  # type: ignore
-                    return False
-                case qtC.QEvent.MouseButtonPress:
-                    if isinstance(obj, _Image):
-                        obj.clicked.emit()
-                        return True
-                case qtC.QEvent.Show:
-                    # if self.calendarWidget() is obj:
-                    self.popupSignal.emit(event)  # type: ignore
-                    return True
-                case qtC.QEvent.Type.KeyPress:
-                    if not isinstance(obj, _Grid_TableWidget):
-                        # print(f"{obj=} {event.key()= } {type(obj)=} {isinstance(obj,LineEdit)=} ")
-                        # TODO - Matbe tab should be processed separately?
-                        if (
-                            event.key() == qtC.Qt.Key_Return
-                            or event.key() == qtC.Qt.Key_Down
-                        ):
-                            obj.focusNextChild()
-                            return True
-        except Exception as e:
-            raise AssertionError(f"Event Filter Failed {e=}")
-        return False
-
-
 @dataclasses.dataclass(slots=True)
 # Using slots for better performance. But had to remove some inheritance to do so
 class _Widget_Registry:
@@ -2343,6 +2286,68 @@ class _Widget_Registry:
             print(output)
 
         return output
+
+
+class _Event_Filter(qtC.QObject):
+    """This class is a Qt event filter that emits signals when certain events occur."""
+
+    focusIn: qtC.Signal = qtC.Signal(qtC.QEvent)
+    focusOut: qtC.Signal = qtC.Signal(qtC.QEvent)
+    mousePressed: qtC.Signal = qtC.Signal(qtC.QEvent)
+    popupSignal: qtC.Signal = qtC.Signal(qtC.QEvent)
+    returnPressed: qtC.Signal = qtC.Signal(qtC.QEvent)
+
+    def __init__(
+        self,
+        parent_app: "QtPyApp",
+        owner_widget: "_qtpyBase_Control",
+        container_tag: str,
+    ):
+        qtC.QObject.__init__(self)
+        self._parent_app = parent_app
+        self._owner_widget = owner_widget
+        self._container_tag = container_tag
+
+    def eventFilter(self, obj: qtC.QObject, event: qtC.QEvent) -> bool:
+        """
+        The function emits signals when certain events occur.
+
+        Args:
+            obj (qtC.QObject): The object that the event is being sent to.
+            event (qtC.QEvent): The event that occurred.
+
+        Returns:
+            bool: The return value is a boolean that indicates whether the event was handled (true) or not (false).
+        """
+        try:
+            match event.type():
+                case qtC.QEvent.FocusIn:
+                    self.focusIn.emit(event)  # type: ignore
+                    return False
+                case qtC.QEvent.FocusOut:
+                    self.focusOut.emit(event)  # type: ignore
+                    return False
+                case qtC.QEvent.MouseButtonPress:
+                    if isinstance(obj, _Image):
+                        obj.clicked.emit()
+                        return True
+                case qtC.QEvent.Show:
+                    # if self.calendarWidget() is obj:
+                    self.popupSignal.emit(event)  # type: ignore
+                    return True
+                case qtC.QEvent.Type.KeyPress:
+                    if not isinstance(obj, _Grid_TableWidget):
+                        # print(f"{obj=} {event.key()= } {type(obj)=} {isinstance(obj,LineEdit)=} ")
+                        # TODO - Matbe tab should be processed separately?
+                        if (
+                            event.key() == qtC.Qt.Key_Return
+                            or event.key() == qtC.Qt.Key_Down
+                        ):
+                            obj.focusNextChild()
+                            return True
+        except Exception as e:
+            raise AssertionError(f"Event Filter Failed {e=}")
+        return False
 
 
 @dataclasses.dataclass
@@ -3347,17 +3352,20 @@ class _qtpyBase_Control(_qtpyBase):
         width_fudge: float = 1.1,
         parent_app: Optional["QtPyApp"] = None,
     ) -> Char_Pixel_Size:
-        """Transforms character size (height,width) in pixel size (height, width).
-        Fudge factors allow precise adjustment
+        """
+        Transforms character size (height, width) in pixel size (height, width),
+        supporting Unicode and non-monospaced fonts, and correctly handling monospaced fonts.
+        Uses hasGlyph to filter characters for non-monospaced fonts.
 
         Args:
-            char_height (int) : Character height in chars
-            char_width (int) :  Character width in chars
-            height_fudge (float) :  Fudge factor multiplier to provide height adjustment
-            width_fudge (float) : Fudge factor multiplier to provide width adjustment
+            char_height: Character height in chars.
+            char_width: Character width in chars.
+            height_fudge: Fudge factor multiplier for height adjustment.
+            width_fudge: Fudge factor multiplier for width adjustment.
+            parent_app: Optional QtPyApp instance (not used in the function body).
 
         Returns:
-            Char_Pixel_Size: CHAR_PIXEL_SIZE instance
+            Character size in pixels.
 
         """
         assert isinstance(char_height, int) and char_height > 0, (
@@ -3383,23 +3391,52 @@ class _qtpyBase_Control(_qtpyBase):
 
         font_metrics = qtG.QFontMetrics(font)
 
-        # Monspaced all the same width, proportional this might not be quite right
-        max_width = -1
-        max_height = -1
-        max_char = ""
-        for character in (
-            string.ascii_lowercase + string.ascii_uppercase + string.digits
-        ):
-            if font_metrics.boundingRect(character).width() > max_width:
-                max_width = font_metrics.boundingRect(character).width()
-                max_char = character
+        # Determine if the font is monospaced by comparing the width of a few different characters.
+        chars_to_compare = "iMW"  # Use characters with different widths
+        char_widths = [
+            font_metrics.horizontalAdvance(char) for char in chars_to_compare
+        ]
+        is_monospaced = all(w == char_widths[0] for w in char_widths)
 
-            if font_metrics.boundingRect(character).height() > max_height:
-                max_height = font_metrics.boundingRect(character).height()
+        if is_monospaced:
+            char_width_pixels = font_metrics.horizontalAdvance("0")
+            width = math.ceil(char_width_pixels * char_width * width_fudge)
+        else:
+            # If it's not monospaced, calculate the width using a representative set of characters.
+            test_characters = (
+                string.ascii_letters
+                + string.digits
+                + "à â æ ç é è ê ë î ï ô œ ù û ü ÿ"  # French
+                + "W M Ä Ö Ü ß é à ü"  # German
+                + "ش س ص ض ط ظ ع غ ف ق ك ل م ن ه و ي"  # Arabic
+                "Щ Ы Э Ю Я Б В Г Д Ж З И Й К Л М Н Ъ"  # Cyrillic
+                "你好世界，这是中文"  # Chinese
+                "こんにちは世界、これは日本語です"  # Japanese
+                "안녕하세요 세상, 이것은 한국어입니다"  # Korean
+            )
+            total_width = 0
+            valid_char_count = 0
+            for char in test_characters:
+                char_width_pixels = font_metrics.horizontalAdvance(char)
+                if char_width_pixels > 0:  # Check if the character has a non-zero width
+                    total_width += char_width_pixels
+                    valid_char_count += 1
 
-        width = math.ceil(
-            font_metrics.horizontalAdvance(max_char, char_width) * width_fudge
-        )
+            if valid_char_count > 0:
+                average_char_width = total_width / valid_char_count
+                width = math.ceil(average_char_width * char_width * width_fudge)
+            else:
+                # If no valid characters are found, use a fallback and print a warning.
+                average_char_width = font_metrics.horizontalAdvance("0")
+                width = math.ceil(average_char_width * char_width * width_fudge)
+                print(
+                    "Warning: The font appears to be unable to display most common characters.  "
+                    "Using width of '0' as a fallback.  This may lead to incorrect size calculations.",
+                    file=sys.stderr,  # Print to standard error
+                )
+
+        # 3. Get the height. This is usually reliable.
+        max_height = font_metrics.height()
         height = math.ceil(max_height * char_height * height_fudge)
 
         return Char_Pixel_Size(height=height, width=width)
@@ -4896,12 +4933,13 @@ class _Container(_qtpyBase_Control):
     _parent: Optional[qtW.QWidget] = None
     _container_tag: str = ""
     _container: Optional[_qtpyBase_Control] = None
-    _current_enable_settings: dict = field(default_factory=dict)  # {}
+    _current_enable_settings: dict = field(default_factory=dict)
 
     _scroll_container: Optional[qtW.QScrollArea] = (
         None  # = qtW.QScrollArea(parent) #None
     )
     _scroll_current_widget: Optional[_qtpyBase_Control] = None
+    _snapshots: dict = field(default_factory=dict)
     _use_lambda: bool = USE_LAMBDA
 
     def __post_init__(self) -> None:
@@ -5981,7 +6019,9 @@ class _Container(_qtpyBase_Control):
         window_id = Get_Window_ID(self.parent_app, self.parent, self)
 
         for item in self.tags_gather():
-            widget = self._parent_app.widget_get(window_id=window_id, tag=item.tag)
+            widget = self._parent_app.widget_get(
+                window_id=window_id, container_tag=item.container_tag, tag=item.tag
+            )
             if isinstance(widget, _Container):
                 continue
 
@@ -6454,8 +6494,6 @@ class _Container(_qtpyBase_Control):
         Args:
             name (str): Name of snapshot
         """
-        self._snapshots = {}
-
         assert isinstance(name, str) and name.strip() != "", (
             f"{name=}. Must be a non-empty str"
         )
@@ -6742,6 +6780,8 @@ class Button(_qtpyBase_Control):
     txt_align: Align_Text = Align_Text.CENTER
     auto_repeat_interval: int = 0  # Milliseconds
 
+    _widget: qtW.QPushButton = None
+
     def __post_init__(self) -> None:
         """Initializes the button object."""
         super().__post_init__()
@@ -6784,7 +6824,6 @@ class Button(_qtpyBase_Control):
         )
 
         if self.auto_repeat_interval > 0:
-            self._widget: qtG.QPushbutton
             self._widget.setAutoRepeat(True)
             self._widget.setAutoRepeatInterval(
                 self.auto_repeat_interval
@@ -7330,6 +7369,7 @@ class Checkbox(_qtpyBase_Control):
 
     checked: bool = False
     # tristate:bool = False #Not enabled for now
+    _widget: qtW.QCheckBox | None = None
 
     def __post_init__(self) -> None:
         """Constructor for the Checkbox that checks arguments and sets instance variables."""
@@ -7376,7 +7416,6 @@ class Checkbox(_qtpyBase_Control):
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
-        self._widget: qtW.QCheckBox
         return self._widget.isChecked()
 
     def button_toggle(self, value: bool = True) -> None:
@@ -7405,7 +7444,7 @@ class Checkbox(_qtpyBase_Control):
         """
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
-        self._widget: qtW.QCheckBox
+
         return self._widget.text()
 
     def value_get(self) -> bool:
@@ -7657,7 +7696,7 @@ class ComboBox(_qtpyBase_Control):
         elif isinstance(icon, qtG.QIcon):
             pass  # All Good
         else:
-            -1
+            return -1
 
         self._widget.setItemIcon(combo_index, qtG.QIcon(icon))
 
@@ -12516,6 +12555,8 @@ class Image(_qtpyBase_Control):
 class Label(_qtpyBase_Control):
     """Instantiates a label widget."""
 
+    _widget: qtW.QLabel = None
+
     def __post_init__(self) -> None:
         super().__post_init__()
 
@@ -12554,7 +12595,6 @@ class Label(_qtpyBase_Control):
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
-        self._widget: qtW.QLabel
         self._widget.setOpenExternalLinks(True)
 
         return widget
@@ -12566,7 +12606,6 @@ class Label(_qtpyBase_Control):
             str: The label text
 
         """
-        self._widget: qtW.QLabel
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
@@ -12583,7 +12622,7 @@ class Label(_qtpyBase_Control):
             raise RuntimeError(f"{self._widget=}. Not set")
 
         assert isinstance(value, str), f"{value=}. Must be str"
-        self._widget: qtW.QLabel
+
         self._widget.setText(self.trans_str(value))
 
 
@@ -12592,6 +12631,8 @@ class LCD(_qtpyBase_Control):
     """Instantiates an LCD like number display widget"""
 
     digit_count: int = 8
+
+    _widget: qtW.QLCDNumber = None
 
     def __post_init__(self) -> None:
         """Constructor that checks parameters and sets instance variables"""
@@ -12627,8 +12668,6 @@ class LCD(_qtpyBase_Control):
             parent_app=parent_app, parent=parent, container_tag=container_tag
         )
 
-        self._widget: qtW.QLCDNumber
-
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
@@ -12659,16 +12698,16 @@ class LCD(_qtpyBase_Control):
         self._widget: qtW.QLCDNumber
 
         if isinstance(value, str):  # Check if a valid number (0..9 or .)
-            assert re.match("^[0-9\.\-]*$", value.strip()), (
+            assert re.match(r"^-?\d+(\.\d+)?$", value.strip()), (
                 f"{value=}. Must be a number"
-            )  # pylint: disable=W1401
+            )
 
         if shiboken6.isValid(self._widget):
             self._widget.display(value)
 
 
 class _Line_Edit(qtW.QLineEdit):
-    """Subclasses a line edit widget to customises the key press and focus event handling"""
+    """Subclasses a line edit widget to customise the key press and focus event handling"""
 
     event_ref = None
     owner_widget = None
@@ -12740,6 +12779,8 @@ class LineEdit(_qtpyBase_Control):
     label_align: Align_Text = Align_Text.RIGHT
     widget_align: Align = Align.LEFT
 
+    _widget: _Line_Edit = None
+
     def __post_init__(self) -> None:
         """Constructor that checks parameters and sets instance variables"""
         super().__post_init__()
@@ -12782,8 +12823,6 @@ class LineEdit(_qtpyBase_Control):
         Returns:
             QWidget : The LineEdit widget or the container that houses it.
         """
-        self._widget: _Line_Edit
-
         password_entry = False
 
         if self.height == -1:
@@ -12845,8 +12884,6 @@ class LineEdit(_qtpyBase_Control):
         """
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
-
-        self._widget: _Line_Edit
 
         event: Sys_Events = args[0]
 
@@ -12913,8 +12950,6 @@ class LineEdit(_qtpyBase_Control):
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
-        self._widget: _Line_Edit
-
         assert isinstance(input_mask, str) and input_mask != "", (
             "input mask must be a non-empty string"
         )
@@ -12965,8 +13000,6 @@ class LineEdit(_qtpyBase_Control):
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
-        self._widget: _Line_Edit
-
         return self._widget.isModified()
 
     def value_get(self, original_value: bool = False) -> str:
@@ -12982,12 +13015,13 @@ class LineEdit(_qtpyBase_Control):
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
-        self._widget: _Line_Edit
-
-        if original_value:
-            return self.original_value
+        if self.editable:
+            if original_value:
+                return self.original_value
+            else:
+                return self._widget.text()
         else:
-            return self._widget.text()
+            return self._widget.placeholderText()
 
     def value_set(self, value: str) -> None:
         """Set the LineEdit widget text to the value string
@@ -12998,8 +13032,6 @@ class LineEdit(_qtpyBase_Control):
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
-        self._widget: _Line_Edit
-
         assert isinstance(value, str), f"value <{value}> must be str"
 
         if not self._widget.isModified():
@@ -13008,7 +13040,10 @@ class LineEdit(_qtpyBase_Control):
 
         trans_text = self.trans_str(value)
 
-        self._widget.setText(trans_text)
+        if self.editable:
+            self._widget.setText(trans_text)
+        else:
+            self._widget.setPlaceholderText(trans_text)
 
 
 @dataclasses.dataclass
@@ -13221,6 +13256,7 @@ class Menu(_qtpyBase_Control):
     tag: str
 
     _menu_items: dict[str, Menu_Entry] = field(default_factory=dict)
+    _widget: qtW.QMenuBar = None
 
     def __post_init__(self) -> None:
         """Constructor that checks parameters and sets properties"""
@@ -13253,6 +13289,7 @@ class Menu(_qtpyBase_Control):
 
         if _menu is None or len(_menu) == 0:
             self._widget = qtW.QMenuBar()
+
             self._widget.setMinimumWidth(parent.width())
             _menu = self._menu_items
 
@@ -13648,6 +13685,8 @@ class ProgressBar(_qtpyBase_Control):
     width: int = 10
     height: int = 1
 
+    _widget: qtW.QProgressBar = None
+
     def __post_init__(self) -> None:
         """Initializes the progressbar object."""
         assert isinstance(self.range_min, int) and self.range_min >= 0, (
@@ -13691,8 +13730,6 @@ class ProgressBar(_qtpyBase_Control):
             parent_app=parent_app, parent=parent, container_tag=container_tag
         )
 
-        self._widget: qtW.QProgressBar
-
         self._widget.setRange(self.range_min, self.range_max)
 
         if self.horizontal:
@@ -13713,12 +13750,12 @@ class ProgressBar(_qtpyBase_Control):
         assert isinstance(max, int) and max > 0 and max > min, (
             f"{max=}. Must be an int > 0 and < {min=}."
         )
-        self._widget: qtW.QProgressBar
+
         self._widget.setRange(min, max)
 
     def reset(self) -> None:
         """Resets the progressbar to the minimum value"""
-        self._widget: qtW.QProgressBar
+
         self._widget.reset()
 
     def value_get(self) -> int:
@@ -13728,7 +13765,6 @@ class ProgressBar(_qtpyBase_Control):
             int: The value of the progressbar.
         """
 
-        self._widget: qtW.QProgressBar
         return self._widget.value()
 
     def value_set(self, value: int) -> None:
@@ -13740,7 +13776,7 @@ class ProgressBar(_qtpyBase_Control):
         assert isinstance(value, int) and self.range_min <= value <= self.range_max, (
             f"{value=}. Must be an int >= {self.range_min} and < {self.range_max}."
         )
-        self._widget: qtW.QProgressBar
+
         self._widget.setValue(value)
 
 
@@ -13749,6 +13785,8 @@ class RadioButton(_qtpyBase_Control):
     """Instantiates a RadioButton widget and associated properties"""
 
     checked: bool = False
+
+    _widget: qtW.QRadioButton = None
 
     def __post_init__(self) -> None:
         """Constructor that checks parameters and sets properties"""
@@ -13788,7 +13826,6 @@ class RadioButton(_qtpyBase_Control):
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
-        self._widget: qtW.QRadioButton
         self._widget.setAutoExclusive(
             False
         )  # When 1 rb in group then cannot check it otherwise!
@@ -13809,8 +13846,6 @@ class RadioButton(_qtpyBase_Control):
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
-        self._widget: qtW.QRadioButton
-
         return self._widget.isChecked()
 
     def button_toggle(self, value: bool = True) -> None:
@@ -13823,8 +13858,6 @@ class RadioButton(_qtpyBase_Control):
             raise RuntimeError(f"{self._widget=}. Not set")
 
         assert isinstance(value, bool), f"{value=}. Must be bool"
-
-        self._widget: qtW.QRadioButton
 
         self._widget.setChecked(value)
 
@@ -13906,6 +13939,8 @@ class Switch(_qtpyBase_Control):
 
     checked: bool = False
 
+    _widget: "_Switch" = None
+
     def __post_init__(self) -> None:
         """Constructor that checks parameters and sets properties"""
         super().__post_init__()
@@ -13948,8 +13983,6 @@ class Switch(_qtpyBase_Control):
             parent_app=parent_app, parent=parent, container_tag=container_tag
         )
 
-        self._widget: _Switch
-
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
@@ -13966,7 +13999,6 @@ class Switch(_qtpyBase_Control):
             enable (str): TEXT_COLORS  word
             disable (str): TEXT_COLORS  word
         """
-        self._widget: _Switch
         self._widget.track_colour_set(enable=enable, disable=disable)
 
     @property
@@ -13979,7 +14011,6 @@ class Switch(_qtpyBase_Control):
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
-        self._widget: _Switch
         return self._widget.isChecked()
 
     def button_toggle(self, value: bool = True) -> None:
@@ -13993,7 +14024,6 @@ class Switch(_qtpyBase_Control):
 
         assert isinstance(value, bool), f"{value=}. Must be bool"
 
-        self._widget: _Switch
         self._widget.setChecked(value)
 
     def value_get(self) -> bool:
@@ -14259,6 +14289,8 @@ class TextEdit(_qtpyBase_Control):
     max_chars: int = -1
     word_wrap: bool = True
 
+    _widget: qtW.QTextEdit = None
+
     def __post_init__(self) -> None:
         """Constructor checks parameters and sets associated properties"""
         super().__post_init__()
@@ -14292,8 +14324,6 @@ class TextEdit(_qtpyBase_Control):
         widget = super()._create_widget(
             parent_app=parent_app, parent=parent, container_tag=container_tag
         )
-
-        self._widget: qtW.QTextEdit
 
         if self.text.strip() != "":
             self._widget.setText(self.trans_str(self.text))
@@ -14372,8 +14402,6 @@ class TextEdit(_qtpyBase_Control):
         Args:
             value (str): The string value to set the TextEdit widget to.
         """
-        self._widget: qtW.QTextEdit
-
         assert isinstance(value, str), f"text <{value=}>. Must be a str"
 
         self._widget.setText(value)
@@ -14388,7 +14416,6 @@ class TextEdit(_qtpyBase_Control):
         Returns:
             str : The text in the text box in the selected format.
         """
-        self._widget: qtW.QTextEdit
 
         assert isinstance(plain_text, bool), f"{plain_text=}. Must be bool"
 
@@ -14423,6 +14450,8 @@ class Timeedit(_qtpyBase_Control):
     validate_callback: Optional[
         Union[Callable, types.FunctionType, types.MethodType, types.LambdaType]
     ] = None
+
+    _widget: qtW.QTimeEdit = None
 
     def __post_init__(self) -> None:
         """Constructor checks argument and sets associated properties"""
@@ -14498,8 +14527,6 @@ class Timeedit(_qtpyBase_Control):
             parent_app=parent_app, parent=parent, container_tag=container_tag
         )
 
-        self._widget: qtW.QTimeEdit
-
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
@@ -14529,8 +14556,6 @@ class Timeedit(_qtpyBase_Control):
         Returns:
             int : 1. If the event is accepted, -1. If the event is rejected
         """
-        self._widget: qtW.QTimeEdit
-
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
@@ -14592,8 +14617,6 @@ class Timeedit(_qtpyBase_Control):
         Args:
             default_text: The times text string or "-" for no time text to be `displayed
         """
-        self._widget: qtW.QTimeEdit
-
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
@@ -14625,8 +14648,6 @@ class Timeedit(_qtpyBase_Control):
             sec (int): Second value
             msec (int): Millisecond value
         """
-        self._widget: qtW.QTimeEdit
-
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
@@ -14685,8 +14706,6 @@ class Timeedit(_qtpyBase_Control):
             format (str): Format string
             time_struct (bool): True - Return time as a time_struct (hour,min,sec,msec), False - Return time as a string
         """
-        self._widget: qtW.QTimeEdit
-
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
@@ -14728,6 +14747,8 @@ class Tab(_qtpyBase_Control):
 
     page_right_margin: int = 10
     page_bottom_margin: int = 50
+
+    _widget: qtW.QTabWidget = None
 
     @dataclasses.dataclass
     class _Page_Def:
@@ -14959,8 +14980,6 @@ class Tab(_qtpyBase_Control):
         Returns:
             The return value is a bool.
         """
-        self._widget: qtW.QTabWidget
-
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
@@ -14993,8 +15012,6 @@ class Tab(_qtpyBase_Control):
         Returns:
             int : 1 - Success, -1 - Failure
         """
-        self._widget: qtW.QTabWidget
-
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
@@ -15173,8 +15190,6 @@ class Tab(_qtpyBase_Control):
             tag (str): The tag name of the page whose icon is to be set on.
             icon (Union[None, str, qtG.QPixmap, qtG.QIcon]): The icon to be set
         """
-        self._widget: qtW.QTabWidget
-
         assert isinstance(tag, str) and tag.strip() != "", (
             f"{tag=}. Must be a non-empty str"
         )
@@ -15269,8 +15284,6 @@ class Tab(_qtpyBase_Control):
             bool: True` if the tab page with the given tag name is visible, `False` otherwise
 
         """
-        self._widget: qtW.QTabWidget
-
         assert isinstance(tag, str) and tag.strip() != "", (
             f"{tag=}. Must be a non-empty str"
         )
@@ -15396,6 +15409,8 @@ class Treeview(_qtpyBase_Control):
     toplevel_items: Union[list[str], tuple[str, ...]] = ()
     _parent_list: list = None
 
+    _widget: qtW.QTreeWidget = None
+
     def __post_init__(self) -> None:
         """Constructor checks arguments and sets properties"""
 
@@ -15459,8 +15474,6 @@ class Treeview(_qtpyBase_Control):
         Returns:
             QWidget : The Treeview widget or the container housing it.
         """
-        self._widget: qtW.QTreeWidget
-
         if self.width < 1:
             self.width = WIDGET_SIZE.width
 
@@ -15651,8 +15664,6 @@ class Treeview(_qtpyBase_Control):
         Returns:
             int : 1 Succeeded, -1 Failed
         """
-        self._widget: qtW.QTreeWidget
-
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
@@ -15713,8 +15724,6 @@ class Treeview(_qtpyBase_Control):
         Returns:
             int : 1 Succeeded, -1 Failed
         """
-        self._widget: qtW.QTreeWidget
-
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
@@ -15766,8 +15775,6 @@ class Treeview(_qtpyBase_Control):
         Args:
             items (Union[list[str], tuple[str, ...]]): The items to add to the tree widget.
         """
-        self._widget: qtW.QTreeWidget
-
         # items, user_data = self._extract_items(items)
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
@@ -15783,9 +15790,6 @@ class Treeview(_qtpyBase_Control):
         Returns:
             list[str] :A list of strings.
         """
-
-        self._widget: qtW.QTreeWidget
-
         root = self._widget.invisibleRootItem()
         child_count = root.childCount()
 
@@ -15816,8 +15820,6 @@ class Treeview(_qtpyBase_Control):
             value (str): The value to set.
             col (int): The column to set. Default is 0.
         """
-        self._widget: qtW.QTreeWidget
-
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
@@ -15840,8 +15842,6 @@ class Treeview(_qtpyBase_Control):
             col (int): The column number to place the widget in
             widget (_qtpyBase_Control): The GUI widget to be inserted.
         """
-        self._widget: qtW.QTreeWidget
-
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
@@ -15961,8 +15961,6 @@ class Treeview(_qtpyBase_Control):
         Returns:
             (bool,list,items) -- [description]
         """
-        self._widget: qtW.QTreeWidget
-
         if self._widget is None:
             raise RuntimeError(f"{self._widget=}. Not set")
 
@@ -15994,6 +15992,8 @@ class Slider(_qtpyBase_Control):
     single_step: int = 1
     orientation: str = "horizontal"
     scale_factor_percent: float = 0.0
+
+    _widget: qtW.QSlider = None
 
     def __post_init__(self) -> None:
         """Initializes the slider object."""
@@ -16050,8 +16050,6 @@ class Slider(_qtpyBase_Control):
             parent_app=parent_app, parent=parent, container_tag=container_tag
         )
 
-        self._widget: qtW.QSlider
-
         self._widget.setMinimum(self.range_min)
         self._widget.setMaximum(self.range_max)
         self._widget.setPageStep(self.page_step)
@@ -16095,8 +16093,6 @@ class Slider(_qtpyBase_Control):
 
         self.range_min = range_min
 
-        self._widget: qtW.QSlider
-
         self._widget.setMinimum(range_min)
 
     def range_max_set(self, range_max: int) -> None:
@@ -16113,8 +16109,6 @@ class Slider(_qtpyBase_Control):
 
         self.range_max = scaled_range_max
 
-        self._widget: qtW.QSlider
-
         self._widget.setMaximum(scaled_range_max)
 
     def value_get(self) -> int:
@@ -16123,8 +16117,6 @@ class Slider(_qtpyBase_Control):
         Returns:
             int: The value of the slider.
         """
-        self._widget: qtW.QSlider
-
         return int(self._widget.value() * self.scale_factor)
 
     def value_set(self, value: int, block_signals: bool = False) -> None:
@@ -16146,8 +16138,6 @@ class Slider(_qtpyBase_Control):
             f" {self.range_min} and < {self.range_max + 2}."
         )
 
-        self._widget: qtW.QSlider
-
         if block_signals:
             self._widget.blockSignals(True)
 
@@ -16166,6 +16156,8 @@ class Spinbox(_qtpyBase_Control):
     single_step: int = 1
     suffix: str = ""
     prefix: str = ""
+
+    _widget: qtW.QSpinBox = None
 
     def __post_init__(self) -> None:
         """Initializes the spinbox object."""
@@ -16208,8 +16200,6 @@ class Spinbox(_qtpyBase_Control):
             parent_app=parent_app, parent=parent, container_tag=container_tag
         )
 
-        self._widget: qtW.QSpinBox
-
         self._widget.setRange(self.range_min, self.range_max)
         self._widget.setSingleStep(self.single_step)
 
@@ -16226,8 +16216,6 @@ class Spinbox(_qtpyBase_Control):
         Returns:
             int: The value of the spinbox.
         """
-
-        self._widget: qtW.QSpinBox
         return self._widget.value()
 
     def value_set(self, value: int) -> None:
@@ -16239,7 +16227,6 @@ class Spinbox(_qtpyBase_Control):
         assert isinstance(value, int) and self.range_min <= value <= self.range_max, (
             f"{value=}. Must be an int >= {self.range_min} and < {self.range_max}."
         )
-        self._widget: qtW.QSpinBox
         self._widget.setValue(value)
 
 
@@ -16375,6 +16362,8 @@ class Video_Player(qtM.QMediaPlayer):
         elif playback_state == qtM.QMediaPlayer.PlaybackState.StoppedState:
             return "stop"
 
+        return ""
+
     def set_source(self, input_file: str, frame_rate: float) -> str:
         """Sets the source file and frame rate for the media player.
 
@@ -16470,37 +16459,35 @@ class Video_Player(qtM.QMediaPlayer):
         Args:
             media_status (qtM.QMediaPlayer.mediaStatus): The status of the media player
         """
-        match media_status:
-            case qtM.QMediaPlayer.MediaStatus.NoMedia:
-                self.source_state = "no_media"
-            case qtM.QMediaPlayer.MediaStatus.LoadingMedia:
-                self.source_state = "loading"
-            case qtM.QMediaPlayer.MediaStatus.LoadedMedia:
-                self.source_state = "loaded"
-
-                if not self._init:
-                    self._init = True
-                    self.pause()
-                    self.seek(0)
-
-            case qtM.QMediaPlayer.MediaStatus.StalledMedia:
-                self.source_state = "stalled"
-            case qtM.QMediaPlayer.MediaStatus.BufferingMedia:
-                self.source_state = "buffering"
-            case qtM.QMediaPlayer.MediaStatus.BufferedMedia:
-                self.source_state = "buffered"
-
-                if not self._init:
-                    self._init = True
-                    self.pause()
-                    self.seek(0)
-
-            case qtM.QMediaPlayer.MediaStatus.EndOfMedia:
-                self.source_state = "end_of_media"
-            case qtM.QMediaPlayer.MediaStatus.InvalidMedia:
-                self.source_state = "invalid_media"
-            case _:
-                self.source_state = "invalid_media"
+        if media_status in (
+            qtM.QMediaPlayer.MediaStatus.LoadedMedia,
+            qtM.QMediaPlayer.MediaStatus.BufferedMedia,
+        ):
+            self.source_state = (
+                "loaded"
+                if media_status == qtM.QMediaPlayer.MediaStatus.LoadedMedia
+                else "buffered"
+            )
+            if not self._init:
+                self._init = True
+                self.pause()
+                self.seek(0)
+        else:
+            match media_status:
+                case qtM.QMediaPlayer.MediaStatus.NoMedia:
+                    self.source_state = "no_media"
+                case qtM.QMediaPlayer.MediaStatus.LoadingMedia:
+                    self.source_state = "loading"
+                case qtM.QMediaPlayer.MediaStatus.StalledMedia:
+                    self.source_state = "stalled"
+                case qtM.QMediaPlayer.MediaStatus.BufferingMedia:
+                    self.source_state = "buffering"
+                case qtM.QMediaPlayer.MediaStatus.EndOfMedia:
+                    self.source_state = "end_of_media"
+                case qtM.QMediaPlayer.MediaStatus.InvalidMedia:
+                    self.source_state = "invalid_media"
+                case _:
+                    self.source_state = "invalid_media"
 
         self.media_status_changed_handler.emit(self.source_state)
 
