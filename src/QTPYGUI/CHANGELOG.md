@@ -1,4 +1,13 @@
 # QTPYGUI Change Log
+## 1.0.4
+- Works With Python 3.13
+- Updated to PySide6 6.9.0
+- LineEdit respects placeholder text when it is set
+- Code refactoring
+- Improved Pixel Char Size calculation
+- Fixed occasional bug in method _media_status_change class Video_Player
+- Added APP_DATA to Special_Path to get the user application data folder
+- Added a missing file to the QTPYGUI distribution - folder-plus.svg
 ## 1.0.3
 - Removed sys_const.py, possible breaking change.  Each application should have its own sys_const.py 
 - Modifed ComboBox and supporting class CSV_File_Def used only with class ComboBox
