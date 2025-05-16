@@ -446,7 +446,7 @@ class Special_Path(strEnum):
     MUSIC  = platformdirs.user_music_dir()
     PICTURES = platformdirs.user_pictures_dir()
     VIDEOS = platformdirs.user_videos_dir()
-    APP_DATA = platformdirs.user_data_dir(appname=g_application.program_name)
+    APP_DATA = platformdirs.user_data_dir()
 
 
 # An enumeration of all the application events that can be handled by the GUI.
