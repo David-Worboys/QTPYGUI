@@ -442,8 +442,8 @@ class Special_Path(strEnum):
 
     DESKTOP = platformdirs.user_desktop_dir()
     DOCUMENTS = platformdirs.user_documents_dir()
-    DOWNLOADS  = platformdirs.user_downloads_dir()
-    MUSIC  = platformdirs.user_music_dir()
+    DOWNLOADS = platformdirs.user_downloads_dir()
+    MUSIC = platformdirs.user_music_dir()
     PICTURES = platformdirs.user_pictures_dir()
     VIDEOS = platformdirs.user_videos_dir()
     APP_DATA = platformdirs.user_data_dir()
@@ -2885,6 +2885,8 @@ class _qtpyBase_Control(_qtpyBase):
                     self._widget.setStyleSheet(self.txt_align.value)
                 case LineEdit():
                     self._widget = _Line_Edit(parent, self)
+                case PlainTextEdit():
+                    self._widget = qtW.QPlainTextEdit(self.text.strip("*"), parent)
                 case ProgressBar():
                     self._widget = qtW.QProgressBar(parent)
                 case RadioButton():
@@ -5848,6 +5850,7 @@ class _Container(_qtpyBase_Control):
         "Label",
         "LineEdit",
         "Spacer",
+        "PlainTextEdit",
         "ProgressBar",
         "RadioButton",
         "Slider",
@@ -13676,6 +13679,137 @@ class Menu(_qtpyBase_Control):
 
 
 @dataclasses.dataclass
+class PlainTextEdit(_qtpyBase_Control):
+    """Instantiates a text edit widget and associated properties"""
+
+    max_chars: int = -1
+    word_wrap: bool = True
+    max_block_count: int = -1
+
+    _widget: qtW.QPlainTextEdit = None
+
+    def __post_init__(self) -> None:
+        """Constructor checks parameters and sets associated properties"""
+        super().__post_init__()
+
+        assert isinstance(self.max_chars, int) and (
+            self.max_chars > 0 or self.max_chars == -1
+        ), f"{self.max_chars=} Must be int > 0 or int = -1"
+
+        assert isinstance(self.word_wrap, bool), f"{self.word_wrap=}. Must be bool"
+        assert isinstance(self.max_block_count, int) and (
+            self.max_block_count > 0 or self.max_block_count == -1
+        ), f"{self.max_block_count=}. Must be int > 0 or int = -1"
+
+    def _create_widget(
+        self, parent_app: QtPyApp, parent: qtW.QWidget, container_tag: str = ""
+    ) -> qtW.QWidget:
+        """Creates the PlainTextEdit widget and sets associated properties.
+
+        Args:
+            parent_app (QtPyApp): The parent application.
+            parent (qtW.QWidget): The parent widget.
+            container_tag (str): The tag name of the container that this widget is in.
+
+        Returns:
+            QWidget : The PlainTextEdit widget or the container that houses it.
+        """
+
+        if self.height <= 0:
+            self.height = WIDGET_SIZE.height
+
+        if self.width <= 0:
+            self.width = WIDGET_SIZE.width
+
+        super()._create_widget(
+            parent_app=parent_app, parent=parent, container_tag=container_tag
+        )
+
+        if self.text.strip() != "":
+            if self.max_chars == -1:
+                self._widget.setPlainText(self.trans_str(self.text))
+            else:
+                self._widget.setPlainText(self.trans_str(self.text)[: self.max_chars])
+
+        if self.max_block_count > 0:
+            self._widget.setMaximumBlockCount(self.max_block_count)
+
+        self._widget.setReadOnly(not self.editable)
+
+        if self.word_wrap:
+            self._widget.setWordWrapMode(qtG.QTextOption.WrapMode.WordWrap)
+        else:
+            self._widget.setWordWrapMode(qtG.QTextOption.WrapMode.NoWrap)
+
+        self._widget.moveCursor(qtG.QTextCursor.End)
+
+        # txt_font is overridden by label font for some reason
+        if self.txt_font is not None:
+            self.font_set(
+                app_font=g_application.app_font_def,
+                widget_font=self.txt_font,
+                widget=self._widget,
+            )
+
+            self._widget.textChanged.connect(
+                functools.partial(self._text_input_changed, self._widget)
+            )
+
+        return self._widget
+
+    def _text_input_changed(self, text_widget: qtW.QPlainTextEdit) -> None:
+        """Called when the text in the PlainTextEdit widget is changed and prevents
+        text entry if the maximum length has been reached
+        """
+        assert isinstance(text_widget, qtW.QPlainTextEdit), (
+            f"{text_widget=}. Must be a qtW.QPlainTextEdit"
+        )
+
+        text = text_widget.toPlainText()
+
+        if self.max_chars > 0 and len(text) > self.max_chars:
+            # Store current cursor position
+            cursor = text_widget.textCursor()
+            current_pos = cursor.position()
+
+            # Truncate the text
+            truncated_text = text[: self.max_chars]
+            text_widget.setPlainText(truncated_text)
+
+            # Restore cursor position, ensuring it's not beyond the new text length
+            if current_pos > self.max_chars:
+                cursor.setPosition(self.max_chars)
+            else:
+                cursor.setPosition(current_pos)
+            text_widget.setTextCursor(cursor)
+
+    def value_set(self, value: str = "", append: bool = True) -> None:
+        """Sets the text of the widget to the string value
+
+        Args:
+            value (str): The string value to set the TextEdit widget to.
+            append (bool, optional): If True, the text will be appended to the existing text. Defaults to True.
+        """
+        assert isinstance(value, str), f"text <{value=}>. Must be a str"
+
+        if append:
+            self._widget.appendPlainText(value)
+        else:
+            self._widget.setPlainText(value)
+
+        self._widget.moveCursor(qtG.QTextCursor.End)
+
+    def value_get(self) -> str:
+        """Returns the text from the TextEdit` widget as either plain text or HTML
+
+        Returns:
+            str : The text in the text box in the selected format.
+        """
+
+        return self._widget.toPlainText()
+
+
+@dataclasses.dataclass
 class ProgressBar(_qtpyBase_Control):
     """Instantiates a progressbar and associated properties"""
 
@@ -14285,7 +14419,6 @@ class _Switch(qtW.QAbstractButton):
 class TextEdit(_qtpyBase_Control):
     """Instantiates a text edit widget and associated properties"""
 
-    # label: str = "&"
     max_chars: int = -1
     word_wrap: bool = True
 
@@ -14297,7 +14430,7 @@ class TextEdit(_qtpyBase_Control):
 
         assert isinstance(self.max_chars, int) and (
             self.max_chars > 0 or self.max_chars == -1
-        ), f"{self.max_chars=} Must be int > 0"
+        ), f"{self.max_chars=} Must be int > 0 or int = -1"
 
         assert isinstance(self.word_wrap, bool), f"{self.word_wrap=}. Must be bool"
 
@@ -14321,7 +14454,7 @@ class TextEdit(_qtpyBase_Control):
         if self.width <= 0:
             self.width = WIDGET_SIZE.width
 
-        widget = super()._create_widget(
+        super()._create_widget(
             parent_app=parent_app, parent=parent, container_tag=container_tag
         )
 
@@ -14339,11 +14472,12 @@ class TextEdit(_qtpyBase_Control):
 
         # Bit ugly, nasty regex check for hmtl and then sets alignment for all paragraphs if no HMTL found
         # Assumes HTML controls formatting'
-        if not re.search("<(\"[^\"]*\"|'[^']*'|[^'\">])*>", self.text):
-            last_position = -1
-            curr_position = self._widget.textCursor().position()
-
-            while last_position != curr_position:
+        if self.text.strip() != "":
+            self._widget.setText(self.trans_str(self.text))
+            # Apply alignment only if initial text is plain text and no HTML
+            if not re.search("<(\"[^\"]*\"|'[^']*'|[^'\">])*>", self.text):
+                cursor = self._widget.textCursor()
+                cursor.select(qtG.QTextCursor.Document)
                 if self.txt_align == Align_Text.LEFT:
                     self._widget.setAlignment(qtC.Qt.AlignLeft)
                 elif self.txt_align == Align_Text.CENTER:
@@ -14351,27 +14485,31 @@ class TextEdit(_qtpyBase_Control):
                 elif self.txt_align == Align_Text.RIGHT:
                     self._widget.setAlignment(qtC.Qt.AlignRight)
                 elif self.txt_align == Align_Text.TOP:
-                    self._widget.setAlignment(qtC.Qt.AlignTop)
+                    pass  # SAlignTop is not applicable
+                cursor.clearSelection()
+                self._widget.setTextCursor(cursor)
 
-                self._widget.moveCursor(qtG.QTextCursor.Down)
-                last_position = curr_position
-                curr_position = self._widget.textCursor().position()
+        self._widget.setReadOnly(not self.editable)
 
-            self._widget.moveCursor(qtG.QTextCursor.End)
+        if self.word_wrap:  # These should apply always
+            self._widget.setWordWrapMode(qtG.QTextOption.WrapMode.WordWrap)
+        else:
+            self._widget.setWordWrapMode(qtG.QTextOption.WrapMode.NoWrap)
 
-            # txt_font is overridden by label font for some reason
-            if self.txt_font is not None:
-                self.font_set(
-                    app_font=g_application.app_font_def,
-                    widget_font=self.txt_font,
-                    widget=self._widget,
-                )
+        self._widget.moveCursor(qtG.QTextCursor.End)
 
-            self._widget.textChanged.connect(
-                functools.partial(self._text_input_changed, self._widget)
+        if self.txt_font is not None:
+            self.font_set(
+                app_font=g_application.app_font_def,
+                widget_font=self.txt_font,
+                widget=self._widget,
             )
 
-        return widget
+        self._widget.textChanged.connect(
+            functools.partial(self._text_input_changed, self._widget)
+        )
+
+        return self._widget
 
     def _text_input_changed(self, text_widget: qtW.QTextEdit) -> None:
         """Called when the text in the TextEdit widget is changed and prevents
@@ -14384,27 +14522,42 @@ class TextEdit(_qtpyBase_Control):
             f"{text_widget=}. Must be a qtW.QTextEdit"
         )
 
-        text = text_widget.toPlainText()
+        text = text_widget.toPlainText()  # Get plain text for length check
 
         if self.max_chars > 0 and len(text) > self.max_chars:
             cursor = text_widget.textCursor()
-            pos = cursor.columnNumber()
-            text = text[: pos - 1] + text[pos:]
-            text_widget.setPlainText(text)
-            cursor.setPosition(pos - 1)
+            current_pos = cursor.position()
+
+            # Truncate the plain text
+            truncated_text_plain = text[: self.max_chars]
+
+            # If the widget contains HTML, a more sophisticated way to set the truncated plain text while preserving
+            # formatting would be required.
+            text_widget.setPlainText(truncated_text_plain)
+
+            # Restore cursor position
+            if current_pos > self.max_chars:
+                cursor.setPosition(self.max_chars)
+            else:
+                cursor.setPosition(current_pos)
             text_widget.setTextCursor(cursor)
 
-        return None
-
-    def value_set(self, value: str = "") -> None:
-        """Sets the text of the widget to the string value
+    def value_set(self, value: str = "", append: bool = False) -> None:
+        """Sets or appends text to the widget.
 
         Args:
-            value (str): The string value to set the TextEdit widget to.
+            value (str): The string value to set or append.
+            append (bool, optional): If True, the text will be appended to the existing text.
+                                      If False, the text will replace the existing text.
+                                      Defaults to False.
         """
-        assert isinstance(value, str), f"text <{value=}>. Must be a str"
+        assert isinstance(value, str), f"value <{value=}>. Must be a str."
 
-        self._widget.setText(value)
+        if append:
+            self._widget.append(value)
+        else:
+            self._widget.setText(value)
+
         self._widget.moveCursor(qtG.QTextCursor.End)
 
     def value_get(self, plain_text: bool = True) -> str:

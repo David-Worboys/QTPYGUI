@@ -8,6 +8,77 @@
 - Fixed occasional bug in method _media_status_change class Video_Player
 - Added APP_DATA to Special_Path to get the user application data folder
 - Added a missing file to the QTPYGUI distribution - folder-plus.svg
+- Added a new widget PlainTextEdit for users who need a plain text edit widget for logs etc.
+
+### PlainTextEdit
+
+Calling PlainTextEdit in a layout will generate a PlainTextEdit control on a form. 
+A PlainTextEdit control is used to enter or display a large amount of plain text. The standard use case is for logs.
+ 
+
+<br>**Properties**
+<br> A PlainTextEdit control has the following properties, but can also use a subset of 
+[_qtpyBase_Control](#_qtpybase_control) properties, which are not shown in the "fully loaded" example below
+
+| **Property** | **Description**                                                                                   | **Type**      | **Optional** |
+|--------------|---------------------------------------------------------------------------------------------------|---------------|--------------|
+| height       | Characters if [pixel_unit](#_qtpybase_control) is False, Otherwise pixels. This will need setting | int (1)       | ✓            | |
+| max_chars    | The maximum number of characters that can be entered into the PlainTextEdit control               | int (-1)      | ✓            |
+| max_block_count| The number of blocks that can be displayed in the PlainTextEdit control before earlier blocks are deleted | int (-1)      | ✓            |
+| width        | Characters if [pixel_unit](#_qtpybase_control) is False, Otherwise pixels. This will need setting | int (10)      | ✓            | |
+| word_wrap    | True, text line wraps, Otherwise it does not                                                      | bool (True)   | ✓            |
+| tag          | The system name of the PlainTextEdit control (required for application processing)                | str           | ❌            |
+ 
+
+<br>A fully loaded PlainTextEdit declaration:
+<br><br>**Note: Only "tag", "text" (To preload the PlainTextEdit control) and "callback" are usually needed**
+- It is possible to paste text into the PlainTextEdit control
+
+```
+PlainTextEdit(
+            tag="plaintextedit",
+            text="Plain Text Edit",
+            label="Plain Text Edit",
+            callback=self.event_handler,
+            height=5,
+            max_chars=10,
+            word_wrap=True,
+    
+            label_font=qtg.Font(
+                style=qtg.Font_Style.OBLIQUE, backcolor="blue",forecolor="yellow", size=12
+            ),
+            txt_font=qtg.Font(
+                style=qtg.Font_Style.NORMAL, backcolor="yellow", size=15,font_name="DejaVu Sans Mono"
+            ),
+            enabled=True,
+            visible=True,
+            tooltip="Plain Text Edit",
+            tune_hsize=15,
+            tune_vsize=15,
+            user_data={"key": "value"},
+            buddy_control=qtg.HBoxContainer().add_row(
+                qtg.Button(
+                    tag="plaintextedit_push",
+                    text="PlainText Edit!",
+                    callback=self.event_handler,
+                    width=10,
+                    height=1,
+                )
+            ),
+        )
+```
+
+<br>**Methods**
+<br>A subset of the [_qtpyBase_Control](#_qtpybase_control) methods apply to a PlainTextEdit instance
+ 
+| **Method** | **Arguments**     | **Type** | **Description**                                                                                        | **Optional** |
+|------------|-------------------|----------|--------------------------------------------------------------------------------------------------------|--------------|
+| value_get  |                   | str      | Returns the text from the PlainTextEdit` widget <br><b>Returns:</b><br> The text in the text box .<br> |              |
+| value_set  |                   | None     | Sets the text of the widget to the string value                                                        |              |
+|            | value             | str      | The string value to set the PlainTextEdit widget to.                                                   | ❌            |
+|            | append            | bool     | True - Append the text, Otherwise overwrite the text                                                   | ✓            |
+
+
 ## 1.0.3
 - Removed sys_const.py, possible breaking change.  Each application should have its own sys_const.py 
 - Modifed ComboBox and supporting class CSV_File_Def used only with class ComboBox
