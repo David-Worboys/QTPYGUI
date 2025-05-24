@@ -1,6 +1,6 @@
 # QTPYGUI
 ### Author: David Worboys 
-##### 2025-05-22 - Updated
+##### 2025-05-25 - Updated
 ##### Update
 ## Index
 1. [Introduction](#introduction)
@@ -67,7 +67,7 @@ mean it is bad or not relevant.
 3. QTPYGUI will always remain opensource, unlike some other similar frameworks
    that used "bait and switch" tactics
 
-4. QTPYGUI uses Python 3.11 for development and ruff (https://github.com/astral-sh/ruff)
+4. QTPYGUI uses Python 3.13 for development and ruff (https://github.com/astral-sh/ruff)
 for formatting. Type hinting is mandatory as are asserts to check all arguments to 
 functions/methods
 
@@ -93,9 +93,8 @@ https://github.com/David-Worboys/Black-DVD-Archiver
 First up, QTPYGUI is pronounced "Cutey Pie GUI" which follows the "QT Groups"
 own pronunciation and appeals to my, admitably lame, sense of humour.
 ### Prerequities
-1. Python version >= 3.8 
-   - If Nuitka is used for application distribution, then Python versions 3.12 
-   and above are not currently supported.
+1. Python version >= 3.9, Recommended >= 3.12 
+   - Nuitka now works with Python 3.13.
 ### Installation
 1. Create your Python project folder and set up your Python project using 
 the virtual environment manager of your choice
