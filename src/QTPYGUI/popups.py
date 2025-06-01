@@ -1101,7 +1101,6 @@ class Langtran_Popup(PopContainer):
         PopContainer.__post_init__(self)  # Need this to get the parent_app instance set
         program_name = self.parent_app.program_name
         self._path = platformdirs.user_data_dir(appname=program_name)
-        print(f"DBG {program_name=} {self._path=}")
 
         self.container = self.layout()
         self._db_settings = App_Settings(program_name)
