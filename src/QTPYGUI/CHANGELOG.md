@@ -1,4 +1,7 @@
 # QTPYGUI Change Log
+## 1.0.4.1
+ - Included a missing file to the QTPYGUI distribution - text.svg
+ - Added a wait indicator to  Langtran_Popup as it can take some seconds to load
 ## 1.0.4
 - Works With Python 3.13
 - Updated to PySide6 6.9.0
