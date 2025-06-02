@@ -1142,6 +1142,7 @@ class Langtran_Popup(PopContainer):
             event (qtg.Action): The triggering event
         """
         assert isinstance(event, Action), f"{event=}. Must be Action"
+
         if "|" in event.tag:  # Grid control tag
             tag = event.tag.split("|")[1]
             row_unique_id = int(
@@ -1309,7 +1310,8 @@ class Langtran_Popup(PopContainer):
                         f" {e if e is not None else ''}{self.sdelim}"
                     ),
                 ).show()
-                return None
+
+        return None
 
     def _export_handler(self, event: Action) -> None:
         """Exports the phrase grid as a language translation file to the users document folder under langtran
@@ -1455,7 +1457,7 @@ class Langtran_Popup(PopContainer):
         Args:
             event (Action): Triggering event
         """
-        trans_table: dict = {}
+
         phrase_grid: Grid = cast(
             Grid,
             event.widget_get(
@@ -1506,48 +1508,60 @@ class Langtran_Popup(PopContainer):
         size_warning_label.visible_set(False)
 
         if error.code == 1 and result:  # Have base words
-            for row_index, result_row in enumerate(result):
-                base_lang_id = result_row[0]
-                base_phrase = result_row[1]
+            with sys_cursor(Cursor.hourglass):
+                copy_col_index = phrase_grid.colindex_get("copy")
+                base_phrase_col_index = phrase_grid.colindex_get("base_phrase")
+                lang_phrase_col_index = phrase_grid.colindex_get("lang_phrase")
+                icon_path = App_Path("text.svg")
 
-                phrase_grid.row_widget_set(
-                    row=row_index,
-                    col=phrase_grid.colindex_get("copy"),
-                    widget=Button(
-                        tag="copy_text",
-                        width=1,
-                        height=1,
-                        icon=App_Path("text.svg"),
-                        tooltip="Copy Text To Clipboard",
-                        callback=self.event_handler,
-                    ),
-                )
+                for row_index, result_row in enumerate(result):
+                    base_lang_id = result_row[0]
+                    base_phrase = result_row[1]
 
-                phrase_grid.value_set(
-                    value=base_phrase,
-                    row=row_index,
-                    col=phrase_grid.colindex_get("base_phrase"),
-                    user_data=result_row,
-                )
-
-                if base_lang_id in trans_table:
-                    lang_phrase = trans_table[base_lang_id][1]
-
-                    if len(lang_phrase) > len(base_phrase):
-                        phrase_grid.checkitemrow_set(
-                            row=row_index,
-                            col=phrase_grid.colindex_get("lang_phrase"),
-                            checked=True,
-                        )
-
-                        size_warning_label.visible_set(True)
+                    phrase_grid.row_widget_set(
+                        row=row_index,
+                        col=copy_col_index,
+                        widget=Button(
+                            tag="copy_text",
+                            width=1,
+                            height=1,
+                            icon=icon_path,
+                            tooltip="Copy Text To Clipboard",
+                            callback=self.event_handler,
+                        ),
+                    )
 
                     phrase_grid.value_set(
-                        value=lang_phrase,
+                        value=base_phrase,
                         row=row_index,
-                        col=phrase_grid.colindex_get("lang_phrase"),
-                        user_data=trans_table[base_lang_id],
+                        col=base_phrase_col_index,
+                        user_data=result_row,
                     )
+
+                    if base_lang_id in trans_table:
+                        lang_phrase = trans_table[base_lang_id][1]
+
+                        if len(lang_phrase) > len(base_phrase):
+                            phrase_grid.checkitemrow_set(
+                                row=row_index,
+                                col=lang_phrase_col_index,
+                                checked=True,
+                            )
+
+                            size_warning_label.visible_set(True)
+
+                        trans_data = trans_table.get(base_lang_id)
+
+                        if trans_data:
+                            lang_phrase = trans_data[1]
+
+                            phrase_grid.value_set(
+                                value=lang_phrase,
+                                row=row_index,
+                                col=lang_phrase_col_index,
+                                user_data=trans_table[base_lang_id],
+                            )
+
         phrase_grid.changed = False
 
     def _get_trans_table(self, event) -> dict[str, tuple[str, str]]:
