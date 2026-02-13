@@ -27,7 +27,6 @@ import types
 from dataclasses import field
 from typing import Callable, Optional, Union, cast, Final
 
-import fs
 import platformdirs
 
 # import translators # 2023-09-30 # David Worboys removed auto translation because of connection and stability issues
@@ -398,8 +397,14 @@ class PopFolderGet(PopContainer):
                         ):  # Use supplied default
                             current_folder = self.root_dir
 
-                        if current_folder is not None and current_folder.strip() != "":
-                            parent_dir = fs.path.dirname(current_folder).strip()
+                        if current_folder and current_folder.strip():
+                            # 1. Strip whitespace and trailing slashes first
+                            clean_path = current_folder.strip().rstrip("/\\")
+                            parent_dir = os.path.dirname(clean_path)
+
+                            # Handle root directory (if parent_dir becomes empty)
+                            if not parent_dir:
+                                parent_dir = "/" if os.name != 'nt' else "\\"
 
                             folderview_widget.change_folder(parent_dir)  # Ignore
                             event.value_set(
