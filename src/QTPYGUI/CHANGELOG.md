@@ -1,4 +1,8 @@
 # QTPYGUI Change Log
+## 1.0.4.3
+    - Cleaned up pyproject.toml to remove deprecated features
+## 1.0.4.2
+    - Removed fs dependency.  This broke apps that used the latest setuptools
 ## 1.0.4.1
  - Included a missing file to the QTPYGUI distribution - text.svg
  - Added a wait indicator to  Langtran_Popup as it can take some seconds to load

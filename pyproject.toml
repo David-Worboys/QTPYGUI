@@ -1,45 +1,51 @@
 [build-system]
 # The lower bound is for <https://github.com/pypa/setuptools/issues/3865>.
-requires = ["setuptools>=67.6.1", "setuptools-scm"]
+requires = ["setuptools>=70.0.0", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
-
 
 [project]
 name = "QTPYGUI"
-version = "1.0.4.1"
+version = "1.0.4.3"
 authors = [
   { name = "David Worboys", email = "davidaworboys@gmail.com"},
 ]
 description = "A Simple Python Declarative User Interface Wrapper Around Pyside6"
-keywords = ["pypi", "cicd", "pyside6","ui","gui","qt","qtpygui","declarative","wrapper","user-interface","qt-bindings",
-    "python-qt","gui-framework","ui-library","pyside6-wrapper","pyside"]
 readme = "README.md"
-requires-python = ">= 3.9"
-license.file = "LICENSE.md"
+requires-python = ">=3.9"
+
+# Updated to SPDX expression to resolve deprecation warnings
+license = "GPL-3.0-or-later"
+
+keywords = [
+    "pypi", "cicd", "pyside6", "ui", "gui", "qt", "qtpygui", "declarative",
+    "wrapper", "user-interface", "qt-bindings", "python-qt", "gui-framework",
+    "ui-library", "pyside6-wrapper", "pyside"
+]
+
 dependencies = [
     "appdirs >= 1.4.4",
-"attrs >= 24.2.0",
-"certifi >= 2024.8.30",
-"charset-normalizer >= 3.4.0",
-"fs >= 2.4.16",
-"idna >= 3.10",
-"Naked >= 0.1.32",
-"numpy >= 1.26.4",
-"pathvalidate >= 3.2.1",
-"platformdirs >= 4.2.0",
-"pycryptodome >= 3.21.0",
-"PySide6 >= 6.8.1",
-"PySide6_Addons >= 6.8.1",
-"PySide6_Essentials >= 6.8.1",
-"python-dateutil >= 2.9.0.post0",
-"PyYAML >= 6.0.2",
-"requests >= 2.32.3",
-"shellescape >= 3.8.1",
-"shiboken6 >= 6.8.1",
-"six >= 1.17.0",
-"titlecase >= 2.4.1",
-"urllib3 >= 2.2.3"
+    "attrs >= 24.2.0",
+    "certifi >= 2024.8.30",
+    "charset-normalizer >= 3.4.0",
+    "idna >= 3.10",
+    "Naked >= 0.1.32",
+    "numpy >= 1.26.4",
+    "pathvalidate >= 3.2.1",
+    "platformdirs >= 4.2.0",
+    "pycryptodome >= 3.21.0",
+    "PySide6 >= 6.8.1",
+    "PySide6_Addons >= 6.8.1",
+    "PySide6_Essentials >= 6.8.1",
+    "python-dateutil >= 2.9.0.post0",
+    "PyYAML >= 6.0.2",
+    "requests >= 2.32.3",
+    "shellescape >= 3.8.1",
+    "shiboken6 >= 6.8.1",
+    "six >= 1.17.0",
+    "titlecase >= 2.4.1",
+    "urllib3 >= 2.2.3"
 ]
+
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
@@ -49,41 +55,9 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Operating System :: POSIX :: Linux",
-    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
+    "Operating System :: Unix",
+    # License classifier removed as it is now redundant with project.license
 ]
-
-
-[tool.build]
-url = "https://github.com/David-Worboys/QTPYGUI"
-long_description = "README.md"
-long_description_content_type = "text/markdown"
-build-number = "0"
-filename = "{name}-{version}-{build-number}-py3-none-any.whl"
-dependencies = [
-    "appdirs >= 1.4.4",
-"attrs >= 23.2.0",
-"certifi >= 2024.8.30",
-"charset-normalizer >= 3.4.0",
-"fs >= 2.4.16",
-"idna >= 3.10",
-"Naked >= 0.1.32",
-"numpy >= 1.26.4",
-"pathvalidate >= 3.2.1",
-"platformdirs >= 4.2.0",
-"pycryptodome >= 3.21.0",
-"PySide6 >= 6.8.1",
-"PySide6_Addons >= 6.8.1",
-"PySide6_Essentials >= 6.8.1",
-"python-dateutil >= 2.9.0.post0",
-"PyYAML >= 6.0.2",
-"requests >= 2.32.3",
-"shellescape >= 3.8.1",
-"shiboken6 >= 6.8.1",
-"six >= 1.17.0",
-"titlecase >= 2.4.1",
-"urllib3 >= 2.2.3"
-]
-
 
 [project.urls]
 Homepage = "https://github.com/David-Worboys/QTPYGUI"
@@ -93,18 +67,11 @@ Issues = "https://github.com/David-Worboys/QTPYGUI/issues"
 
 [tool.setuptools]
 include-package-data = true
+# Modern way to include license files
+license-files = ["LICENSE.md"]
 
 [tool.setuptools.package-data]
-QTPYGUI = ["*.svg","IBM-Plex-Mono/*.ttf"]
+QTPYGUI = ["*.svg", "IBM-Plex-Mono/*.ttf"]
 
-[tool.build.classifiers]
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Operating System :: Unix"
-]
+[tool.setuptools_scm]
+# Satisfies the warning even if version is managed manually
