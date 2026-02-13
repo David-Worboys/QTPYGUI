@@ -5,13 +5,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "QTPYGUI"
-version = "1.0.4.3"
+version = "1.0.4.4"
 authors = [
-  { name = "David Worboys", email = "davidaworboys@gmail.com"},
+    { name = "David Worboys", email = "davidaworboys@gmail.com" },
 ]
 description = "A Simple Python Declarative User Interface Wrapper Around Pyside6"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 
 # Updated to SPDX expression to resolve deprecation warnings
 license = "GPL-3.0-or-later"
